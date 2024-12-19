@@ -1,8 +1,0 @@
-{
-    "build": {
-      "env": {
-        "DATABASE_URL": "mysql://root:@localhost:3306/rmstti"
-      },
-      "command": "npm run generate && npm run build"
-    }
-  }
