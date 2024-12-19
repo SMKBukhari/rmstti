@@ -1,0 +1,207 @@
+// This is your Prisma schema file for MySQL.
+// Learn more about Prisma Schema at https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model UserProfile {
+  userId              String             @id @unique @default(cuid())
+  fullName            String
+  email               String             @unique
+  password            String
+  ConfirmPassword     String?
+  gender              Gender             @default(Male)
+  contactNumber       String
+  DOB                 DateTime?
+  city                String?
+  country             String?
+  userImage           String?
+  departmentId        String?
+  department          Department?        @relation(fields: [departmentId], references: [id])
+  jobExperience       JobExperience[]
+  education           Education[]
+  resumeUrl           String?
+  resumeName          String?
+  resumePublicId      String?
+  DOJ                 DateTime?
+  workstatusId        String?
+  workstatus          WorkStatus?        @relation(fields: [workstatusId], references: [id])
+  statusId            String?
+  status              Status?            @relation(fields: [statusId], references: [id])
+  applicationStatusId String?
+  applicationStatus   ApplicationStatus? @relation(fields: [applicationStatusId], references: [id])
+  skype               String?
+  linkedIn            String?
+  github              String?
+  twitter             String?
+  facebook            String?
+  instagram           String?
+  behance             String?
+  otpCode             String?
+  otpCodeExpiry       DateTime?
+  resetToken          String?
+  resetTokenExpiry    DateTime?
+  loginSessionToken   String?
+  loginSessionExpiry  DateTime?
+  isVerified          Boolean?           @default(false)
+  roleId              String?
+  role                Role?              @relation(fields: [roleId], references: [id])
+  notifications       Notifications[]
+  skills              Skills[]
+  JobApplications     JobApplications[]
+}
+
+model Role {
+  id        String        @id @unique @default(cuid())
+  name      String        @unique
+  users     UserProfile[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now())
+}
+
+model WorkStatus {
+  id        String        @id @unique @default(cuid())
+  name      String        @unique
+  users     UserProfile[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now())
+}
+
+model Status {
+  id        String        @id @unique @default(cuid())
+  name      String        @unique
+  users     UserProfile[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now())
+}
+
+model ApplicationStatus {
+  id              String            @id @unique @default(cuid())
+  name            String            @unique
+  users           UserProfile[]
+  JobApplications JobApplications[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now())
+}
+
+model JobApplications {
+  id                  String             @id @unique @default(cuid())
+  userId              String
+  user                UserProfile        @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  applicationStatusId String?
+  applicationStatus   ApplicationStatus? @relation(fields: [applicationStatusId], references: [id])
+  coverLetter         String?
+  department          String?
+  resumeUrl           String?
+  resumeName          String?
+  resumePublicId      String?
+  reference           String?
+  referenceContact    String?
+  appliedDate         DateTime?          @default(now())
+  interviewDate       DateTime?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @default(now())
+}
+
+model Department {
+  id        String        @id @unique @default(cuid())
+  name      String        @unique
+  users     UserProfile[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now())
+}
+
+model JobExperience {
+  id               String      @id @unique @default(cuid())
+  userProfileId    String
+  userProfile      UserProfile @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
+  jobTitle         String
+  employmentType   String
+  companyName      String
+  location         String
+  startDate        DateTime?
+  currentlyWorking Boolean?
+  endDate          DateTime?
+  description      String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @default(now())
+
+  @@index([userProfileId], name: "idj_userProfileId")
+}
+
+model Education {
+  id                String      @id @unique @default(cuid())
+  userProfileId     String
+  userProfile       UserProfile @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
+  university        String
+  degree            String
+  fieldOfStudy      String
+  grade             String?
+  startDate         DateTime?
+  currentlyStudying Boolean?    @default(false)
+  endDate           DateTime?
+  description       String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @default(now())
+
+  @@index([userProfileId], name: "ide_userProfileId")
+}
+
+model Skills {
+  id              String      @id @unique @default(cuid())
+  userProfileId   String
+  userProfile     UserProfile @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
+  name            String      @unique
+  experienceLevel String
+}
+
+model Notifications {
+  id          String              @id @unique @default(cuid())
+  userId      String
+  user        UserProfile         @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  title       String
+  message     String
+  createdBy   NotificationCreator
+  senderImage String?
+  link        String?
+  createdAt   DateTime            @default(now())
+  isRead      Boolean             @default(false)
+  type        NotificationType
+}
+
+enum Gender {
+  Male
+  Female
+  Other
+}
+
+enum NotificationType {
+  General
+  Task
+  Event
+  Announcement
+  ProfileUpdate
+  UserCreation
+  Verification
+  RoleChange
+  Alert
+  Achievement
+  Reminder
+  Reward
+  Security
+}
+
+enum NotificationCreator {
+  Applicant
+  Admin
+  CEO
+  Manager
+  Employee
+  Account
+}
