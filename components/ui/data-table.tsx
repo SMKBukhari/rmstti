@@ -70,7 +70,7 @@ export function DataTable<TData, TValue>({
   });
 
   const handleRowClick = (row: TData) => {
-    // Dynamically construct the row link using "routePrefix"
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const link = `/${routePrefix}/${(row as any).id}`;
     router.push(link);
   };

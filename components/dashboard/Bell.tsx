@@ -40,7 +40,7 @@ const BellNotification = ({ user, notifications }: BellNotificationProps) => {
   const onCheckAll = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.patch("/api/user/notifications/checkAll", {
+      await axios.patch("/api/user/notifications/checkAll", {
         userId: user?.userId,
       });
       setRemovedNotifications(unreadNotifications.map((notif) => notif.id));
@@ -62,7 +62,7 @@ const BellNotification = ({ user, notifications }: BellNotificationProps) => {
     try {
       setIsLoading(true);
       // Send notification ID to the backend to mark it as read
-      const response = await axios.patch("/api/user/notifications/checkOne", {
+      await axios.patch("/api/user/notifications/checkOne", {
         notificationId,
       });
       router.refresh();
