@@ -1,16 +1,16 @@
 "use client";
 import { UserProfile } from "@prisma/client";
-import { Worker, Viewer } from "@react-pdf-viewer/core";
-import { pdfjs } from "react-pdf";
-import "@react-pdf-viewer/core/lib/styles/index.css";
+// import { Worker, Viewer } from "@react-pdf-viewer/core";
+// import { pdfjs } from "react-pdf";
+// import "@react-pdf-viewer/core/lib/styles/index.css";
 import { Separator } from "@/components/ui/separator";
 
 interface UserResumeSectionProps {
   user: UserProfile | null;
 }
 
-pdfjs.GlobalWorkerOptions.workerSrc =
-  "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+// pdfjs.GlobalWorkerOptions.workerSrc =
+//   "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
 
 const UserResumeSection = ({ user }: UserResumeSectionProps) => {
   return (
@@ -22,9 +22,10 @@ const UserResumeSection = ({ user }: UserResumeSectionProps) => {
           </h3>
           <Separator />
           {user?.resumeUrl ? (
-            <Worker workerUrl='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js'>
-              <Viewer enableSmoothScroll fileUrl={user?.resumeUrl || ""} />
-            </Worker>
+            // <Worker workerUrl='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js'>
+            //   <Viewer enableSmoothScroll fileUrl={user?.resumeUrl || ""} />
+            // </Worker>
+            <h1>TODO://Resume Show</h1>
           ) : (
             <p className='text-muted-foreground text-base'>
               No resume provided.

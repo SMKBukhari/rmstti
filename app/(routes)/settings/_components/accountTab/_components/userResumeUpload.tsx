@@ -7,9 +7,9 @@ import { File, FilePlus, Loader2, Plus, Trash, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Worker, Viewer } from "@react-pdf-viewer/core";
-import { pdfjs } from "react-pdf";
-import "@react-pdf-viewer/core/lib/styles/index.css";
+// import { Worker, Viewer } from "@react-pdf-viewer/core";
+// import { pdfjs } from "react-pdf";
+// import "@react-pdf-viewer/core/lib/styles/index.css";
 
 // Modal component (can be reused in other components)
 const Modal = ({ isOpen, onClose, children }: any) => {
@@ -31,8 +31,8 @@ const Modal = ({ isOpen, onClose, children }: any) => {
   );
 };
 
-pdfjs.GlobalWorkerOptions.workerSrc =
-  "https://cdn.jsdelivr.net/pnpm/pdfjs-dist@4.9.155/build/pdf.worker.min.js";
+// pdfjs.GlobalWorkerOptions.workerSrc =
+//   "https://cdn.jsdelivr.net/pnpm/pdfjs-dist@4.9.155/build/pdf.worker.min.js";
 
 const UserResumeUpload = ({ user }: { user: UserProfile | null }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -228,9 +228,9 @@ const UserResumeUpload = ({ user }: { user: UserProfile | null }) => {
 
       {/* Modal for PDF Viewer */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <Worker workerUrl='https://cdn.jsdelivr.net/pnpm/pdfjs-dist@4.9.155/build/pdf.worker.min.js'>
+        {/* <Worker workerUrl='https://cdn.jsdelivr.net/pnpm/pdfjs-dist@4.9.155/build/pdf.worker.min.js'>
           <Viewer fileUrl={fileUrl || user?.resumeUrl || ""} />
-        </Worker>
+        </Worker> */}
       </Modal>
     </div>
   );
