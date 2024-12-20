@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { compileOTPMail, sendMail } from "@/lib/emails/mail";
+import Cookies from "js-cookie";
 
 export const POST = async (req: Request) => {
   try {
@@ -94,6 +95,11 @@ export const POST = async (req: Request) => {
         type: "General",
       },
     });
+
+    Cookies.set("userId", user.userId, {
+      expires: 1,
+    });
+
     // if (response?.messageId) {
     //   return NextResponse.json(user, { status: 201 });
     // } else {

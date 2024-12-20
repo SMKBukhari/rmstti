@@ -47,7 +47,7 @@ const SignUpForm = () => {
     try {
       setIsLoading(true);
       const response = await axios.post("/api/user", values);
-      router.push(`/verify/${response.data.userId}`);
+      router.push(`/verify/${response.data.user.userId}`);
       toast.success(
         "Account created successfully, Please First Verify Your Email."
       );
