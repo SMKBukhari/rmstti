@@ -33,22 +33,25 @@ const Navbar = async () => {
         select: {
           fullName: true,
           userImage: true,
-        }
-      }
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
-    }
+    },
   });
-  
 
   return (
-    <div className='p-4 md:py-10 md:px-6 border-b h-full flex items-center bg-[#FFFFFF]/95 dark:bg-[#0A0A0Ad0]/95 backdrop-blur-sm rounded-xl'>
-      {/* Mobile Routes */}
-      <MobileSidebar />
+    <div className='flex h-20 items-center justify-between gap-x-4 py-5 sm:gap-x-6'>
+      {/* Mobile menu button - Only visible on smaller screens */}
+      <div className='flex xl:hidden'>
+        <MobileSidebar />
+      </div>
 
-      {/* Sidebar Routes */}
-      <NavbarRoutes userProfile={user} notifications={notifications} />
+      {/* Center content */}
+      <div className='flex flex-1 items-center justify-end gap-x-4 sm:gap-x-6'>
+        <NavbarRoutes userProfile={user} notifications={notifications} />
+      </div>
     </div>
   );
 };

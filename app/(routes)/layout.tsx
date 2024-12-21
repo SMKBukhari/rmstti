@@ -15,32 +15,36 @@ const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
   const user = await db.userProfile.findUnique({
     where: {
       userId: userId,
-    }
+    },
   });
 
   if (!user) {
     redirect("/signIn");
   }
-  
 
   return (
-    <div className="h-full" suppressHydrationWarning>
-      {/* Header with backdrop blur effect */}
-      <header className="h-20 xl:ml-24 fixed inset-x-0 top-0 pt-5 z-50 flex justify-center w-full bg-[#f1f1f1d0] dark:bg-[#1A1A1Ad0] backdrop-blur-sm rounded-md">
-        <div className="w-full max-w-[1400px] px-4 rounded-md">
-          <Navbar />
-        </div>
-      </header>
-
-      {/* Sidebar (visible on xl and larger screens) */}
-      <div className="hidden xl:block w-56 flex-col fixed inset-y-0 z-50">
+    <div className='min-h-screen'>
+      {/* Sidebar - Hidden on mobile, visible on xl screens */}
+      <div className='hidden xl:fixed xl:inset-y-0 xl:flex xl:w-52 xl:flex-col'>
         <Sidebar />
       </div>
 
-      {/* Main content */}
-      <main className="pt-24 xl:ml-48 h-full mt-1 md:mt-6 flex justify-center">
-        <div className="w-full max-w-[1400px] mx-auto px-4">{children}</div>
-      </main>
+      {/* Main content area */}
+      <div className='xl:pl-52'>
+        {/* Sticky header */}
+        <header className='sticky top-0 z-40 flex h-20 shrink-0 items-center gap-x-4 border-b bg-background px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8'>
+          <div className='w-full max-w-7xl mx-auto'>
+            <Navbar />
+          </div>
+        </header>
+
+        {/* Main content */}
+        <main className='py-6 lg:py-8'>
+          <div className='px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto'>
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 };
