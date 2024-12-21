@@ -1,8 +1,5 @@
 import { db } from "@/lib/db";
-import {
-  compileInterviewScheduledMail,
-  sendMail,
-} from "@/lib/emails/mail";
+import { compileInterviewScheduledMail, sendMail } from "@/lib/emails/mail";
 import { NotificationCreator, NotificationType } from "@prisma/client";
 import { format } from "date-fns";
 import { NextResponse } from "next/server";
@@ -12,7 +9,7 @@ export const POST = async (
   { params }: { params: { userId: string } }
 ) => {
   try {
-    const { userId } = await params;
+    const { userId } = params;
     const { interviewDateTime, applicantId } = await req.json();
 
     // Get the user profile
@@ -137,6 +134,7 @@ export const POST = async (
             name: "Interviewed",
           },
         },
+        currentJobApplicationId: jobApplication.id,
         role: {
           connect: {
             name: "Interviewee",

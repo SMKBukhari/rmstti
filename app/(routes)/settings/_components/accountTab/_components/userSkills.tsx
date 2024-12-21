@@ -21,7 +21,7 @@ import { UserSkills } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Skills, UserProfile } from "@prisma/client";
 import axios from "axios";
-import { Edit, Loader2, Plus, X } from "lucide-react";
+import { Loader2, Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -52,15 +52,6 @@ const UserSkillss = ({ user }: AccountTabUserSkillsProps) => {
     resolver: zodResolver(UserSkills),
   });
 
-  const startEditing = (skillId: string) => {
-    setEditingSkillId(skillId);
-    const skill = user?.skills?.find((skill) => skill.id === skillId);
-    if (skill) {
-      form.setValue("name", skill.name);
-      form.setValue("experienceLevel", skill.experienceLevel);
-    }
-  };
-
   const cancelEditing = () => {
     setEditingSkillId(null); // Clear the editing experience ID
   };
@@ -70,11 +61,11 @@ const UserSkillss = ({ user }: AccountTabUserSkillsProps) => {
   const onSubmit = async (values: z.infer<typeof UserSkills>) => {
     try {
       setIsLoading(true);
-      const response = await axios.post(
+      await axios.post(
         `/api/user/${user?.userId}/userSkills`,
         { skills: [values] }
       );
-      toast.success(`Skill added successfully to ${user?.fullName}.`);
+      toast.success(`New Skill added.`);
       toggleEditing()
       router.refresh();
     } catch (error: unknown) {
@@ -93,7 +84,7 @@ const UserSkillss = ({ user }: AccountTabUserSkillsProps) => {
   const saveSkill = async (values: z.infer<typeof UserSkills>) => {
     try {
       // Update existing experience via API call
-      const response = await axios.patch(
+      await axios.patch(
         `/api/user/${user?.userId}/userSkills/${editingSkillId}`,
         { skills: [values] }
       );

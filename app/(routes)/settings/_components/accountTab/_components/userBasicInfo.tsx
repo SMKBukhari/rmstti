@@ -66,7 +66,7 @@ const UserBasicInfo = ({ user }: AccountTabUserInfoProps) => {
   const onSubmit = async (values: z.infer<typeof UserBasicInfor>) => {
     try {
       setIsLoading(true);
-      const response = await axios.patch(
+      await axios.patch(
         `/api/user/${user?.userId}/updateUser`,
         values
       );

@@ -63,6 +63,8 @@ const roleSeed = async () => {
     await database.role.createMany({
       data: [
         { name: "User" },
+        { name: "Applicant" },
+        { name: "Interviewee" },
         { name: "Admin" },
         { name: "Manager" },
         { name: "Employee" },

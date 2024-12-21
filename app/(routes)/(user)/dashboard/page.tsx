@@ -5,6 +5,7 @@ import React from "react";
 import UserBannerSuccess from "./_components/userBannerSuccess";
 import UserBannerWarning from "./_components/userBannerWarning";
 import ApplicantBanner from "./_components/applicantBanner";
+import ApplicantInterviewBanner from "./_components/applicantInterviewDateBanner";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -30,6 +31,12 @@ const page = async () => {
     },
   });
 
+  const jobApplications = await db.jobApplications.findMany({
+    where: {
+      id: user?.currentJobApplicationId || "",
+    },
+  });
+
   if (user?.isVerified === false) {
     redirect(`/verify/${userId}`);
   }
@@ -47,10 +54,13 @@ const page = async () => {
 
   const userRole = user?.role?.name === "User";
   const applicantRole = user?.role?.name === "Applicant";
+  const intervieweeRole = user?.role?.name === "Interviewee";
 
   const totalFields = requiredFieldsForApply.length;
   const completedFields = requiredFieldsForApply.filter(Boolean).length;
   const isComplete = requiredFieldsForApply.every(Boolean);
+
+  const interviewDateTime = jobApplications[0]?.interviewDate;
 
   return (
     <div>
@@ -62,6 +72,7 @@ const page = async () => {
         ))}
 
       {applicantRole && <ApplicantBanner />}
+      {intervieweeRole && <ApplicantInterviewBanner interviewDateTime={interviewDateTime} />}
 
       <h1>Dashboard</h1>
       <p>Welcome to your dashboard</p>

@@ -71,7 +71,7 @@ const UserEducation = ({ user }: AccouuntTabUserEducationProps) => {
 
   const onSubmit = async (values: z.infer<typeof UserEducations>) => {
     try {
-      const response = await axios.post(
+      await axios.post(
         `/api/user/${user?.userId}/userEducations`,
         // create values not iterable
         { educations: [values] }
@@ -93,7 +93,7 @@ const UserEducation = ({ user }: AccouuntTabUserEducationProps) => {
   const saveEducation = async (values: z.infer<typeof UserEducations>) => {
     try {
       // Update existing experience via API call
-      const response = await axios.patch(
+      await axios.patch(
         `/api/user/${user?.userId}/userEducations/${editingEducationId}`,
         { educations: values }
       );
@@ -118,7 +118,7 @@ const UserEducation = ({ user }: AccouuntTabUserEducationProps) => {
       await axios.delete(
         `/api/user/${user?.userId}/userEducations/${education.id}`
       );
-      toast.success("Education Detail deleted successfully.");
+      toast.success(`Your Education Detail (${education.university} - ${education.degree}) deleted successfully.`);
       router.refresh();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {

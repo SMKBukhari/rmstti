@@ -5,14 +5,20 @@ import { UserProfile } from "@prisma/client";
 import axios, { AxiosProgressEvent } from "axios";
 import { File, FilePlus, Loader2, Plus, Trash, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 // import { Worker, Viewer } from "@react-pdf-viewer/core";
 // import { pdfjs } from "react-pdf";
 // import "@react-pdf-viewer/core/lib/styles/index.css";
 
+type Modal = {
+  isOpen: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+};
+
 // Modal component (can be reused in other components)
-const Modal = ({ isOpen, onClose, children }: any) => {
+const Modal = ({ isOpen, onClose, children }: Modal) => {
   if (!isOpen) return null;
 
   return (
@@ -31,16 +37,15 @@ const Modal = ({ isOpen, onClose, children }: any) => {
   );
 };
 
-// pdfjs.GlobalWorkerOptions.workerSrc =
-//   "https://cdn.jsdelivr.net/pnpm/pdfjs-dist@4.9.155/build/pdf.worker.min.js";
-
 const UserResumeUpload = ({ user }: { user: UserProfile | null }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isResumeLoading, setIsResumeLoading] = useState(true);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [iframeUrl, setIframeUrl] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
   const router = useRouter();
 
@@ -114,6 +119,21 @@ const UserResumeUpload = ({ user }: { user: UserProfile | null }) => {
       setIsLoading(false);
       router.refresh();
     }
+  };
+
+  useEffect(() => {
+    setIsResumeLoading(true);
+    if (fileUrl || user?.resumeUrl || "".includes("cloudinary.com")) {
+      setIframeUrl(
+        `${fileUrl || user?.resumeUrl || ""}#toolbar=0&navpanes=0&scrollbar=0`
+      );
+    } else {
+      setIframeUrl(fileUrl || user?.resumeUrl || "");
+    }
+  }, [user?.resumeUrl, fileUrl]);
+
+  const handleIframeLoad = () => {
+    setIsResumeLoading(false);
   };
 
   return (
@@ -231,9 +251,22 @@ const UserResumeUpload = ({ user }: { user: UserProfile | null }) => {
         {/* <Worker workerUrl='https://cdn.jsdelivr.net/pnpm/pdfjs-dist@4.9.155/build/pdf.worker.min.js'>
           <Viewer fileUrl={fileUrl || user?.resumeUrl || ""} />
         </Worker> */}
-        <h1>
-          TODO: Implement Resume View
-        </h1>
+        {isResumeLoading && (
+          <div className='absolute inset-0 flex items-center justify-center bg-gray-100'>
+            <div className='text-center'>
+              <Loader2 className='w-10 h-10 animate-spin text-blue-500 mx-auto' />
+              <p className='mt-2 text-gray-600'>Loading PDF...</p>
+            </div>
+          </div>
+        )}
+        {iframeUrl && (
+          <iframe
+            src={iframeUrl}
+            className='w-full h-full border-none'
+            title='PDF Preview'
+            onLoad={handleIframeLoad}
+          />
+        )}
       </Modal>
     </div>
   );

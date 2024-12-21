@@ -11,50 +11,51 @@ datasource db {
 }
 
 model UserProfile {
-  userId              String             @id @unique @default(cuid())
-  fullName            String
-  email               String             @unique
-  password            String
-  ConfirmPassword     String?
-  gender              Gender             @default(Male)
-  contactNumber       String
-  DOB                 DateTime?
-  city                String?
-  country             String?
-  userImage           String?
-  departmentId        String?
-  department          Department?        @relation(fields: [departmentId], references: [id])
-  jobExperience       JobExperience[]
-  education           Education[]
-  resumeUrl           String?
-  resumeName          String?
-  resumePublicId      String?
-  DOJ                 DateTime?
-  workstatusId        String?
-  workstatus          WorkStatus?        @relation(fields: [workstatusId], references: [id])
-  statusId            String?
-  status              Status?            @relation(fields: [statusId], references: [id])
-  applicationStatusId String?
-  applicationStatus   ApplicationStatus? @relation(fields: [applicationStatusId], references: [id])
-  skype               String?
-  linkedIn            String?
-  github              String?
-  twitter             String?
-  facebook            String?
-  instagram           String?
-  behance             String?
-  otpCode             String?
-  otpCodeExpiry       DateTime?
-  resetToken          String?
-  resetTokenExpiry    DateTime?
-  loginSessionToken   String?
-  loginSessionExpiry  DateTime?
-  isVerified          Boolean?           @default(false)
-  roleId              String?
-  role                Role?              @relation(fields: [roleId], references: [id])
-  notifications       Notifications[]
-  skills              Skills[]
-  JobApplications     JobApplications[]
+  userId                  String             @id @unique @default(cuid())
+  fullName                String
+  email                   String             @unique
+  password                String
+  ConfirmPassword         String?
+  gender                  Gender             @default(Male)
+  contactNumber           String
+  DOB                     DateTime?
+  city                    String?
+  country                 String?
+  userImage               String?
+  departmentId            String?
+  department              Department?        @relation(fields: [departmentId], references: [id])
+  jobExperience           JobExperience[]
+  education               Education[]
+  resumeUrl               String?
+  resumeName              String?
+  resumePublicId          String?
+  DOJ                     DateTime?
+  workstatusId            String?
+  workstatus              WorkStatus?        @relation(fields: [workstatusId], references: [id])
+  statusId                String?
+  status                  Status?            @relation(fields: [statusId], references: [id])
+  applicationStatusId     String?
+  applicationStatus       ApplicationStatus? @relation(fields: [applicationStatusId], references: [id])
+  skype                   String?
+  linkedIn                String?
+  github                  String?
+  twitter                 String?
+  facebook                String?
+  instagram               String?
+  behance                 String?
+  otpCode                 String?
+  otpCodeExpiry           DateTime?
+  resetToken              String?
+  resetTokenExpiry        DateTime?
+  loginSessionToken       String?
+  loginSessionExpiry      DateTime?
+  isVerified              Boolean?           @default(false)
+  roleId                  String?
+  role                    Role?              @relation(fields: [roleId], references: [id])
+  notifications           Notifications[]
+  skills                  Skills[]
+  JobApplications         JobApplications[]
+  currentJobApplicationId String?
 }
 
 model Role {

@@ -50,13 +50,8 @@ const SocialLinls = ({ user }: AccountTabSocialLinksProps) => {
   const onSubmit = async (values: z.infer<typeof UserSocialLinks>) => {
     try {
       setIsLoading(true);
-      const response = await axios.patch(
-        `/api/user/${user?.userId}/updateUser`,
-        values
-      );
-      toast.success(
-        `${response.data.fullName} Your profile updated successfully."`
-      );
+      await axios.patch(`/api/user/${user?.userId}/updateUser`, values);
+      toast.success(`${user?.fullName} Your profile updated successfully."`);
       router.refresh();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -113,7 +108,7 @@ const SocialLinls = ({ user }: AccountTabSocialLinksProps) => {
               )}
             />
           </div>
-          
+
           <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
             <FormField
               control={form.control}
@@ -150,7 +145,7 @@ const SocialLinls = ({ user }: AccountTabSocialLinksProps) => {
               )}
             />
           </div>
-          
+
           <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
             <FormField
               control={form.control}
@@ -187,7 +182,7 @@ const SocialLinls = ({ user }: AccountTabSocialLinksProps) => {
               )}
             />
           </div>
-          
+
           <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
             <FormField
               control={form.control}
@@ -207,7 +202,7 @@ const SocialLinls = ({ user }: AccountTabSocialLinksProps) => {
               )}
             />
           </div>
-          
+
           <div className='flex w-full'>
             <Button
               variant={"primary"}

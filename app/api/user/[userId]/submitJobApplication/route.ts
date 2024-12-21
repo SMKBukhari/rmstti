@@ -8,7 +8,7 @@ export const POST = async (
   { params }: { params: { userId: string } }
 ) => {
   try {
-    const { userId } = await params;
+    const { userId } = params;
     const { department, coverLetter, reference, referenceContact } =
       await req.json();
 
@@ -26,21 +26,35 @@ export const POST = async (
       where: { name: "Applied" },
     });
 
-    const admins = await db.userProfile.findMany({
-      where: {
-        role: {
-          name: "Admin",
-        },
-      },
+    if (!applicationStatus) {
+      return new NextResponse("Application status not found", { status: 404 });
+    }
+
+    // Find the "Applicant" role
+    const applicantRole = await db.role.findFirst({
+      where: { name: "Applicant" },
     });
 
-    const ceo = await db.userProfile.findMany({
-      where: {
-        role: {
-          name: "CEO",
+    if (!applicantRole) {
+      return new NextResponse("Applicant role not found", { status: 404 });
+    }
+
+    const [admins, ceo] = await Promise.all([
+      db.userProfile.findMany({
+        where: {
+          role: {
+            name: "Admin",
+          },
         },
-      },
-    });
+      }),
+      db.userProfile.findMany({
+        where: {
+          role: {
+            name: "CEO",
+          },
+        },
+      }),
+    ]);
 
     const notifications = [
       {
@@ -49,7 +63,7 @@ export const POST = async (
         message: `Your job application has been submitted for ${
           department || "IT Department"
         } successfully.`,
-        createdBy: NotificationCreator.Account, // Notification from the system.
+        createdBy: NotificationCreator.Account,
         type: NotificationType.General,
       },
       ...ceo.map((ceo) => ({
@@ -58,7 +72,7 @@ export const POST = async (
         message: `A new job application has been submitted by ${
           user.fullName
         } for ${department || "IT Department"}.`,
-        createdBy: NotificationCreator.Applicant, // Notification from the system.
+        createdBy: NotificationCreator.Applicant,
         senderImage: user.userImage,
         link: `/admin/applicants/${user.userId}`,
         type: NotificationType.General,
@@ -69,73 +83,62 @@ export const POST = async (
         message: `A new job application has been submitted by ${
           user.fullName
         } for ${department || "IT Department"}.`,
-        createdBy: NotificationCreator.Applicant, // Notification from the system.
+        createdBy: NotificationCreator.Applicant,
         senderImage: user.userImage,
         link: `/admin/applicants/${user.userId}`,
         type: NotificationType.General,
       })),
     ];
 
-    // Create the job application entry
-    const jobApplication = await db.jobApplications.create({
-      data: {
-        userId: user.userId,
-        applicationStatusId: applicationStatus?.id,
-        resumeName: user.resumeName,
-        resumeUrl: user.resumeUrl,
-        resumePublicId: user.resumePublicId,
-        coverLetter: coverLetter || "",
-        department: department || "IT Department",
-        reference: reference || "",
-        referenceContact: referenceContact || "",
-      },
-    });
-
-    await db.notifications.createMany({
-      data: notifications,
-    });
-
-    await db.userProfile.update({
-      where: {
-        userId: user.userId,
-      },
-      data: {
-        applicationStatus: {
-          connect: {
-            name: "Applied",
-          },
+    // Use a transaction to ensure all database operations succeed or fail together
+    const [jobApplication, updatedUser] = await db.$transaction([
+      db.jobApplications.create({
+        data: {
+          userId: user.userId,
+          applicationStatusId: applicationStatus.id,
+          resumeName: user.resumeName,
+          resumeUrl: user.resumeUrl,
+          resumePublicId: user.resumePublicId,
+          coverLetter: coverLetter || "",
+          department: department || "IT Department",
+          reference: reference || "",
+          referenceContact: referenceContact || "",
         },
-        role: {
-          connect: {
-            name: "Applicant",
-          },
+      }),
+      db.notifications.createMany({
+        data: notifications,
+      }),
+      db.userProfile.update({
+        where: {
+          userId: user.userId,
         },
-      },
-    });
+        data: {
+          applicationStatusId: applicationStatus.id,
+          roleId: applicantRole.id,
+        },
+      }),
+    ]);
 
     const emailBody = await compileApplicationReceivedMail(user.fullName);
-    const response = await sendMail({
+    const emailResponse = await sendMail({
       to: user.email,
       subject: "Application Received (The Truth International)",
       body: emailBody,
     });
 
-    // if (!response?.messageId) {
-    //   return NextResponse.json({
-    //     message: "Notifications updated successfully.",
-    //     jobApplication,
-    //   });
-    // } else {
-    //   return new NextResponse("Failed to send email", { status: 500 });
-    // }
+    if (!emailResponse?.messageId) {
+      console.warn("Email sending failed, but application was submitted successfully.");
+    }
 
     return NextResponse.json({
-      message: "Notifications updated successfully.",
+      message: "Application submitted successfully and user role updated to Applicant.",
       jobApplication,
-      response,
+      updatedUser,
+      emailSent: !!emailResponse?.messageId,
     });
   } catch (error) {
     console.error(`SUBMIT_RESUME_POST: ${error}`);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 };
+

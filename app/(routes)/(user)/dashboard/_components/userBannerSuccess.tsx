@@ -19,6 +19,7 @@ interface UserBannerSuccessProps {
 
 const UserBannerSuccess = ({ label, user }: UserBannerSuccessProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const openDialog = () => {
@@ -42,18 +43,20 @@ const UserBannerSuccess = ({ label, user }: UserBannerSuccessProps) => {
 
   const onSubmit = async (values: z.infer<typeof JobApplicationSchema>) => {
     try {
-      const response = await axios.post(
+      setIsLoading(true);
+      await axios.post(
         `/api/user/${user?.userId}/submitJobApplication`,
-        values
+        {...values}
       );
       toast.success(
         `${user?.fullName} Your application has been submitted successfully.`
       );
       closeDialog();
       router.refresh();
-      if (typeof window !== "undefined") {
-        window.location.reload();
-      }
+      // if (typeof window !== "undefined") {
+      //   window.location.reload();
+      // }
+      setIsLoading(false);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         if (error.response && error.response.data) {
@@ -64,6 +67,7 @@ const UserBannerSuccess = ({ label, user }: UserBannerSuccessProps) => {
       }
     } finally {
       setIsDialogOpen(false);
+      setIsLoading(false);
     }
   };
   return (
@@ -127,6 +131,7 @@ const UserBannerSuccess = ({ label, user }: UserBannerSuccessProps) => {
             label: "Submit",
             type: "submit",
             variant: "primary",
+            isLoading: isLoading,
           },
           {
             label: "Cancel",

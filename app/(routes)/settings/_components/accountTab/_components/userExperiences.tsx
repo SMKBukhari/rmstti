@@ -72,7 +72,7 @@ const UserExperiences = ({ user }: AccountTabUserExperiencesProps) => {
 
   const onSubmit = async (values: z.infer<typeof UserExperience>) => {
     try {
-      const response = await axios.post(
+      await axios.post(
         `/api/user/${user?.userId}/userExperiences`,
         // create values not iterable
         { jobExperience: [values] }
@@ -94,7 +94,7 @@ const UserExperiences = ({ user }: AccountTabUserExperiencesProps) => {
   const saveExperience = async (values: z.infer<typeof UserExperience>) => {
     try {
       // Update existing experience via API call
-      const response = await axios.patch(
+      await axios.patch(
         `/api/user/${user?.userId}/userExperiences/${editingExperienceId}`,
         { jobExperience: values }
       );
@@ -119,7 +119,7 @@ const UserExperiences = ({ user }: AccountTabUserExperiencesProps) => {
       await axios.delete(
         `/api/user/${user?.userId}/userExperiences/${jobExperience.id}`
       );
-      toast.success("Experience Detail deleted successfully.");
+      toast.success(`Your Experience Detail (${jobExperience.companyName} - ${jobExperience.jobTitle}) deleted successfully.`);
       router.refresh();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {

@@ -20,7 +20,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar } from "@/components/ui/calendar";
+// import { Calendar } from "@/components/ui/calendar";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/style.css";
 import ComboBox from "@/components/ui/combo-box";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { FieldValues, Path, UseFormReturn } from "react-hook-form";
@@ -120,7 +122,7 @@ const DialogForm = <T extends FieldValues>({
                                 className='w-auto p-0'
                                 align='start'
                               >
-                                <Calendar
+                                {/* <Calendar
                                   mode='single'
                                   selected={innerField.value}
                                   onSelect={innerField.onChange}
@@ -129,8 +131,22 @@ const DialogForm = <T extends FieldValues>({
                                     today.setHours(0, 0, 0, 0);
                                     return date < today;
                                   }}
-                                  initialFocus
-                                />
+                                  autoFocus
+                                /> */}
+                                <div className='p-4'>
+                                  <DayPicker
+                                    mode='single'
+                                    captionLayout="dropdown"
+                                    selected={innerField.value}
+                                    onSelect={innerField.onChange}
+                                    disabled={(date: Date) => {
+                                      const today = new Date();
+                                      today.setHours(0, 0, 0, 0);
+                                      return date < today;
+                                    }}
+                                    autoFocus
+                                  />
+                                </div>
                                 <div className='p-3 border-t border-border'>
                                   <TimePicker12
                                     setDate={innerField.onChange}
