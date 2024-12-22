@@ -92,22 +92,39 @@ model ApplicationStatus {
 }
 
 model JobApplications {
-  id                  String             @id @unique @default(cuid())
-  userId              String
-  user                UserProfile        @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  applicationStatusId String?
-  applicationStatus   ApplicationStatus? @relation(fields: [applicationStatusId], references: [id])
-  coverLetter         String?
-  department          String?
-  resumeUrl           String?
-  resumeName          String?
-  resumePublicId      String?
-  reference           String?
-  referenceContact    String?
-  appliedDate         DateTime?          @default(now())
-  interviewDate       DateTime?
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @default(now())
+  id                     String             @id @unique @default(cuid())
+  userId                 String
+  user                   UserProfile        @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  applicationStatusId    String?
+  applicationStatus      ApplicationStatus? @relation(fields: [applicationStatusId], references: [id])
+  coverLetter            String?
+  department             String?
+  resumeUrl              String?
+  resumeName             String?
+  resumePublicId         String?
+  reference              String?
+  referenceContact       String?
+  appliedDate            DateTime?          @default(now())
+  interviewDate          DateTime?
+  isInterviewed          Boolean?           @default(false)
+  appearance             String?
+  communication          String?
+  reasoning              String?
+  education              String?
+  jobKnowledge           String?
+  workExperience         String?
+  generalKnowledge       String?
+  iq                     String?
+  pose                   String?
+  personality            String?
+  salaryExpectation      String?
+  strengths              String?
+  weaknesses             String?
+  remarks                String?
+  interviewerName        String?
+  interviewerDesignation String?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @default(now())
 }
 
 model Department {

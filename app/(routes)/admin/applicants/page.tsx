@@ -44,6 +44,7 @@ const ApplicantsPage = async () => {
       appliedAt: applicant.appliedDate
         ? format(new Date(applicant.appliedDate), "MMMM do, yyyy")
         : "N/A",
+      department: applicant.department ?? "N/A",
       userImage: applicant.user?.userImage ?? "N/A",
     })
   );

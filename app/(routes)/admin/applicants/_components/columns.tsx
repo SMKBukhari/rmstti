@@ -16,28 +16,10 @@ export type ApplicantsColumns = {
   contact: string;
   appliedAt: string;
   userImage: string;
+  department: string;
 };
 
 export const columns: ColumnDef<ApplicantsColumns>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <input
-        type='checkbox'
-        checked={table.getIsAllRowsSelected()}
-        onChange={table.getToggleAllRowsSelectedHandler()}
-        aria-label='Select all rows'
-      />
-    ),
-    cell: ({ row }) => (
-      <input
-        type='checkbox'
-        checked={row.getIsSelected()}
-        onChange={row.getToggleSelectedHandler()}
-        aria-label='Select row'
-      />
-    ),
-  },
   {
     accessorKey: "userImage",
     header: "",
@@ -68,6 +50,10 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
   {
     accessorKey: "contact",
     header: "Contact",
+  },
+  {
+    accessorKey: "department",
+    header: "Application For",
   },
   {
     accessorKey: "appliedAt",

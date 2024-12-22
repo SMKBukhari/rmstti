@@ -4,11 +4,28 @@ import { db } from "@/lib/db";
 import React from "react";
 import { ApplicantsColumns, columns } from "./_components/columns";
 import { format } from "date-fns";
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
 const IntervieweePage = async () => {
+  const cookieStore = cookies();
+  const userId = (await cookieStore).get("userId")?.value;
+
+  if (!userId) {
+    redirect("/signIn");
+  }
+  
   const applicationStatus = await db.applicationStatus.findFirst({
     where: { name: "Interviewed" },
   });
+
+
+  const user = await db.userProfile.findUnique({
+    where: {
+      userId: userId,
+    },
+  });
+
   const interviewees = await db.jobApplications.findMany({
     where: {
       applicationStatusId: applicationStatus?.id,
@@ -21,16 +38,18 @@ const IntervieweePage = async () => {
   // Formatting the applicants data for the table
   const formattedApplicants: ApplicantsColumns[] = interviewees.map(
     (interviewee) => ({
-      id: interviewee.user.userId,
+      user: user,
+      id: interviewee?.user?.userId ?? "N/A",
       fullName: interviewee.user?.fullName ?? "N/A",
       email: interviewee.user?.email ?? "N/A",
       contact: interviewee.user?.contactNumber ?? "N/A",
-      appliedAt: interviewee.interviewDate
+      interviewDate: interviewee.interviewDate
         ? format(new Date(interviewee.interviewDate), "MMMM do, yyyy")
         : "N/A",
       resume: interviewee.user?.resumeUrl ?? "N/A",
       resumeName: interviewee.user?.resumeName ?? "N/A",
       userImage: interviewee.user?.userImage ?? "N/A",
+      department: interviewee.department ?? "N/A",
     })
   );
 
@@ -45,6 +64,7 @@ const IntervieweePage = async () => {
           columns={columns}
           data={formattedApplicants}
           searchKey='fullName'
+          routePrefix='admin/interviewees'
         />
       </div>
     </div>

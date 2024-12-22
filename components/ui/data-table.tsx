@@ -31,11 +31,6 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   searchKey: string;
   routePrefix?: string;
-  onAction?: (actions: string[], ids: string[]) => void;
-  actions?: Array<{
-    label: string;
-    action: (selectedIds: string[]) => void;
-  }>;
 }
 
 export function DataTable<TData, TValue>({
@@ -75,10 +70,6 @@ export function DataTable<TData, TValue>({
       const link = `/${routePrefix}/${(row as any).id}`;
       router.push(link);
     }
-  };
-
-  const handleBulkAction = () => {
-    console.log("Selected rows:", Object.keys(rowSelection));
   };
 
   return (
@@ -150,14 +141,6 @@ export function DataTable<TData, TValue>({
       </div>
 
       <div className='flex items-center justify-end space-x-2 py-4'>
-        <Button
-          variant='outline'
-          size='sm'
-          onClick={handleBulkAction}
-          disabled={Object.keys(rowSelection).length === 0}
-        >
-          Perform Bulk Action
-        </Button>
         <Button
           variant='outline'
           size='sm'

@@ -1,91 +1,322 @@
 "use client";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { BadgeCheck, BadgeX, Calendar, Eye, Loader, MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import Link from "next/link";
+import { Loader2 } from "lucide-react";
+import DialogForm from "@/components/DialogForm";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { InterviewRatingFormSchema } from "@/schemas";
+import { UserProfile } from "@prisma/client";
 
 interface CellActionsProps {
+  user: UserProfile | null;
   id: string;
   fullName: string;
   email: string;
+  appliedFor: string;
 }
 
-const CellActions = ({ id, fullName, email }: CellActionsProps) => {
+const CellActions = ({
+  user,
+  id,
+  fullName,
+  email,
+  appliedFor,
+}: CellActionsProps) => {
+  const [isDialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const [isRejection, setIsRejection] = useState(false);
 
-  const sendSelected = async () => {
-    setIsLoading(true);
+  const form = useForm<z.infer<typeof InterviewRatingFormSchema>>({
+    resolver: zodResolver(InterviewRatingFormSchema),
+    defaultValues: {
+      candidateName: fullName,
+      personality: "0",
+      appearance: "0",
+      communication: "0",
+      reasoning: "0",
+      education: "0",
+      jobKnowledge: "0",
+      workExperience: "0",
+      generalKnowledge: "0",
+      iq: "0",
+      pose: "0",
+      salaryExpectations: "",
+      strengths: "",
+      weaknesses: "",
+      remarks: "",
+      interviewDate: new Date(),
+      positionApplied: appliedFor,
+    },
+  });
+
+  const onSubmit = async (data: z.infer<typeof InterviewRatingFormSchema>) => {
     try {
-      await axios.post("/api/sendSelected", { email, fullName });
-      toast.success("Email sent successfully");
+      setIsLoading(true);
+      await axios.post(`/api/user/${user?.userId}/interviewRatingForm`, {
+        id,
+        ...data,
+      });
+      console.log(data);
+      toast.success(`Interview updated successfully for ${fullName}.`);
+      setDialogOpen(false);
       setIsLoading(false);
+      router.refresh();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
-        console.error(error.response?.data);
-        toast.error("Failed to send email");
+        if (error.response && error.response.data) {
+          toast.error(error.response.data);
+        } else {
+          toast.error("An unexpected error occurred. Please try again.");
+        }
       }
+    } finally {
+      setDialogOpen(false);
+      setIsLoading(false);
     }
   };
 
-  const Rejected = async () => {
-    setIsRejection(true);
+  const onReject = async () => {
     try {
-      await axios.post("/api/sendRejected", { email, fullName });
-      toast.success("Email sent successfully");
-      setIsLoading(false);
+      setIsRejection(true);
+      await axios.post(`/api/user/${user?.userId}/rejectJobApplication`, {
+        applicantId: id,
+        notifcationTitle: "Application Rejected",
+        notificationMessage:
+          "Your Application has been rejected. Please try again later.",
+      });
+      toast.success(`Applicant ${fullName} rejected successfully.`);
+      router.refresh();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
-        console.error(error.response?.data);
-        toast.error("Failed to send email");
+        if (error.response && error.response.data) {
+          toast.error(error.response.data);
+        } else {
+          toast.error("An unexpected error occurred. Please try again.");
+        }
       }
+    } finally {
+      setIsRejection(false);
     }
   };
+
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent the click from bubbling up to the row
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button size={"icon"} variant={"ghost"}>
-          <MoreHorizontal className='h-4 w-4' />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <Link href={`/admin/applicants/${id}`}>
-          <DropdownMenuItem>
-            <Eye className='w-10 h-10 mr-2 text-[#ffff]' />
-            View
-          </DropdownMenuItem>
-        </Link>
+    <div className='flex gap-3' onClick={handleButtonClick}>
+      <Button
+        variant={"outline"}
+        className='bg-transparent dark:border-white border-black'
+        onClick={() => setDialogOpen(true)}
+      >
         {isLoading ? (
-          <DropdownMenuItem>
-            <Loader className='w-4 h-4 animate-spin dark:text-[#1034ff] text-[#295B81]' />
-          </DropdownMenuItem>
+          <Loader2 className='w-4 h-4 animate-spin dark:text-[#1034ff] text-[#295B81]' />
         ) : (
-          <DropdownMenuItem onClick={sendSelected}>
-            <Calendar className='w-10 h-10 mr-2 text-[#ffff]' />
-            Interview
-          </DropdownMenuItem>
+          <span>Interview</span>
         )}
-
+      </Button>
+      <Button variant={"destructive"} onClick={onReject}>
         {isRejection ? (
-          <DropdownMenuItem>
-            <Loader className='w-4 h-4 animate-spin dark:text-[#1034ff] text-[#295B81]' />
-          </DropdownMenuItem>
+          <Loader2 className='w-4 h-4 animate-spin' />
         ) : (
-          <DropdownMenuItem onClick={Rejected}>
-            <BadgeX className='w-10 h-10 mr-2 dark:text-[#ff816b] text-[#d31510]' />
-            Rejected
-          </DropdownMenuItem>
+          <span>Reject</span>
         )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </Button>
+
+      <DialogForm
+        isOpen={isDialogOpen}
+        onOpenChange={setDialogOpen}
+        title='Interview Rating Form'
+        description='Fill out the interview rating form for the applicant.'
+        fields={[
+          {
+            name: "candidateName",
+            label: "Candidate Name",
+            placeholder: "Enter candidate name",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "interviewDate",
+            label: "Interview Date",
+            type: "date",
+          },
+          {
+            name: "positionApplied",
+            label: "Position Applied For",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "appearance",
+            label: "Appearance/Mannerism",
+            type: "select",
+            comboboxOptions: [
+              { label: "Poor (0)", value: "0" },
+              { label: "Average (1)", value: "1" },
+              { label: "Good (2)", value: "2" },
+              { label: "V. Good (3)", value: "3" },
+              { label: "Excellent (4)", value: "4" },
+            ],
+          },
+          {
+            name: "communication",
+            label: "Communication/Presentation skills",
+            type: "select",
+            comboboxOptions: [
+              { label: "Poor (0)", value: "0" },
+              { label: "Average (1)", value: "1" },
+              { label: "Good (2)", value: "2" },
+              { label: "V. Good (3)", value: "3" },
+              { label: "Excellent (4)", value: "4" },
+            ],
+          },
+          {
+            name: "reasoning",
+            label: "Reasoning and Judgment",
+            type: "select",
+            comboboxOptions: [
+              { label: "Poor (0)", value: "0" },
+              { label: "Average (1)", value: "1" },
+              { label: "Good (2)", value: "2" },
+              { label: "V. Good (3)", value: "3" },
+              { label: "Excellent (4)", value: "4" },
+            ],
+          },
+          {
+            name: "education",
+            label: "Education",
+            type: "select",
+            comboboxOptions: [
+              { label: "Poor (0)", value: "0" },
+              { label: "Average (1)", value: "1" },
+              { label: "Good (2)", value: "2" },
+              { label: "V. Good (3)", value: "3" },
+              { label: "Excellent (4)", value: "4" },
+            ],
+          },
+          {
+            name: "jobKnowledge",
+            label: "Job/Subject Knowledge",
+            type: "select",
+            comboboxOptions: [
+              { label: "Poor (0)", value: "0" },
+              { label: "Average (1)", value: "1" },
+              { label: "Good (2)", value: "2" },
+              { label: "V. Good (3)", value: "3" },
+              { label: "Excellent (4)", value: "4" },
+            ],
+          },
+          {
+            name: "workExperience",
+            label: "Work Experience",
+            type: "select",
+            comboboxOptions: [
+              { label: "Poor (0)", value: "0" },
+              { label: "Average (1)", value: "1" },
+              { label: "Good (2)", value: "2" },
+              { label: "V. Good (3)", value: "3" },
+              { label: "Excellent (4)", value: "4" },
+            ],
+          },
+          {
+            name: "generalKnowledge",
+            label: "General Knowledge",
+            type: "select",
+            comboboxOptions: [
+              { label: "Poor (0)", value: "0" },
+              { label: "Average (1)", value: "1" },
+              { label: "Good (2)", value: "2" },
+              { label: "V. Good (3)", value: "3" },
+              { label: "Excellent (4)", value: "4" },
+            ],
+          },
+          {
+            name: "iq",
+            label: "I.Q.",
+            type: "select",
+            comboboxOptions: [
+              { label: "Poor (0)", value: "0" },
+              { label: "Average (1)", value: "1" },
+              { label: "Good (2)", value: "2" },
+              { label: "V. Good (3)", value: "3" },
+              { label: "Excellent (4)", value: "4" },
+            ],
+          },
+          {
+            name: "pose",
+            label: "Pose & Maturity",
+            type: "select",
+            comboboxOptions: [
+              { label: "Poor (0)", value: "0" },
+              { label: "Average (1)", value: "1" },
+              { label: "Good (2)", value: "2" },
+              { label: "V. Good (3)", value: "3" },
+              { label: "Excellent (4)", value: "4" },
+            ],
+          },
+          {
+            name: "personality",
+            label: "Personality, Attitudes and Social adjustment",
+            type: "select",
+            comboboxOptions: [
+              { label: "Poor (0)", value: "0" },
+              { label: "Average (1)", value: "1" },
+              { label: "Good (2)", value: "2" },
+              { label: "V. Good (3)", value: "3" },
+              { label: "Excellent (4)", value: "4" },
+            ],
+          },
+          {
+            name: "salaryExpectations",
+            label: "Salary Expectations",
+            type: "input",
+          },
+          {
+            name: "strengths",
+            label: "Strengths for this job",
+            type: "textarea",
+          },
+          {
+            name: "weaknesses",
+            label: "Weakness for this job",
+            type: "textarea",
+          },
+          { name: "remarks", label: "Remarks", type: "textarea" },
+          { name: "interviewerName", label: "Interviewer Name", type: "input" },
+          {
+            name: "interviewerDesignation",
+            label: "Interviewer Designation",
+            type: "input",
+          },
+        ]}
+        buttons={[
+          {
+            label: "Submit and Generate PDF",
+            type: "submit",
+            variant: "primary",
+            isLoading: isLoading,
+            // onClick: () => {
+            //   onSubmit(form.getValues());
+            // },
+          },
+          {
+            label: "Cancel",
+            type: "button",
+            onClick: () => setDialogOpen(false),
+          },
+        ]}
+        onSubmit={onSubmit}
+        form={form}
+      />
+    </div>
   );
 };
 

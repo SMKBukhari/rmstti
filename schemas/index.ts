@@ -156,3 +156,34 @@ export const JobApplicationSchema = z.object({
 export const ScheduleInterviewSchema = z.object({
   interviewDateTime: z.date(),
 });
+
+export const InterviewRatingFormSchema = z.object({
+  candidateName: z.string().min(1, "Candidate name is required"),
+  interviewDate: z.date(),
+  positionApplied: z.string().min(1, "Position applied is required"),
+  appearance: z.string().min(1, "Appearance/Mannerism rating is required."),
+  communication: z
+    .string()
+    .min(1, "Communication/Presentation skills rating is required."),
+  reasoning: z.string().min(1, "Reasoning and Judgment rating is required."),
+  education: z.string().min(1, "Education rating is required."),
+  jobKnowledge: z.string().min(1, "Job/Subject Knowledge rating is required."),
+  workExperience: z.string().min(1, "Work Experience rating is required."),
+  generalKnowledge: z.string().min(1, "General Knowledge rating is required."),
+  iq: z.string().min(1, "I.Q. rating is required."),
+  pose: z.string().min(1, "Pose & Maturity rating is required."),
+  personality: z
+    .string()
+    .min(
+      1,
+      "Personality, Attitudes, and Social adjustment rating is required."
+    ),
+  salaryExpectations: z.string(),
+  strengths: z.string(),
+  weaknesses: z.string(),
+  remarks: z.string(),
+  interviewerName: z.string().min(1, "Interviewer name is required"),
+  interviewerDesignation: z
+    .string()
+    .min(1, "Interviewer designation is required"),
+});
