@@ -69,12 +69,17 @@ const NavbarRoutes = ({ userProfile, notifications }: NavbarRoutesProps) => {
     pathName?.startsWith("/admin/dashboard") ||
     pathName?.startsWith("/admin/employees") ||
     pathName?.startsWith("/admin/applicants") ||
+    pathName?.startsWith("/admin/rejected") ||
     pathName?.startsWith("/admin/interviewees") ||
     pathName?.startsWith("/admin/profile") ||
     pathName?.startsWith("/admin/settings");
 
   const isManagerPage =
     pathName?.startsWith("/manager/dashboard") ||
+    pathName?.startsWith("/manager/employees") ||
+    pathName?.startsWith("/manager/applicants") ||
+    pathName?.startsWith("/manager/rejected") ||
+    pathName?.startsWith("/manager/interviewees") ||
     pathName?.startsWith("/manager/profile") ||
     pathName?.startsWith("/manager/settings");
 
@@ -82,6 +87,7 @@ const NavbarRoutes = ({ userProfile, notifications }: NavbarRoutesProps) => {
     pathName?.startsWith("/ceo/dashboard") ||
     pathName?.startsWith("/ceo/dashboard/employees") ||
     pathName?.startsWith("/ceo/dashboard/applicants") ||
+    pathName?.startsWith("/ceo/dashboard/rejected") ||
     pathName?.startsWith("/ceo/dashboard/interviewees") ||
     pathName?.startsWith("/ceo/dashboard/overview") ||
     pathName?.startsWith("/ceo/profile") ||
@@ -101,7 +107,9 @@ const NavbarRoutes = ({ userProfile, notifications }: NavbarRoutesProps) => {
   return (
     <div className='flex justify-between w-full items-center'>
       <div>
-        <p className='text-muted-foreground md:text-sm text-xs'>Welcome back!</p>
+        <p className='text-muted-foreground md:text-sm text-xs'>
+          Welcome back!
+        </p>
         {userProfile?.fullName ? (
           <h1 className='md:text-xl text-lg font-semibold text-neutral-900 dark:text-neutral-100'>
             {userProfile.fullName}

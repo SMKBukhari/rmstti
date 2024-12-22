@@ -1,20 +1,15 @@
 "use client";
 import ClientAvatar from "@/components/AvatarClient";
-import DialogForm from "@/components/DialogForm";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { ScheduleInterviewSchema } from "@/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { JobApplications, Role, Status, UserProfile } from "@prisma/client";
 import axios from "axios";
 import { Country } from "country-state-city";
 import { Check, Crown, Flag, Loader2, Mail, User } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
 
 interface UserAboutSectionProps {
   user: UserProfile | null;
@@ -24,42 +19,36 @@ interface UserAboutSectionProps {
   userJobApplications:
     | (UserProfile & { jobApplications: JobApplications[] })
     | null;
+  isRejectedApplicant: boolean;
 }
 
 const UserAboutSection = ({
   user,
   applicant,
   userJobApplications,
+  isRejectedApplicant,
 }: UserAboutSectionProps) => {
-  const [isDialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isRejection, setIsRejection] = useState(false);
   const router = useRouter();
   const countryName = applicant?.country
     ? Country.getCountryByCode(applicant.country)?.name || applicant.country
     : "Not Specified";
 
-  const form = useForm<z.infer<typeof ScheduleInterviewSchema>>({
-    resolver: zodResolver(ScheduleInterviewSchema),
-    defaultValues: {
-      interviewDateTime: new Date(),
-    },
-  });
-
-  const onSubmit = async (data: z.infer<typeof ScheduleInterviewSchema>) => {
+  const onSubmit = async () => {
     try {
       setIsLoading(true);
-      await axios.post(`/api/user/${user?.userId}/scheduleAnInterview`, {
-        applicantId: applicant?.userId,
-        interviewDateTime: data.interviewDateTime,
-      });
-      toast.success(
-        `Interview scheduled successfully for ${applicant?.fullName}.`
+      await axios.post(
+        `/api/user/${user?.userId}/shortlistRejectedApplication`,
+        {
+          applicantId: applicant?.userId,
+        }
       );
-      setDialogOpen(false);
+      toast.success(
+        `Applicant ${applicant?.fullName} has been shortlisted successfully.`
+      );
       setIsLoading(false);
       router.refresh();
-      redirect("/admin/applicants");
+      redirect("/admin/rejected");
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         if (error.response && error.response.data) {
@@ -69,32 +58,7 @@ const UserAboutSection = ({
         }
       }
     } finally {
-      setDialogOpen(false);
       setIsLoading(false);
-    }
-  };
-
-  const onReject = async () => {
-    try {
-      setIsRejection(true);
-      await axios.post(`/api/user/${user?.userId}/rejectJobApplication`, {
-        applicantId: applicant?.userId,
-        notifcationTitle: "Application Rejected",
-        notificationMessage:
-          "Your Application has been rejected. Please try again later.",
-      });
-      toast.success(`Applicant ${applicant?.fullName} rejected successfully.`);
-      router.refresh();
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        if (error.response && error.response.data) {
-          toast.error(error.response.data);
-        } else {
-          toast.error("An unexpected error occurred. Please try again.");
-        }
-      }
-    } finally {
-      setIsRejection(false);
     }
   };
 
@@ -117,8 +81,8 @@ const UserAboutSection = ({
             </div>
             <div className='flex flex-col gap-2 items-center'>
               <h2 className='text-lg'>{applicant?.fullName}</h2>
-              <h3 className='text-muted-foreground text-base bg-gray-800 py-1 px-3 rounded-sm'>
-                {applicant?.role?.name}
+              <h3 className=' text-base bg-destructive text-destructive-foreground py-1 px-3 rounded-sm'>
+                {isRejectedApplicant ? "Rejected" : `${applicant?.role?.name}`}
               </h3>
             </div>
           </div>
@@ -175,47 +139,16 @@ const UserAboutSection = ({
             )}
           </div>
         ))}
-        <div className='flex sm:flex-row flex-col flex-wrap justify-center gap-4'>
-          <Button variant={"primary"} onClick={() => setDialogOpen(true)}>
-            Schedule an Interview
-          </Button>
-          <Button variant={"destructive"} onClick={onReject}>
-            {isRejection ? (
+        <div className='flex sm:flex-row flex-col flex-wrap gap-4'>
+          <Button variant={"primary"} className='w-full' onClick={onSubmit}>
+            {isLoading ? (
               <Loader2 className='w-5 h-5 animate-spin' />
             ) : (
-              "Reject"
+              "Shortlist"
             )}
           </Button>
         </div>
       </div>
-
-      <DialogForm
-        isOpen={isDialogOpen}
-        onOpenChange={setDialogOpen}
-        title='Schedule an Interview'
-        description='Select a date and time for the interview.'
-        fields={[
-          {
-            name: "interviewDateTime",
-            type: "datetime",
-          },
-        ]}
-        buttons={[
-          {
-            label: "Schedule",
-            type: "submit",
-            variant: "primary",
-            isLoading: isLoading,
-          },
-          {
-            label: "Cancel",
-            type: "button",
-            onClick: () => setDialogOpen(false),
-          },
-        ]}
-        onSubmit={onSubmit}
-        form={form}
-      />
     </main>
   );
 };

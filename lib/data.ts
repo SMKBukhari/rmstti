@@ -1,5 +1,5 @@
 import { Country, City } from "country-state-city"
-import { Bell, BookUser, ChartNoAxesCombined, FileUser, LayoutDashboard, Lock, Settings, User, Users } from "lucide-react";
+import { Bell, BookUser, ChartNoAxesCombined, FileUser, LayoutDashboard, Lock, Settings, User, UserRoundX, Users } from "lucide-react";
 
 export const GenderOptions = [
   { label: "Male", value: "Male" },
@@ -84,6 +84,11 @@ export const adminRoutes = [
     href: "/admin/applicants",
   },
   {
+    icon: UserRoundX,
+    label: "Rejected",
+    href: "/admin/rejected",
+  },
+  {
     icon: BookUser,
     label: "Interviewees",
     href: "/admin/interviewees",
@@ -165,6 +170,26 @@ export const managerRoutes = [
     href: "/manager/dashboard",
   },
   {
+    icon: Users,
+    label: "Employees",
+    href: "/admin/employees",
+  },
+  {
+    icon: FileUser,
+    label: "Applicants",
+    href: "/admin/applicants",
+  },
+  {
+    icon: UserRoundX,
+    label: "Rejected",
+    href: "/admin/rejected",
+  },
+  {
+    icon: BookUser,
+    label: "Interviewees",
+    href: "/admin/interviewees",
+  },
+  {
     icon: User,
     label: "Profile",
     href: "/profile",
@@ -186,17 +211,22 @@ export const ceoRoutes = [
   {
     icon: Users,
     label: "Employees",
-    href: "/ceo/dashboard/employees",
+    href: "/admin/employees",
   },
   {
     icon: FileUser,
-    label: "Recruiters",
-    href: "/ceo/dashboard/recruiters",
+    label: "Applicants",
+    href: "/admin/applicants",
+  },
+  {
+    icon: UserRoundX,
+    label: "Rejected",
+    href: "/admin/rejected",
   },
   {
     icon: BookUser,
-    label: "Interviewers",
-    href: "/ceo/dashboard/interviewers",
+    label: "Interviewees",
+    href: "/admin/interviewees",
   },
   {
     icon: ChartNoAxesCombined,
