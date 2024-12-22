@@ -5,6 +5,7 @@ import { OTPMail } from "./designs/otpMail";
 import { ForgotPasswordMail } from "@/lib/emails/designs/forgotPasswordLinkMail";
 import { ApplicationReceivedMail } from "./designs/applicationReceivedMail";
 import { InterviewScheduledMail } from "./designs/interviewScheduleMail";
+import { ApplicationRejectedMail } from "./designs/rejectJobApplicationMail ";
 
 const { SMTP_PASSWORD, SMTP_EMAIL } = process.env;
 export const sendMail = async ({
@@ -99,24 +100,34 @@ export const compileInterviewScheduledMail = async (
   return htmlBody;
 };
 
+export const compileRejectedApplicationMail = async (fullName: string) => {
+  const template = handlebars.compile(ApplicationRejectedMail);
 
-export const sendTestEmail = async () => {
-  const testEmail = "unveiltech.mk@gmail.com"; // Change this to a valid email address
-  const subject = "Test Email - OTP";
-  const fullName = "John Doe"; // Test user name
-  const otp = "123456"; // Test OTP
-
-  const body = await compileOTPMail(fullName, otp);
-
-  const result = await sendMail({
-    to: testEmail,
-    subject: subject,
-    body: body,
+  const htmlBody = template({
+    fullName: fullName,
   });
 
-  if (result) {
-    console.log("Test email sent successfully:", result);
-  } else {
-    console.error("Failed to send test email");
-  }
+  return htmlBody;
 };
+
+
+// export const sendTestEmail = async () => {
+//   const testEmail = "unveiltech.mk@gmail.com"; // Change this to a valid email address
+//   const subject = "Test Email - OTP";
+//   const fullName = "John Doe"; // Test user name
+//   const otp = "123456"; // Test OTP
+
+//   const body = await compileOTPMail(fullName, otp);
+
+//   const result = await sendMail({
+//     to: testEmail,
+//     subject: subject,
+//     body: body,
+//   });
+
+//   if (result) {
+//     console.log("Test email sent successfully:", result);
+//   } else {
+//     console.error("Failed to send test email");
+//   }
+// };

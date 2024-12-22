@@ -34,7 +34,7 @@ interface DataTableProps<TData, TValue> {
   onAction?: (actions: string[], ids: string[]) => void;
   actions?: Array<{
     label: string;
-    action: (selectedIds: string[]) => void; // Action function triggered on dropdown selection
+    action: (selectedIds: string[]) => void;
   }>;
 }
 
@@ -46,10 +46,9 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [rowSelection, setRowSelection] = useState<{ [key: string]: boolean }>(
-    {}
-  );
+  const [rowSelection, setRowSelection] = useState<{ [key: string]: boolean }>({});
   const router = useRouter();
+
   const table = useReactTable({
     data,
     columns,
@@ -69,14 +68,17 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  const handleRowClick = (row: TData) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const link = `/${routePrefix}/${(row as any).id}`;
-    router.push(link);
+  const handleRowClick = (row: TData, event: React.MouseEvent) => {
+    // Check if the click target is a button or inside a button
+    if (!(event.target as HTMLElement).closest('button')) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const link = `/${routePrefix}/${(row as any).id}`;
+      router.push(link);
+    }
   };
 
   const handleBulkAction = () => {
-    console.log("Selected rows:", Object.keys(rowSelection)); // Get selected row ids
+    console.log("Selected rows:", Object.keys(rowSelection));
   };
 
   return (
@@ -97,18 +99,16 @@ export function DataTable<TData, TValue>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -118,9 +118,9 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  onClick={() => {
+                  onClick={(event) => {
                     if (routePrefix) {
-                      handleRowClick(row.original);
+                      handleRowClick(row.original, event);
                     }
                   }}
                   className={`${routePrefix ? "cursor-pointer" : ""}`}

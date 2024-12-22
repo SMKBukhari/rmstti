@@ -4,8 +4,23 @@ import { db } from "@/lib/db";
 import React from "react";
 import { ApplicantsColumns, columns } from "./_components/columns";
 import { format } from "date-fns";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 const ApplicantsPage = async () => {
+  const cookieStore = cookies();
+  const userId = (await cookieStore).get("userId")?.value;
+
+  if (!userId) {
+    redirect("/signIn");
+  }
+
+  const user = await db.userProfile.findUnique({
+    where: {
+      userId: userId,
+    },
+  });
+
   const applicationStatus = await db.applicationStatus.findFirst({
     where: { name: "Applied" },
   });
@@ -21,6 +36,7 @@ const ApplicantsPage = async () => {
   // Formatting the applicants data for the table
   const formattedApplicants: ApplicantsColumns[] = applicants.map(
     (applicant) => ({
+      user: user,
       id: applicant.user.userId,
       fullName: applicant.user?.fullName ?? "N/A",
       email: applicant.user?.email ?? "N/A",
@@ -31,7 +47,6 @@ const ApplicantsPage = async () => {
       userImage: applicant.user?.userImage ?? "N/A",
     })
   );
-  
 
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
@@ -44,7 +59,7 @@ const ApplicantsPage = async () => {
           columns={columns}
           data={formattedApplicants}
           searchKey='fullName'
-          routePrefix="admin/applicants"
+          routePrefix='admin/applicants'
         />
       </div>
     </div>

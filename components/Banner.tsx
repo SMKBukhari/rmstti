@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 
 const bannerVariants = cva(
-  "border text-center md:p-4 p-3 text-sm flex items-center w-full rounded-md",
+  "border md:text-start text-center md:p-4 p-3 text-sm flex items-center w-full rounded-md",
   {
     variants: {
       variant: {

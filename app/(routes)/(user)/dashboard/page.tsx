@@ -6,6 +6,7 @@ import UserBannerSuccess from "./_components/userBannerSuccess";
 import UserBannerWarning from "./_components/userBannerWarning";
 import ApplicantBanner from "./_components/applicantBanner";
 import ApplicantInterviewBanner from "./_components/applicantInterviewDateBanner";
+import UserBannerWarningRejected from "./_components/userBannerWarningRejected";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -15,9 +16,9 @@ const page = async () => {
     redirect("/signIn");
   }
 
-  if (userId.length < 24) {
-    redirect("/signIn");
-  }
+  // if (userId.length < 24) {
+  //   redirect("/signIn");
+  // }
 
   const user = await db.userProfile.findUnique({
     where: {
@@ -26,6 +27,7 @@ const page = async () => {
     include: {
       education: true,
       jobExperience: true,
+      applicationStatus: true,
       skills: true,
       role: true,
     },
@@ -62,9 +64,11 @@ const page = async () => {
 
   const interviewDateTime = jobApplications[0]?.interviewDate;
 
+  const isRejected = user?.applicationStatus?.name === "Rejected";
+
   return (
     <div>
-      {userRole &&
+      {userRole && !isRejected &&
         (isComplete ? (
           <UserBannerSuccess label="Submit" user={user} />
         ) : (
@@ -73,6 +77,8 @@ const page = async () => {
 
       {applicantRole && <ApplicantBanner />}
       {intervieweeRole && <ApplicantInterviewBanner interviewDateTime={interviewDateTime} />}
+
+      {userRole && isRejected && <UserBannerWarningRejected />}
 
       <h1>Dashboard</h1>
       <p>Welcome to your dashboard</p>

@@ -2,12 +2,14 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, File } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import Link from "next/link";
 import CellActions from "./CellActions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserProfile } from "@prisma/client";
 
 export type ApplicantsColumns = {
+  user: UserProfile | null;
   id: string;
   fullName: string;
   email: string;
@@ -84,8 +86,10 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const { id, fullName, email } = row.original;
-      return <CellActions id={id} fullName={fullName} email={email} />;
+      const { user, id, fullName, email } = row.original;
+      return (
+        <CellActions user={user} id={id} fullName={fullName} email={email} />
+      );
     },
   },
 ];

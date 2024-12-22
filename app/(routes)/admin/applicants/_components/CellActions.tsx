@@ -4,100 +4,134 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import DialogForm from "@/components/DialogForm";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ScheduleInterviewSchema } from "@/schemas";
+import { UserProfile } from "@prisma/client";
 
 interface CellActionsProps {
+  user: UserProfile | null;
   id: string;
   fullName: string;
   email: string;
 }
 
-const CellActions = ({ id, fullName, email }: CellActionsProps) => {
+const CellActions = ({ user, id, fullName, email }: CellActionsProps) => {
+  const [isDialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const [isRejection, setIsRejection] = useState(false);
 
-  const sendSelected = async () => {
-    setIsLoading(true);
+  const form = useForm<z.infer<typeof ScheduleInterviewSchema>>({
+    resolver: zodResolver(ScheduleInterviewSchema),
+    defaultValues: {
+      interviewDateTime: new Date(),
+    },
+  });
+
+  const onSubmit = async (data: z.infer<typeof ScheduleInterviewSchema>) => {
     try {
-      await axios.post("/api/sendSelected", { email, fullName });
-      toast.success("Email sent successfully");
+      setIsLoading(true);
+      await axios.post(`/api/user/${user?.userId}/scheduleAnInterview`, {
+        applicantId: id,
+        interviewDateTime: data.interviewDateTime,
+      });
+      toast.success(`Interview scheduled successfully for ${fullName}.`);
+      setDialogOpen(false);
       setIsLoading(false);
+      router.refresh();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
-        console.error(error.response?.data);
-        toast.error("Failed to send email");
+        if (error.response && error.response.data) {
+          toast.error(error.response.data);
+        } else {
+          toast.error("An unexpected error occurred. Please try again.");
+        }
       }
+    } finally {
+      setDialogOpen(false);
+      setIsLoading(false);
     }
   };
 
-  const Rejected = async () => {
-    setIsRejection(true);
+  const onReject = async () => {
     try {
-      await axios.post("/api/sendRejected", { email, fullName });
-      toast.success("Email sent successfully");
-      setIsLoading(false);
+      setIsRejection(true);
+      await axios.post(`/api/user/${user?.userId}/rejectJobApplication`, {
+        applicantId: id,
+        notifcationTitle: "Application Rejected", 
+        notificationMessage: "Your Application has been rejected. Please try again later.",
+      });
+      toast.success(`Applicant ${fullName} rejected successfully.`);
+      router.refresh();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
-        console.error(error.response?.data);
-        toast.error("Failed to send email");
+        if (error.response && error.response.data) {
+          toast.error(error.response.data);
+        } else {
+          toast.error("An unexpected error occurred. Please try again.");
+        }
       }
+    } finally {
+      setIsRejection(false);
     }
   };
+
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent the click from bubbling up to the row
+  };
+
   return (
-    // <DropdownMenu>
-    //   <DropdownMenuTrigger asChild>
-    //     <Button size={"icon"} variant={"ghost"}>
-    //       <MoreHorizontal className='h-4 w-4' />
-    //     </Button>
-    //   </DropdownMenuTrigger>
-    //   <DropdownMenuContent>
-    //     <Link href={`/admin/applicants/${id}`}>
-    //       <DropdownMenuItem>
-    //         <Eye className='w-10 h-10 mr-2 text-[#ffff]' />
-    //         View
-    //       </DropdownMenuItem>
-    //     </Link>
-    //     {isLoading ? (
-    //       <DropdownMenuItem>
-    //         <Loader className='w-4 h-4 animate-spin dark:text-[#1034ff] text-[#295B81]' />
-    //       </DropdownMenuItem>
-    //     ) : (
-    //       <DropdownMenuItem onClick={sendSelected}>
-    //         <Calendar className='w-10 h-10 mr-2 text-[#ffff]' />
-    //         Interview
-    //       </DropdownMenuItem>
-    //     )}
-
-    //     {isRejection ? (
-    //       <DropdownMenuItem>
-    //         <Loader className='w-4 h-4 animate-spin dark:text-[#1034ff] text-[#295B81]' />
-    //       </DropdownMenuItem>
-    //     ) : (
-    //       <DropdownMenuItem onClick={Rejected}>
-    //         <BadgeX className='w-10 h-10 mr-2 dark:text-[#ff816b] text-[#d31510]' />
-    //         Rejected
-    //       </DropdownMenuItem>
-    //     )}
-    //   </DropdownMenuContent>
-    // </DropdownMenu>
-    <div className='flex gap-3'>
+    <div className='flex gap-3' onClick={handleButtonClick}>
       <Button
         variant={"outline"}
         className='bg-transparent border-white'
-        onClick={sendSelected}
+        onClick={() => setDialogOpen(true)}
       >
         {isLoading ? (
           <Loader2 className='w-4 h-4 animate-spin dark:text-[#1034ff] text-[#295B81]' />
         ) : (
-          <span>Interview</span>
+          <span>Schedule</span>
         )}
       </Button>
-      <Button variant={"destructive"} onClick={sendSelected}>
+      <Button variant={"destructive"} onClick={onReject}>
         {isRejection ? (
           <Loader2 className='w-4 h-4 animate-spin' />
         ) : (
           <span>Reject</span>
         )}
       </Button>
+
+      <DialogForm
+        isOpen={isDialogOpen}
+        onOpenChange={setDialogOpen}
+        title='Schedule an Interview'
+        description='Select a date and time for the interview.'
+        fields={[
+          {
+            name: "interviewDateTime",
+            type: "datetime",
+          },
+        ]}
+        buttons={[
+          {
+            label: "Schedule",
+            type: "submit",
+            variant: "primary",
+            isLoading: isLoading,
+          },
+          {
+            label: "Cancel",
+            type: "button",
+            onClick: () => setDialogOpen(false),
+          },
+        ]}
+        onSubmit={onSubmit}
+        form={form}
+      />
     </div>
   );
 };
