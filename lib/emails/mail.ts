@@ -6,6 +6,7 @@ import { ForgotPasswordMail } from "@/lib/emails/designs/forgotPasswordLinkMail"
 import { ApplicationReceivedMail } from "./designs/applicationReceivedMail";
 import { InterviewScheduledMail } from "./designs/interviewScheduleMail";
 import { ApplicationRejectedMail } from "./designs/rejectJobApplicationMail ";
+import { JobOfferMail } from "./designs/jobOfferMail";
 
 const { SMTP_PASSWORD, SMTP_EMAIL } = process.env;
 export const sendMail = async ({
@@ -17,7 +18,6 @@ export const sendMail = async ({
   subject: string;
   body: string;
 }) => {
-
   const transport = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -87,7 +87,7 @@ export const compileApplicationReceivedMail = async (fullName: string) => {
 export const compileInterviewScheduledMail = async (
   fullName: string,
   interviewDate: string,
-  interviewTime: string,
+  interviewTime: string
 ) => {
   const template = handlebars.compile(InterviewScheduledMail);
 
@@ -110,6 +110,43 @@ export const compileRejectedApplicationMail = async (fullName: string) => {
   return htmlBody;
 };
 
+export const compileJobOfferMail = async (
+  fullName: string,
+  designation: string,
+  department: string,
+  salary: string
+) => {
+  const template = handlebars.compile(JobOfferMail);
+
+  const htmlBody = template({
+    fullName: fullName,
+    designation: designation,
+    department: department,
+    salary: salary,
+  });
+
+  return htmlBody;
+};
+
+export const compileHiredMail = async (
+  fullName: string,
+  designation: string,
+  department: string,
+  salary: string,
+  joiningDate: string
+) => {
+  const template = handlebars.compile(JobOfferMail);
+
+  const htmlBody = template({
+    fullName: fullName,
+    designation: designation,
+    department: department,
+    salary: salary,
+    joiningDate: joiningDate,
+  });
+
+  return htmlBody;
+};
 
 // export const sendTestEmail = async () => {
 //   const testEmail = "unveiltech.mk@gmail.com"; // Change this to a valid email address

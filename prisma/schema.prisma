@@ -24,6 +24,9 @@ model UserProfile {
   userImage               String?
   departmentId            String?
   department              Department?        @relation(fields: [departmentId], references: [id])
+  departmentOffered       String?
+  designation             String?
+  designationOffered      String?
   jobExperience           JobExperience[]
   education               Education[]
   resumeUrl               String?
@@ -50,8 +53,12 @@ model UserProfile {
   loginSessionToken       String?
   loginSessionExpiry      DateTime?
   isVerified              Boolean?           @default(false)
+  isHired                 Boolean?           @default(false)
+  salary                  String?
+  salaryOffered           String?
   roleId                  String?
   role                    Role?              @relation(fields: [roleId], references: [id])
+  roleOffered             String?
   notifications           Notifications[]
   skills                  Skills[]
   JobApplications         JobApplications[]

@@ -109,6 +109,7 @@ const DialogForm = <T extends FieldValues>({
                                     "w-[340px] pl-3 text-left font-normal",
                                     !innerField.value && "text-muted-foreground"
                                   )}
+                                  disabled={field.disabled || isSubmitting}
                                 >
                                   {innerField.value ? (
                                     format(innerField.value, "PPP hh:mm:ss a")

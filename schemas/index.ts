@@ -187,3 +187,18 @@ export const InterviewRatingFormSchema = z.object({
     .string()
     .min(1, "Interviewer designation is required"),
 });
+
+export const JobOfferSchema = z.object({
+  designation: z.string(),
+  department: z.string(),
+  salary: z.string(),
+  role: z.string(),
+});
+
+export const JobOfferAcceptanceSchema = z.object({
+  joiningDate: z.date(),
+  salary: z.string(),
+  designation: z.string(),
+  department: z.string(),
+  role: z.string(),
+});

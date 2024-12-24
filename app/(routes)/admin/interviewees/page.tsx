@@ -14,21 +14,34 @@ const IntervieweePage = async () => {
   if (!userId) {
     redirect("/signIn");
   }
-  
+
   const applicationStatus = await db.applicationStatus.findFirst({
     where: { name: "Interviewed" },
   });
 
+  const offeredStatus = await db.applicationStatus.findFirst({
+    where: { name: "Offered" },
+  });
+
+  const applicationStatusIds = [
+    applicationStatus?.id,
+    offeredStatus?.id,
+  ].filter((id): id is string => id !== undefined);
 
   const user = await db.userProfile.findUnique({
     where: {
       userId: userId,
     },
+    include: {
+      role: true,
+    },
   });
 
   const interviewees = await db.jobApplications.findMany({
     where: {
-      applicationStatusId: applicationStatus?.id,
+      applicationStatusId: {
+        in: applicationStatusIds,
+      },
     },
     include: {
       user: true,
@@ -50,6 +63,17 @@ const IntervieweePage = async () => {
       resumeName: interviewee.user?.resumeName ?? "N/A",
       userImage: interviewee.user?.userImage ?? "N/A",
       department: interviewee.department ?? "N/A",
+      isInterviewed: interviewee.isInterviewed ?? false,
+      appearance: interviewee.appearance ?? "N/A",
+      communication: interviewee.communication ?? "N/A",
+      reasoning: interviewee.reasoning ?? "N/A",
+      education: interviewee.education ?? "N/A",
+      jobKnowledge: interviewee.jobKnowledge ?? "N/A",
+      workExperience: interviewee.workExperience ?? "N/A",
+      generalKnowledge: interviewee.generalKnowledge ?? "N/A",
+      iq: interviewee.iq ?? "N/A",
+      pose: interviewee.pose ?? "N/A",
+      personality: interviewee.personality ?? "N/A",
     })
   );
 

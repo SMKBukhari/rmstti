@@ -28,7 +28,13 @@ const ApplicantDetailsPage = async ({
     where: {
       userId: userId,
     },
+    include: {
+      role: true,
+    },
   });
+
+  const departments = await db.department.findMany();
+  const roles = await db.role.findMany();
 
   const interviewee = await db.userProfile.findFirst({
     where: {
@@ -82,6 +88,8 @@ const ApplicantDetailsPage = async ({
       <div className='grid md:grid-cols-3 grid-cols-1 md:gap-5 gap-0'>
         <div className='md:col-span-1'>
           <UserAboutSection
+            role={roles}
+            department={departments}
             applicant={interviewee}
             user={user}
             userJobApplications={userWithJobApplications}

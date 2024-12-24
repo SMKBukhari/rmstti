@@ -7,10 +7,12 @@ import UserBannerWarning from "./_components/userBannerWarning";
 import ApplicantBanner from "./_components/applicantBanner";
 import ApplicantInterviewBanner from "./_components/applicantInterviewDateBanner";
 import UserBannerWarningRejected from "./_components/userBannerWarningRejected";
+import UserBannerJobOffer from "./_components/userBannerJobOffer";
 
 const page = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
+  
 
   if (!userId) {
     redirect("/signIn");
@@ -65,20 +67,35 @@ const page = async () => {
   const interviewDateTime = jobApplications[0]?.interviewDate;
 
   const isRejected = user?.applicationStatus?.name === "Rejected";
+  const isOffered = user?.applicationStatus?.name === "Offered";
+  const isHired = user?.applicationStatus?.name === "Hired";
 
   return (
     <div>
-      {userRole && !isRejected &&
+      {userRole &&
+        !isRejected &&
+        !isOffered &&
+        !isHired &&
+        !intervieweeRole &&
         (isComplete ? (
-          <UserBannerSuccess label="Submit" user={user} />
+          <UserBannerSuccess label='Submit' user={user} />
         ) : (
-          <UserBannerWarning completedFields={completedFields} totalFields={totalFields} />
+          <UserBannerWarning
+            completedFields={completedFields}
+            totalFields={totalFields}
+          />
         ))}
 
       {applicantRole && <ApplicantBanner />}
-      {intervieweeRole && <ApplicantInterviewBanner interviewDateTime={interviewDateTime} />}
+      {intervieweeRole && !isOffered && !isHired && (
+        <ApplicantInterviewBanner interviewDateTime={interviewDateTime} />
+      )}
 
       {userRole && isRejected && <UserBannerWarningRejected />}
+
+      {intervieweeRole && isOffered && (
+        <UserBannerJobOffer label='Submit' user={user} />
+      )}
 
       <h1>Dashboard</h1>
       <p>Welcome to your dashboard</p>
@@ -87,5 +104,3 @@ const page = async () => {
 };
 
 export default page;
-
-

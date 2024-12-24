@@ -29,11 +29,7 @@ const workStatusSeed = async () => {
 const statusSeed = async () => {
   try {
     await database.status.createMany({
-      data: [
-        { name: "Active" },
-        { name: "Resigned" },
-        { name: "Terminated" },
-      ],
+      data: [{ name: "Active" }, { name: "Resigned" }, { name: "Terminated" }],
     });
     console.log("Statuses seeded successfully.");
   } catch (error) {
@@ -49,6 +45,7 @@ const applicationStatusSeed = async () => {
         { name: "Shortlisted" },
         { name: "Interviewed" },
         { name: "Rejected" },
+        { name: "Offered" },
         { name: "Hired" },
       ],
     });
@@ -77,11 +74,27 @@ const roleSeed = async () => {
   }
 };
 
+const departmentSeed = async () => {
+  try {
+    await database.department.createMany({
+      data: [
+        { name: "IT Department" },
+        { name: "Research Department" },
+        { name: "Magazine Department" },
+      ],
+    });
+    console.log("Departments seeded successfully.");
+  } catch (error) {
+    console.log(`Error on seeding departments: ${error}`);
+  }
+};
+
 const options = {
   1: workStatusSeed,
   2: statusSeed,
   3: applicationStatusSeed,
   4: roleSeed,
+  5: departmentSeed,
 } as const;
 
 console.log("Select an option to seed the database:");
@@ -89,6 +102,7 @@ console.log("1: Work Status");
 console.log("2: Status");
 console.log("3: Application Status");
 console.log("4: Role");
+console.log("5: Department");
 
 rl.question("Enter your choice: ", (choice: string) => {
   const seedFunction = options[parseInt(choice) as SeedOption];

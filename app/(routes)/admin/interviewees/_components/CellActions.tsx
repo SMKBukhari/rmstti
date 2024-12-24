@@ -10,10 +10,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InterviewRatingFormSchema } from "@/schemas";
-import { UserProfile } from "@prisma/client";
+import { Role, UserProfile } from "@prisma/client";
 
 interface CellActionsProps {
-  user: UserProfile | null;
+  user: (UserProfile & { role: Role | null }) | null;
   id: string;
   fullName: string;
   email: string;
@@ -52,6 +52,8 @@ const CellActions = ({
       remarks: "",
       interviewDate: new Date(),
       positionApplied: appliedFor,
+      interviewerName: user?.fullName ?? "",
+      interviewerDesignation: user?.role?.name ?? "",
     },
   });
 

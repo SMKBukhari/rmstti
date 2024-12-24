@@ -14,7 +14,6 @@ const LoginPage = () => {
       // const sessionToken = localStorage.getItem("sessionToken");
       const sessionToken = Cookies.get("sessionToken");
       const userId = Cookies.get("userId");
-      console.log(sessionToken);
       if (sessionToken) {
         // Check if the session token has expired
         // const sessionExpiry = localStorage.getItem("sessionExpiry");
