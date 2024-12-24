@@ -33,14 +33,14 @@ const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
       <div className='xl:pl-52'>
         {/* Sticky header */}
         <header className='sticky top-0 z-40 flex h-20 shrink-0 items-center gap-x-4 border-b bg-background px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8'>
-          <div className='w-full max-w-7xl mx-auto'>
+          <div className='w-full max-w-full mx-auto'>
             <Navbar />
           </div>
         </header>
 
         {/* Main content */}
         <main className='py-6 lg:py-8'>
-          <div className='px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto'>
+          <div className='px-4 sm:px-6 lg:px-8 max-w-full mx-auto'>
             {children}
           </div>
         </main>

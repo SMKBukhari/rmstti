@@ -1,7 +1,4 @@
-import { db } from "@/lib/db";
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,24 +10,5 @@ export default async function AdminLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = cookies();
-  const userId = (await cookieStore).get("userId")?.value;
-
-  if (!userId) {
-    redirect("/signIn");
-  }
-
-  const user = await db.userProfile.findUnique({
-    where: {
-      userId: userId,
-      role: {
-        name: "Admin",
-      },
-    },
-  });
-
-  if (!user) {
-    redirect("/signIn");
-  }
   return <main>{children}</main>;
 }

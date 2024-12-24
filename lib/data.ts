@@ -172,22 +172,22 @@ export const managerRoutes = [
   {
     icon: Users,
     label: "Employees",
-    href: "/admin/employees",
+    href: "/manager/employees",
   },
   {
     icon: FileUser,
     label: "Applicants",
-    href: "/admin/applicants",
+    href: "/manager/applicants",
   },
   {
     icon: UserRoundX,
     label: "Rejected",
-    href: "/admin/rejected",
+    href: "/manager/rejected",
   },
   {
     icon: BookUser,
     label: "Interviewees",
-    href: "/admin/interviewees",
+    href: "/manager/interviewees",
   },
   {
     icon: User,
@@ -211,22 +211,22 @@ export const ceoRoutes = [
   {
     icon: Users,
     label: "Employees",
-    href: "/admin/employees",
+    href: "/ceo/employees",
   },
   {
     icon: FileUser,
     label: "Applicants",
-    href: "/admin/applicants",
+    href: "/ceo/applicants",
   },
   {
     icon: UserRoundX,
     label: "Rejected",
-    href: "/admin/rejected",
+    href: "/ceo/rejected",
   },
   {
     icon: BookUser,
     label: "Interviewees",
-    href: "/admin/interviewees",
+    href: "/ceo/interviewees",
   },
   {
     icon: ChartNoAxesCombined,

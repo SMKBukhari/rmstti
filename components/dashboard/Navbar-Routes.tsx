@@ -108,7 +108,7 @@ const NavbarRoutes = ({ userProfile, notifications }: NavbarRoutesProps) => {
     <div className='flex justify-between w-full items-center'>
       <div>
         <p className='text-muted-foreground md:text-sm text-xs'>
-          Welcome back!
+          Welcome back 👋🏻
         </p>
         {userProfile?.fullName ? (
           <h1 className='md:text-xl text-lg font-semibold text-neutral-900 dark:text-neutral-100'>

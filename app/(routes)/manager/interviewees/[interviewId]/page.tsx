@@ -82,7 +82,7 @@ const ApplicantDetailsPage = async ({
       <div className='flex items-center justify-between w-full'>
         <CustomBreadCrumb
           breadCrumbPage={interviewee?.fullName || ""}
-          breadCrumbItem={[{ link: "/admin/interviewees", label: "Interviewees" }]}
+          breadCrumbItem={[{ link: "/admin/applicants", label: "Applicants" }]}
         />
       </div>
       <div className='grid md:grid-cols-3 grid-cols-1 md:gap-5 gap-0'>

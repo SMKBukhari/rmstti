@@ -12,9 +12,9 @@ const ProfilePage = async () => {
     redirect("/signIn");
   }
 
-  if (userId.length < 24) {
-    redirect("/signIn");
-  }
+  // if (userId.length < 24) {
+  //   redirect("/signIn");
+  // }
 
   const user = await db.userProfile.findUnique({
     where: {

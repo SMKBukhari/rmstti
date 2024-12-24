@@ -11,7 +11,7 @@ import { cookies } from "next/headers";
 const ApplicantDetailsPage = async ({
   params,
 }: {
-  params: { interviewId: string };
+  params: { applicantId: string };
 }) => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
@@ -28,17 +28,11 @@ const ApplicantDetailsPage = async ({
     where: {
       userId: userId,
     },
-    include: {
-      role: true,
-    },
   });
 
-  const departments = await db.department.findMany();
-  const roles = await db.role.findMany();
-
-  const interviewee = await db.userProfile.findFirst({
+  const applicant = await db.userProfile.findFirst({
     where: {
-      userId: params.interviewId,
+      userId: params.applicantId,
     },
     include: {
       role: true,
@@ -50,47 +44,51 @@ const ApplicantDetailsPage = async ({
     },
   });
 
-  const userWithJobExperiences = interviewee
+  const isApplicant = applicant?.role?.name === "Applicant";
+
+  const userWithJobExperiences = applicant
     ? {
-        ...interviewee,
-        jobExperiences: interviewee?.jobExperience || [],
-        userId: interviewee.userId || "", // Ensure `userId` is a string
+        ...applicant,
+        jobExperiences: applicant?.jobExperience || [],
+        userId: applicant.userId || "", // Ensure `userId` is a string
       }
     : null;
 
-  const userWithEducations = interviewee
+  const userWithEducations = applicant
     ? {
-        ...interviewee,
-        educations: interviewee?.education || [],
-        userId: interviewee.userId || "",
+        ...applicant,
+        educations: applicant?.education || [],
+        userId: applicant.userId || "",
       }
     : null;
 
-  const userWithJobApplications = interviewee
+  const userWithJobApplications = applicant
     ? {
-        ...interviewee,
-        jobApplications: interviewee?.JobApplications || [],
-        userId: interviewee.userId || "",
+        ...applicant,
+        jobApplications: applicant?.JobApplications || [],
+        userId: applicant.userId || "",
       }
     : null;
 
   if (!user) {
     redirect("/admin/applicants");
   }
+
+  if (!isApplicant) {
+    redirect("/admin/applicants");
+  }
   return (
     <div className='w-full'>
       <div className='flex items-center justify-between w-full'>
         <CustomBreadCrumb
-          breadCrumbPage={interviewee?.fullName || ""}
-          breadCrumbItem={[{ link: "/admin/interviewees", label: "Interviewees" }]}
+          breadCrumbPage={applicant?.fullName || ""}
+          breadCrumbItem={[{ link: "/admin/applicants", label: "Applicants" }]}
         />
       </div>
       <div className='grid md:grid-cols-3 grid-cols-1 md:gap-5 gap-0'>
         <div className='md:col-span-1'>
           <UserAboutSection
-            role={roles}
-            department={departments}
-            applicant={interviewee}
+            applicant={applicant}
             user={user}
             userJobApplications={userWithJobApplications}
           />
@@ -100,11 +98,11 @@ const ApplicantDetailsPage = async ({
             userExperiences={userWithJobExperiences}
             userEducations={userWithEducations}
           />
-          <UserSkillsSection user={interviewee} />
+          <UserSkillsSection user={applicant} />
           <UserCoverLetterSection
             userJobApplications={userWithJobApplications}
           />
-          <UserResumeSection user={interviewee} />
+          <UserResumeSection user={applicant} />
         </div>
       </div>
     </div>

@@ -6,7 +6,7 @@ import { JobOfferAcceptanceSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserProfile } from "@prisma/client";
 import axios from "axios";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";

@@ -96,14 +96,14 @@ const ImageUpload = ({ user }: AccountTabImageUploadProps) => {
               cropping: true,
               multiple: false,
               maxFiles: 1,
-              maxFileSize: 1000000, // 1MB
+              maxFileSize: 3000000, // 1MB
               context: {
                 alt: `Image of ${user?.fullName}`,
                 title: `Image of ${user?.fullName}`,
                 caption: `Image of ${user?.fullName}`,
                 description: `Image of ${user?.fullName}`,
               },
-              maxImageFileSize: 1000000,
+              maxImageFileSize: 3000000,
               clientAllowedFormats: ["png", "jpeg", "jpg"],
             }}
             onSuccess={handleUpload}

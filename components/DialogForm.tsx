@@ -216,7 +216,7 @@ const DialogForm = <T extends FieldValues>({
               ))}
             </div>
             <div className='flex w-full'>
-              <DialogFooter>
+              <DialogFooter className="w-full flex gap-3">
                 {buttons.map((button, index) => (
                   <Button
                     key={index}

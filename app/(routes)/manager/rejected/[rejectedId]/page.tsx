@@ -8,10 +8,10 @@ import CustomBreadCrumb from "@/components/CustomBreadCrumb";
 import UserResumeSection from "./_components/UserResumeSection";
 import { cookies } from "next/headers";
 
-const ApplicantDetailsPage = async ({
+const RejectedApplicantDetailsPage = async ({
   params,
 }: {
-  params: { interviewId: string };
+  params: { rejectedId: string };
 }) => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
@@ -20,25 +20,19 @@ const ApplicantDetailsPage = async ({
     redirect("/signIn");
   }
 
-  if (userId.length < 24) {
-    redirect("/signIn");
-  }
+  // if (userId.length < 24) {
+  //   redirect("/signIn");
+  // }
 
   const user = await db.userProfile.findFirst({
     where: {
       userId: userId,
     },
-    include: {
-      role: true,
-    },
   });
 
-  const departments = await db.department.findMany();
-  const roles = await db.role.findMany();
-
-  const interviewee = await db.userProfile.findFirst({
+  const rejectedApplicant = await db.userProfile.findFirst({
     where: {
-      userId: params.interviewId,
+      userId: params.rejectedId,
     },
     include: {
       role: true,
@@ -47,50 +41,58 @@ const ApplicantDetailsPage = async ({
       jobExperience: true,
       education: true,
       JobApplications: true,
+      applicationStatus: true,
     },
   });
 
-  const userWithJobExperiences = interviewee
+  const isRejectedApplicant =
+    rejectedApplicant?.applicationStatus?.name === "Rejected";
+  const applicantRole = rejectedApplicant?.role?.name === "User";
+
+  const userWithJobExperiences = rejectedApplicant
     ? {
-        ...interviewee,
-        jobExperiences: interviewee?.jobExperience || [],
-        userId: interviewee.userId || "", // Ensure `userId` is a string
+        ...rejectedApplicant,
+        jobExperiences: rejectedApplicant?.jobExperience || [],
+        userId: rejectedApplicant.userId || "", // Ensure `userId` is a string
       }
     : null;
 
-  const userWithEducations = interviewee
+  const userWithEducations = rejectedApplicant
     ? {
-        ...interviewee,
-        educations: interviewee?.education || [],
-        userId: interviewee.userId || "",
+        ...rejectedApplicant,
+        educations: rejectedApplicant?.education || [],
+        userId: rejectedApplicant.userId || "",
       }
     : null;
 
-  const userWithJobApplications = interviewee
+  const userWithJobApplications = rejectedApplicant
     ? {
-        ...interviewee,
-        jobApplications: interviewee?.JobApplications || [],
-        userId: interviewee.userId || "",
+        ...rejectedApplicant,
+        jobApplications: rejectedApplicant?.JobApplications || [],
+        userId: rejectedApplicant.userId || "",
       }
     : null;
 
   if (!user) {
-    redirect("/admin/applicants");
+    redirect("/admin/rejected");
+  }
+
+  if (!isRejectedApplicant || !applicantRole) {
+    redirect("/admin/rejected");
   }
   return (
     <div className='w-full'>
       <div className='flex items-center justify-between w-full'>
         <CustomBreadCrumb
-          breadCrumbPage={interviewee?.fullName || ""}
-          breadCrumbItem={[{ link: "/admin/interviewees", label: "Interviewees" }]}
+          breadCrumbPage={rejectedApplicant?.fullName || ""}
+          breadCrumbItem={[{ link: "/admin/rejected", label: "Rejected" }]}
         />
       </div>
       <div className='grid md:grid-cols-3 grid-cols-1 md:gap-5 gap-0'>
         <div className='md:col-span-1'>
           <UserAboutSection
-            role={roles}
-            department={departments}
-            applicant={interviewee}
+            isRejectedApplicant={isRejectedApplicant}
+            applicant={rejectedApplicant}
             user={user}
             userJobApplications={userWithJobApplications}
           />
@@ -100,15 +102,15 @@ const ApplicantDetailsPage = async ({
             userExperiences={userWithJobExperiences}
             userEducations={userWithEducations}
           />
-          <UserSkillsSection user={interviewee} />
+          <UserSkillsSection user={rejectedApplicant} />
           <UserCoverLetterSection
             userJobApplications={userWithJobApplications}
           />
-          <UserResumeSection user={interviewee} />
+          <UserResumeSection user={rejectedApplicant} />
         </div>
       </div>
     </div>
   );
 };
 
-export default ApplicantDetailsPage;
+export default RejectedApplicantDetailsPage;
