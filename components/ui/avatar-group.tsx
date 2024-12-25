@@ -2,7 +2,6 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
 import { useState } from "react";
 
 interface User {
@@ -39,17 +38,6 @@ export default function AvatarGroup({
         style={{ height: size }}
       >
         {visibleUsers.map((user, index) => (
-          <Link
-            href={`
-            ${user.role === "Manager" && `/manager/team-members/${user.userId}`}
-            ${
-              user.role === "Employee" &&
-              `/employee/team-members/${user.userId}`
-            }
-            ${user.role === "Admin" && `/admin/team-members/${user.userId}`}
-          `}
-            key={user.id}
-          >
             <motion.div
               key={user.id}
               className='relative'
@@ -110,7 +98,6 @@ export default function AvatarGroup({
                 </motion.div>
               )}
             </motion.div>
-          </Link>
         ))}
 
         {remainingUsers > 0 && (

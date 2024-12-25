@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import React from "react";
 import TotalEmployee from "./_components/Cards/TotalEmployee";
 import TotalApplicant from "./_components/Cards/TotalApplicants";
+import LeaveRequests from "./_components/Cards/LeaveRequests";
+import TotalLeaves from "./_components/Cards/TotalLeaves";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -105,16 +107,33 @@ const page = async () => {
         previousCountApplicants) *
       100
     : 0;
+
+  const leaveRequests = await db.leaveRequest.findMany({
+    where: { userId: userId },
+  });
+  const pendingRequests = leaveRequests.filter(
+    (req) => req.status === "Pending"
+  );
+  const approvedRequests = leaveRequests.filter(
+    (req) => req.status === "Approved"
+  );
+  const rejectedRequests = leaveRequests.filter(
+    (req) => req.status === "Rejected"
+  );
+
   return (
     <>
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-        <TotalEmployee
-          totalEmployees={currentCountEmployees}
-          percentageChange={percentageChange}
+        <LeaveRequests
+          totalRequests={leaveRequests.length}
+          statusCounts={{
+            Pending: pendingRequests.length,
+            Approved: approvedRequests.length,
+            Rejected: rejectedRequests.length,
+          }}
         />
-        <TotalApplicant
-          totalEmployees={currentCountApplicants}
-          percentageChange={percentageChangeApplicants}
+        <TotalLeaves
+          userId={userId}
         />
       </div>
     </>

@@ -1,5 +1,18 @@
-import { Country, City } from "country-state-city"
-import { Bell, BookUser, ChartNoAxesCombined, FileUser, Group, LayoutDashboard, Lock, Settings, User, UserRoundX, Users } from "lucide-react";
+import { Country, City } from "country-state-city";
+import {
+  Bell,
+  BookUser,
+  ChartNoAxesCombined,
+  FileUser,
+  Group,
+  LayoutDashboard,
+  Lock,
+  NotebookText,
+  Settings,
+  User,
+  UserRoundX,
+  Users,
+} from "lucide-react";
 
 export const GenderOptions = [
   { label: "Male", value: "Male" },
@@ -12,7 +25,7 @@ export const ExperienceLevels = [
   { label: "Intermediate", value: "Intermediate" },
   { label: "Advanced", value: "Advanced" },
   { label: "Expert", value: "Expert" },
-]
+];
 
 export const CountryOptions = Country.getAllCountries().map((country) => ({
   label: country.name,
@@ -20,13 +33,15 @@ export const CountryOptions = Country.getAllCountries().map((country) => ({
 }));
 
 export const getCityOptions = (countryCode: string) => {
-    const cities = City.getCitiesOfCountry(countryCode);
-    
-    // Use a unique value that combines city name and country code or some unique identifier
-    return cities ? cities.map((city) => ({
+  const cities = City.getCitiesOfCountry(countryCode);
+
+  // Use a unique value that combines city name and country code or some unique identifier
+  return cities
+    ? cities.map((city) => ({
         label: city.name,
         value: `${city.name}-${city.stateCode || countryCode}`, // Append state code or country code for uniqueness
-    })) : [];
+      }))
+    : [];
 };
 
 export const settingsTabs = [
@@ -40,7 +55,7 @@ export const settingsTabs = [
     label: "Security",
     value: "security",
   },
-]
+];
 
 const notificationRoute = {
   icon: Bell, // Use the appropriate icon for notifications
@@ -77,6 +92,11 @@ export const adminRoutes = [
     icon: Group,
     label: "Team Members",
     href: "/admin/team-members",
+  },
+  {
+    icon: NotebookText,
+    label: "Leave Management",
+    href: "/admin/leave-management",
   },
   {
     icon: Users,
@@ -161,6 +181,11 @@ export const employeeRoutes = [
     href: "/employee/team-members",
   },
   {
+    icon: NotebookText,
+    label: "Leave Management",
+    href: "/employee/leave-management",
+  },
+  {
     icon: User,
     label: "Profile",
     href: "/profile",
@@ -183,6 +208,11 @@ export const managerRoutes = [
     icon: Group,
     label: "Team Members",
     href: "/manager/team-members",
+  },
+  {
+    icon: NotebookText,
+    label: "Leave Management",
+    href: "/manager/leave-management",
   },
   {
     icon: FileUser,
@@ -224,6 +254,11 @@ export const ceoRoutes = [
     href: "/ceo/employees",
   },
   {
+    icon: NotebookText,
+    label: "Leave Management",
+    href: "/ceo/leave-management",
+  },
+  {
     icon: FileUser,
     label: "Applicants",
     href: "/ceo/applicants",
@@ -255,4 +290,3 @@ export const ceoRoutes = [
   },
   notificationRoute, // Add notifications route
 ];
-
