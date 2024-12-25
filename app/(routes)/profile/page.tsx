@@ -52,7 +52,7 @@ const ProfilePage = async () => {
   const teamMembers =
     user?.role?.name !== "User"
       ? user?.department?.users.filter(
-          (teamMember) => teamMember.userId !== user.userId
+          (teamMember) => teamMember.userId
         )
       : [];
 

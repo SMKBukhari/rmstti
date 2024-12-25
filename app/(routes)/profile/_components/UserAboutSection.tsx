@@ -1,3 +1,4 @@
+import AvatarGroup from "@/components/ui/avatar-group";
 import { Role, Status, UserProfile } from "@prisma/client";
 import { Country } from "country-state-city";
 import { Check, Crown, Flag, Mail, Phone, User } from "lucide-react";
@@ -23,6 +24,14 @@ const UserAboutSection = ({ user, teamMembers }: UserAboutSectionProps) => {
   const countryName = user?.country
     ? Country.getCountryByCode(user.country)?.name || user.country
     : "Not Specified";
+
+    const teamMembersAvatar = teamMembers?.map((member) => ({
+    id: parseInt(member.userId, 10),
+    userId: member.userId || "",
+    name: member.fullName || "",
+    image: member.userImage || "",
+    role: member.role?.name || "",
+    })) || [];
   return (
     <>
       <div className='w-full flex flex-col gap-10 px-5 py-7 bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-xl mt-5'>
@@ -118,8 +127,8 @@ const UserAboutSection = ({ user, teamMembers }: UserAboutSectionProps) => {
             <h3 className='uppercase text-neutral-600 dark:text-neutral-400 text-sm font-semibold tracking-wider'>
               Team Members
             </h3>
+            <AvatarGroup users={teamMembersAvatar} limit={4} />
           </div>
-          //   TODO: Add team members list
         )}
       </div>
     </>

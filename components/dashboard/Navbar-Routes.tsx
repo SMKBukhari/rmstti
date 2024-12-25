@@ -62,11 +62,13 @@ const NavbarRoutes = ({ userProfile, notifications }: NavbarRoutesProps) => {
 
   const isEmployeePage =
     pathName?.startsWith("/employee/dashboard") ||
+    pathName?.startsWith("/employee/team-members") ||
     pathName?.startsWith("/employee/profile") ||
     pathName?.startsWith("/employee/settings");
 
   const isAdminPage =
     pathName?.startsWith("/admin/dashboard") ||
+    pathName?.startsWith("/admin/team-members") ||
     pathName?.startsWith("/admin/employees") ||
     pathName?.startsWith("/admin/applicants") ||
     pathName?.startsWith("/admin/rejected") ||
@@ -76,6 +78,7 @@ const NavbarRoutes = ({ userProfile, notifications }: NavbarRoutesProps) => {
 
   const isManagerPage =
     pathName?.startsWith("/manager/dashboard") ||
+    pathName?.startsWith("/manager/team-members") ||
     pathName?.startsWith("/manager/employees") ||
     pathName?.startsWith("/manager/applicants") ||
     pathName?.startsWith("/manager/rejected") ||

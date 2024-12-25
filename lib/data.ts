@@ -1,5 +1,5 @@
 import { Country, City } from "country-state-city"
-import { Bell, BookUser, ChartNoAxesCombined, FileUser, LayoutDashboard, Lock, Settings, User, UserRoundX, Users } from "lucide-react";
+import { Bell, BookUser, ChartNoAxesCombined, FileUser, Group, LayoutDashboard, Lock, Settings, User, UserRoundX, Users } from "lucide-react";
 
 export const GenderOptions = [
   { label: "Male", value: "Male" },
@@ -72,6 +72,11 @@ export const adminRoutes = [
     icon: LayoutDashboard,
     label: "Dashboard",
     href: "/admin/dashboard",
+  },
+  {
+    icon: Group,
+    label: "Team Members",
+    href: "/admin/team-members",
   },
   {
     icon: Users,
@@ -151,6 +156,11 @@ export const employeeRoutes = [
     href: "/employee/dashboard",
   },
   {
+    icon: Group,
+    label: "Team Members",
+    href: "/employee/team-members",
+  },
+  {
     icon: User,
     label: "Profile",
     href: "/profile",
@@ -170,9 +180,9 @@ export const managerRoutes = [
     href: "/manager/dashboard",
   },
   {
-    icon: Users,
-    label: "Employees",
-    href: "/manager/employees",
+    icon: Group,
+    label: "Team Members",
+    href: "/manager/team-members",
   },
   {
     icon: FileUser,

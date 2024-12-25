@@ -31,6 +31,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   searchKey: string;
   routePrefix?: string;
+  userId?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -38,10 +39,13 @@ export function DataTable<TData, TValue>({
   data,
   searchKey,
   routePrefix,
+  userId,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [rowSelection, setRowSelection] = useState<{ [key: string]: boolean }>({});
+  const [rowSelection, setRowSelection] = useState<{ [key: string]: boolean }>(
+    {}
+  );
   const router = useRouter();
 
   const table = useReactTable({
@@ -64,10 +68,13 @@ export function DataTable<TData, TValue>({
   });
 
   const handleRowClick = (row: TData, event: React.MouseEvent) => {
-    // Check if the click target is a button or inside a button
-    if (!(event.target as HTMLElement).closest('button')) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const link = `/${routePrefix}/${(row as any).id}`;
+    if (!(event.target as HTMLElement).closest("button")) {
+      const link =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (row as any).id === userId // Check if the row belongs to the signed-in user
+          ? "/profile"
+          : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            `/${routePrefix}/${(row as any).id}`;
       router.push(link);
     }
   };

@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { redirect } from "next/navigation";
 import UserAboutSection from "./_components/UserAboutSection";
 import UserExperienceEducationSection from "./_components/UserExperienceEducationSection";
 import UserCoverLetterSection from "./_components/UserCoverLetterSection";
@@ -15,14 +14,6 @@ const ApplicantDetailsPage = async ({
 }) => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
-
-  if (!userId) {
-    redirect("/signIn");
-  }
-
-  if (userId.length < 24) {
-    redirect("/signIn");
-  }
 
   const user = await db.userProfile.findFirst({
     where: {
@@ -43,8 +34,6 @@ const ApplicantDetailsPage = async ({
       JobApplications: true,
     },
   });
-
-  const isApplicant = applicant?.role?.name === "Applicant";
 
   const userWithJobExperiences = applicant
     ? {
@@ -69,14 +58,6 @@ const ApplicantDetailsPage = async ({
         userId: applicant.userId || "",
       }
     : null;
-
-  if (!user) {
-    redirect("/admin/applicants");
-  }
-
-  if (!isApplicant) {
-    redirect("/admin/applicants");
-  }
   return (
     <div className='w-full'>
       <div className='flex items-center justify-between w-full'>
