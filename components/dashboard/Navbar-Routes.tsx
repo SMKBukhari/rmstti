@@ -63,12 +63,14 @@ const NavbarRoutes = ({ userProfile, notifications }: NavbarRoutesProps) => {
   const isEmployeePage =
     pathName?.startsWith("/employee/dashboard") ||
     pathName?.startsWith("/employee/team-members") ||
+    pathName?.startsWith("/employee/leave-management") ||
     pathName?.startsWith("/employee/profile") ||
     pathName?.startsWith("/employee/settings");
 
   const isAdminPage =
     pathName?.startsWith("/admin/dashboard") ||
     pathName?.startsWith("/admin/team-members") ||
+    pathName?.startsWith("/admin/leave-management") ||
     pathName?.startsWith("/admin/employees") ||
     pathName?.startsWith("/admin/applicants") ||
     pathName?.startsWith("/admin/rejected") ||
@@ -79,6 +81,7 @@ const NavbarRoutes = ({ userProfile, notifications }: NavbarRoutesProps) => {
   const isManagerPage =
     pathName?.startsWith("/manager/dashboard") ||
     pathName?.startsWith("/manager/team-members") ||
+    pathName?.startsWith("/manager/leave-management") ||
     pathName?.startsWith("/manager/employees") ||
     pathName?.startsWith("/manager/applicants") ||
     pathName?.startsWith("/manager/rejected") ||
@@ -88,11 +91,12 @@ const NavbarRoutes = ({ userProfile, notifications }: NavbarRoutesProps) => {
 
   const isCEOPage =
     pathName?.startsWith("/ceo/dashboard") ||
-    pathName?.startsWith("/ceo/dashboard/employees") ||
-    pathName?.startsWith("/ceo/dashboard/applicants") ||
-    pathName?.startsWith("/ceo/dashboard/rejected") ||
-    pathName?.startsWith("/ceo/dashboard/interviewees") ||
-    pathName?.startsWith("/ceo/dashboard/overview") ||
+    pathName?.startsWith("/ceo/leave-management") ||
+    pathName?.startsWith("/ceo/employees") ||
+    pathName?.startsWith("/ceo/applicants") ||
+    pathName?.startsWith("/ceo/rejected") ||
+    pathName?.startsWith("/ceo/interviewees") ||
+    pathName?.startsWith("/ceo/overview") ||
     pathName?.startsWith("/ceo/profile") ||
     pathName?.startsWith("/ceo/settings");
 

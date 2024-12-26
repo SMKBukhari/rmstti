@@ -89,12 +89,36 @@ const departmentSeed = async () => {
   }
 };
 
+const leaveTypesSeed = async () => {
+  try {
+    await database.leaveType.createMany({
+      data: [
+        { name: "Annual Leave" },
+        { name: "Sick Leave" },
+        { name: "Maternity Leave" },
+        { name: "Paternity Leave" },
+        { name: "Parental Leave" },
+        { name: "Family or Personal Leave" },
+        { name: "Compensatory Time" },
+        { name: "Study or Exam Leave" },
+        { name: "Hajj Leave" },
+        { name: "Umrah Leave" },
+        { name: "Half Leave" },
+      ],
+    });
+    console.log("Leave Type seeded successfully.");
+  } catch (error) {
+    console.log(`Error on seeding Leave Type: ${error}`);
+  }
+};
+
 const options = {
   1: workStatusSeed,
   2: statusSeed,
   3: applicationStatusSeed,
   4: roleSeed,
   5: departmentSeed,
+  6: leaveTypesSeed,
 } as const;
 
 console.log("Select an option to seed the database:");
@@ -103,6 +127,7 @@ console.log("2: Status");
 console.log("3: Application Status");
 console.log("4: Role");
 console.log("5: Department");
+console.log("6: Leave Types");
 
 rl.question("Enter your choice: ", (choice: string) => {
   const seedFunction = options[parseInt(choice) as SeedOption];

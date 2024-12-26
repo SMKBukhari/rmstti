@@ -202,3 +202,14 @@ export const JobOfferAcceptanceSchema = z.object({
   department: z.string(),
   role: z.string(),
 });
+
+export const LeaveRequestSchema = z.object({
+  leaveType: z.string(),
+  startDate: z.date(),
+  endDate: z.date(),
+  reason: z.string(),
+});
+
+export const LeaveDeleteSchema = z.object({
+  agree: z.string(),
+});

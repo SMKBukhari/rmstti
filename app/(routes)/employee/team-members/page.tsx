@@ -65,7 +65,7 @@ const TeamMembersPage = async () => {
           columns={columns}
           data={formattedApplicants}
           searchKey='fullName'
-          routePrefix='manager/team-members'
+          routePrefix='employee/team-members'
           userId={user?.userId}
         />
       </div>
