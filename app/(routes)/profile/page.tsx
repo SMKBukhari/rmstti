@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import UserProfileSection from "./_components/UserProfileSection";
 import UserAboutSection from "./_components/UserAboutSection";
 import UserExperienceEducationSection from "./_components/UserExperienceEducationSection";
+import { Card } from "@/components/ui/card";
 const ProfilePage = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
@@ -51,9 +52,7 @@ const ProfilePage = async () => {
 
   const teamMembers =
     user?.role?.name !== "User"
-      ? user?.department?.users.filter(
-          (teamMember) => teamMember.userId
-        )
+      ? user?.department?.users.filter((teamMember) => teamMember.userId)
       : [];
 
   return (

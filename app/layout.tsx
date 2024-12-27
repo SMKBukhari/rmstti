@@ -24,7 +24,8 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body
-        className={`${roboto.className} antialiased bg-[#f1f1f1] dark:bg-[#1A1A1A]`}
+        // className={`${roboto.className} antialiased bg-[#f1f1f1] dark:bg-[#1A1A1A] overflow-hidden`}
+        className={`${roboto.className} antialiased overflow-hidden`}
       >
         <Providers>
           <main>{children}</main>

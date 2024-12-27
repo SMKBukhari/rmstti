@@ -1,5 +1,6 @@
 import ClientAvatar from "@/components/AvatarClient";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card } from "@/components/ui/card";
 import { Role, UserProfile } from "@prisma/client";
 import { format } from "date-fns";
 import { CalendarCheck, Crown, MapPin } from "lucide-react";
@@ -10,7 +11,7 @@ interface UserProfileSectionProps {
 const UserProfileSection = ({ user }: UserProfileSectionProps) => {
   const avatarFallback = user?.fullName?.substring(0, 2).toUpperCase() || "U";
   return (
-    <div className='w-full md:h-24 h-40 flex md:flex-row flex-col md:justify-start justify-end items-center bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-xl relative'>
+    <Card className='w-full md:h-24 h-40 flex md:flex-row flex-col md:justify-start justify-end items-center bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-xl relative'>
       <div className='md:w-16 md:h-16 sm:w-24 sm:h-24 w-16 h-16  ml-5 md:relative absolute md:-top-0 -top-3'>
         {user?.userImage ? (
           <Avatar className='w-full h-full'>
@@ -46,7 +47,7 @@ const UserProfileSection = ({ user }: UserProfileSectionProps) => {
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

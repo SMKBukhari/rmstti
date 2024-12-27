@@ -1,4 +1,5 @@
 import AvatarGroup from "@/components/ui/avatar-group";
+import { Card } from "@/components/ui/card";
 import { Role, Status, UserProfile } from "@prisma/client";
 import { Country } from "country-state-city";
 import { Check, Crown, Flag, Mail, Phone, User } from "lucide-react";
@@ -25,16 +26,17 @@ const UserAboutSection = ({ user, teamMembers }: UserAboutSectionProps) => {
     ? Country.getCountryByCode(user.country)?.name || user.country
     : "Not Specified";
 
-    const teamMembersAvatar = teamMembers?.map((member) => ({
-    id: parseInt(member.userId, 10),
-    userId: member.userId || "",
-    name: member.fullName || "",
-    image: member.userImage || "",
-    role: member.role?.name || "",
+  const teamMembersAvatar =
+    teamMembers?.map((member) => ({
+      id: parseInt(member.userId, 10),
+      userId: member.userId || "",
+      name: member.fullName || "",
+      image: member.userImage || "",
+      role: member.role?.name || "",
     })) || [];
   return (
     <>
-      <div className='w-full flex flex-col gap-10 px-5 py-7 bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-xl mt-5'>
+      <Card className='w-full flex flex-col gap-10 px-5 py-7 bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-xl mt-5'>
         <div className='flex flex-col gap-4'>
           <h3 className='uppercase text-neutral-600 dark:text-neutral-400 text-sm font-semibold tracking-wider'>
             About
@@ -130,7 +132,7 @@ const UserAboutSection = ({ user, teamMembers }: UserAboutSectionProps) => {
             <AvatarGroup users={teamMembersAvatar} limit={4} />
           </div>
         )}
-      </div>
+      </Card>
     </>
   );
 };

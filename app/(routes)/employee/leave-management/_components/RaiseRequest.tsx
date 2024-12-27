@@ -59,7 +59,7 @@ const RaiseRequest = ({ leaveType, user }: RaiseRequestProps) => {
   };
   return (
     <>
-      <div className='flex w-full items-end justify-end'>
+      <div className='flex w-full items-end justify-end mt-6'>
         <Button variant={"primary"} onClick={() => setDialogOpen(true)}>
           <Plus className='w-5 h-5 mr-2' /> Raise Request
         </Button>

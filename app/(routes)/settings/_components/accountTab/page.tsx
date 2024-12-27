@@ -6,6 +6,7 @@ import UserExperiences from "./_components/userExperiences";
 import UserEducation from "./_components/userEducations";
 import UserSkillss from "./_components/userSkills";
 import UserResumeUpload from "./_components/userResumeUpload";
+import { Card } from "@/components/ui/card";
 
 interface AccountTabPageProps {
   user: UserProfile | null;
@@ -24,12 +25,12 @@ const AccountTabPage = ({ user, userExperiences, userEducation, userSkills }: Ac
 
       <UserResumeUpload user={user} />
 
-      <div className='w-full flex flex-col items-center justify-center gap-10 px-10 py-10 pt-13 bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-xl mt-5'>
+      <Card className='w-full flex flex-col items-center justify-center gap-10 px-10 py-10 pt-13 bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-xl mt-5'>
         <h2 className='text-xl font-medium text-muted-foreground self-start'>
           Social Links
         </h2>
         <SocialLinls user={user} />
-      </div>
+      </Card>
 
       <UserExperiences user={userExperiences} />
 

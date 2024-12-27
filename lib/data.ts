@@ -5,9 +5,11 @@ import {
   ChartNoAxesCombined,
   FileUser,
   Group,
+  Hand,
   LayoutDashboard,
   Lock,
   NotebookText,
+  NotepadTextDashed,
   Settings,
   User,
   UserRoundX,
@@ -97,6 +99,18 @@ export const adminRoutes = [
     icon: NotebookText,
     label: "Leave Management",
     href: "/admin/leave-management",
+    subitems: [
+      {
+        icon: Hand,
+        label: "Raise Leave Requests",
+        href: "/admin/leave-management/raise-requests",
+      },
+      {
+        icon: NotepadTextDashed,
+        label: "Manage Employee Leave Requests",
+        href: "/admin/leave-management/manage-requests",
+      },
+    ],
   },
   {
     icon: Users,
@@ -130,44 +144,6 @@ export const adminRoutes = [
   },
   notificationRoute, // Add notifications route
 ];
-
-// export const applicantRoutes = [
-//   {
-//     icon: LayoutDashboard,
-//     label: "Dashboard",
-//     href: "/applicant/dashboard",
-//   },
-//   {
-//     icon: User,
-//     label: "Profile",
-//     href: "/profile",
-//   },
-//   {
-//     icon: Settings,
-//     label: "Account Settings",
-//     href: "/settings",
-//   },
-//   notificationRoute, // Add notifications route
-// ];
-
-// export const interviewerRoutes = [
-//   {
-//     icon: LayoutDashboard,
-//     label: "Dashboard",
-//     href: "/interviewer/dashboard",
-//   },
-//   {
-//     icon: User,
-//     label: "Profile",
-//     href: "/profile",
-//   },
-//   {
-//     icon: Settings,
-//     label: "Account Settings",
-//     href: "/settings",
-//   },
-//   notificationRoute, // Add notifications route
-// ];
 
 export const employeeRoutes = [
   {
@@ -213,6 +189,18 @@ export const managerRoutes = [
     icon: NotebookText,
     label: "Leave Management",
     href: "/manager/leave-management",
+    subitems: [
+      {
+        icon: Hand,
+        label: "Raise Leave Requests",
+        href: "/manager/leave-management/raise-requests",
+      },
+      {
+        icon: NotepadTextDashed,
+        label: "Manage Employee Leave Requests",
+        href: "/manager/leave-management/manage-requests",
+      },
+    ],
   },
   {
     icon: FileUser,

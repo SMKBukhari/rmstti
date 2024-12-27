@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { UserProfile } from "@prisma/client";
 import axios, { AxiosProgressEvent } from "axios";
 import { File, FilePlus, Loader2, Plus, Trash, X } from "lucide-react";
@@ -137,7 +138,7 @@ const UserResumeUpload = ({ user }: { user: UserProfile | null }) => {
   };
 
   return (
-    <div className='w-full flex flex-col items-center justify-center gap-10 px-10 py-10 pt-13 bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-xl mt-5'>
+    <Card className='w-full flex flex-col items-center justify-center gap-10 px-10 py-10 pt-13 bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-xl mt-5'>
       <div className='flex justify-between w-full'>
         <h2 className='text-xl font-medium text-muted-foreground self-start'>
           Upload Resume<span className='text-red-500 ml-1'>*</span>
@@ -268,7 +269,7 @@ const UserResumeUpload = ({ user }: { user: UserProfile | null }) => {
           />
         )}
       </Modal>
-    </div>
+    </Card>
   );
 };
 
