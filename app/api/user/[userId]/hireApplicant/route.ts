@@ -85,7 +85,7 @@ export const POST = async (
         message: `${applicant.fullName} has been hired for the position of ${designation} in the ${department} department by ${user.fullName}.`,
         createdBy: NotificationCreator.Admin, // Notification from the system.
         senderImage: user.userImage,
-        link: `/admin/employees`,
+        link: `/ceo/employees`,
         type: NotificationType.General,
       })),
       ...adminExcepThisUser.map((admin) => ({

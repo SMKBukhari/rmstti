@@ -33,7 +33,7 @@ const CellActions = ({ user, id, fullName, email }: CellActionsProps) => {
   const onSubmit = async () => {
     try {
       setIsLoading(true);
-      await axios.delete(`/api/user/${user?.userId}/raiseLeaveRequest/${id}`);
+      await axios.delete(`/api/user/${user?.userId}/employeeRaiseLeaveRequest/${id}`);
       toast.success(`Leave request Deleted successfully.`);
       setDialogOpen(false);
       setIsLoading(false);

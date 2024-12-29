@@ -2,10 +2,10 @@ import CustomBreadCrumb from "@/components/CustomBreadCrumb";
 import { DataTable } from "@/components/ui/data-table";
 import { db } from "@/lib/db";
 import React from "react";
-import { columns, LeaveRequestsColumns } from "./_components/columns";
 import { format } from "date-fns";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { columns, LeaveRequestsColumns } from "./_components/columns";
 import RaiseRequest from "./_components/RaiseRequest";
 
 const ApplicantsPage = async () => {
@@ -54,7 +54,14 @@ const ApplicantsPage = async () => {
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
       <div className='flex items-center justify-between w-full'>
-        <CustomBreadCrumb breadCrumbPage='Leave Management' />
+        <CustomBreadCrumb breadCrumbPage='Raise Requests' breadCrumbItem={
+          [
+            {
+              label: 'Leave Management',
+              link: '/manager/leave-management/raise-requests',
+            },
+          ]
+        } />
       </div>
 
       <RaiseRequest leaveType={leaveTypes} user={user} />
@@ -64,7 +71,7 @@ const ApplicantsPage = async () => {
           columns={columns}
           data={formattedLeaveRequests}
           searchKey='leaveType'
-          routePrefix='employee/leave-management'
+          routePrefix='manager/leave-management/raise-requests'
         />
       </div>
     </div>

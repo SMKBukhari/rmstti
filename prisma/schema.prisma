@@ -72,19 +72,23 @@ model UserProfile {
 }
 
 model LeaveRequest {
-  id              String      @id @unique @default(cuid())
-  userId          String
-  user            UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  leaveTypeId     String
-  leaveType       LeaveType   @relation(fields: [leaveTypeId], references: [id])
-  startDate       DateTime
-  endDate         DateTime
-  reason          String
-  status          LeaveStatus @default(Pending)
-  managerApproval Boolean?    @default(false)
-  ceoApproval     Boolean?    @default(false)
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @default(now())
+  id                    String      @id @unique @default(cuid())
+  userId                String
+  user                  UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  leaveTypeId           String
+  leaveType             LeaveType   @relation(fields: [leaveTypeId], references: [id])
+  startDate             DateTime
+  endDate               DateTime
+  reason                String
+  status                LeaveStatus @default(Pending)
+  managerApproval       Boolean?    @default(false)
+  adminApproval         Boolean?    @default(false)
+  ceoApproval           Boolean?    @default(false)
+  requireHigherApproval Boolean?    @default(false)
+  approvedBy            String?
+  rejectedBy            String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @default(now())
 }
 
 model LeaveType {
@@ -265,4 +269,5 @@ enum LeaveStatus {
   Pending
   Approved
   Rejected
+  PendingHigherApproval
 }

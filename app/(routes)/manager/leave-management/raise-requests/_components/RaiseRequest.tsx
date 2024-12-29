@@ -36,7 +36,7 @@ const RaiseRequest = ({ leaveType, user }: RaiseRequestProps) => {
   const onSubmit = async (data: z.infer<typeof LeaveRequestSchema>) => {
     try {
       setIsLoading(true);
-      await axios.post(`/api/user/${user?.userId}/raiseLeaveRequest`, {
+      await axios.post(`/api/user/${user?.userId}/managerLeaveManagement`, {
         ...data,
       });
       console.log(data);
