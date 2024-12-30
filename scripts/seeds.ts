@@ -14,10 +14,11 @@ const workStatusSeed = async () => {
   try {
     await database.WorkStatus.createMany({
       data: [
-        { name: "On Leave" },
-        { name: "On Site" },
-        { name: "Work From Home" },
-        { name: "Half Day" },
+        // { name: "On Leave" },
+        // { name: "On Site" },
+        // { name: "Work From Home" },
+        // { name: "Half Day" },
+        { name: "Absent" },
       ],
     });
     console.log("Work statuses seeded successfully.");
