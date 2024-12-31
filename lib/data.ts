@@ -2,6 +2,7 @@ import { Country, City } from "country-state-city";
 import {
   Bell,
   BookUser,
+  Calendar,
   ChartNoAxesCombined,
   FileUser,
   Group,
@@ -245,6 +246,11 @@ export const ceoRoutes = [
     icon: NotebookText,
     label: "Leave Management",
     href: "/ceo/leave-management",
+  },
+  {
+    icon: Calendar,
+    label: "Time Table",
+    href: "/ceo/timetable",
   },
   {
     icon: FileUser,

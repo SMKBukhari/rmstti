@@ -69,6 +69,7 @@ model UserProfile {
   leaveRequests           LeaveRequest[]
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @default(now())
+  TimeTable               TimeTable[]
 }
 
 model LeaveRequest {
@@ -234,6 +235,30 @@ model Notifications {
   type        NotificationType
 }
 
+model TimeTable {
+  id         String      @id @unique @default(cuid())
+  userId     String
+  user       UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  date       DateTime
+  shiftStart DateTime
+  shiftEnd   DateTime
+  shiftType  ShiftType
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @default(now())
+}
+
+// Company related models
+model company {
+  id          String      @id @unique @default(cuid())
+  name        String      @unique
+  logo        String?
+  email       String?
+  contact     String?
+  address     String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now())
+}
+
 enum Gender {
   Male
   Female
@@ -270,4 +295,10 @@ enum LeaveStatus {
   Approved
   Rejected
   PendingHigherApproval
+}
+
+enum ShiftType {
+  Morning
+  Evening
+  Off
 }

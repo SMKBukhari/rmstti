@@ -23,31 +23,28 @@ const ApplicantsPage = async () => {
   const applicationStatus = await db.applicationStatus.findFirst({
     where: { name: "Hired" },
   });
-  const employees = await db.jobApplications.findMany({
+  const employees = await db.userProfile.findMany({
     where: {
       applicationStatusId: applicationStatus?.id,
     },
     include: {
-      user: {
-        include: {
-          role: true,
-          workstatus: true,
-        },
-      },
+      role: true,
+      workstatus: true,
+      department: true,
     },
   });
 
   // Formatting the applicants data for the table
   const formattedEmployees: EmployeeColumns[] = employees.map((employee) => ({
     user: user,
-    id: employee.user.userId,
-    fullName: employee.user?.fullName ?? "N/A",
-    email: employee.user?.email ?? "N/A",
-    contact: employee.user?.contactNumber ?? "N/A",
-    role: employee.user.role?.name ?? "N/A",
-    department: employee.department ?? "N/A",
-    status: employee.user.workstatus?.name ?? "N/A",
-    userImage: employee.user?.userImage ?? "N/A",
+    id: employee.userId,
+    fullName: employee.fullName ?? "N/A",
+    email: employee.email ?? "N/A",
+    contact: employee.contactNumber ?? "N/A",
+    role: employee.role?.name ?? "N/A",
+    department: employee.department?.name ?? "N/A",
+    status: employee.workstatus?.name ?? "N/A",
+    userImage: employee.userImage ?? "N/A",
   }));
 
   return (
