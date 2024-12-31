@@ -213,3 +213,7 @@ export const LeaveRequestSchema = z.object({
 export const LeaveDeleteSchema = z.object({
   agree: z.string(),
 });
+
+export const DepartmentsSchema = z.object({
+  name: z.string(),
+});

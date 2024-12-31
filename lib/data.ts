@@ -2,6 +2,7 @@ import { Country, City } from "country-state-city";
 import {
   Bell,
   BookUser,
+  Building2,
   Calendar,
   ChartNoAxesCombined,
   FileUser,
@@ -12,6 +13,7 @@ import {
   NotebookText,
   NotepadTextDashed,
   Settings,
+  SlidersHorizontal,
   User,
   UserRoundX,
   Users,
@@ -52,6 +54,19 @@ export const settingsTabs = [
     icon: Users,
     label: "Account",
     value: "account",
+  },
+  {
+    icon: Lock,
+    label: "Security",
+    value: "security",
+  },
+];
+
+export const configurationTabs = [
+  {
+    icon: Building2,
+    label: "General",
+    value: "general",
   },
   {
     icon: Lock,
@@ -114,6 +129,11 @@ export const adminRoutes = [
     ],
   },
   {
+    icon: Calendar,
+    label: "Time Table",
+    href: "/admin/timetable",
+  },
+  {
     icon: Users,
     label: "Employees",
     href: "/admin/employees",
@@ -142,6 +162,11 @@ export const adminRoutes = [
     icon: Settings,
     label: "Account Settings",
     href: "/settings",
+  },
+  {
+    icon: SlidersHorizontal,
+    label: "Configuration",
+    href: "/admin/configuration",
   },
   notificationRoute, // Add notifications route
 ];
@@ -281,6 +306,11 @@ export const ceoRoutes = [
     icon: Settings,
     label: "Account Settings",
     href: "/settings",
+  },
+  {
+    icon: SlidersHorizontal,
+    label: "Configuration",
+    href: "/ceo/configuration",
   },
   notificationRoute, // Add notifications route
 ];
