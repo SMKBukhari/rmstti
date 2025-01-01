@@ -9,6 +9,7 @@ import {
   Group,
   Hand,
   LayoutDashboard,
+  List,
   Lock,
   NotebookText,
   NotepadTextDashed,
@@ -132,6 +133,11 @@ export const adminRoutes = [
     icon: Calendar,
     label: "Time Table",
     href: "/admin/timetable",
+  },
+  {
+    icon: List,
+    label: "Jobs",
+    href: "/admin/jobs",
   },
   {
     icon: Users,
@@ -276,6 +282,11 @@ export const ceoRoutes = [
     icon: Calendar,
     label: "Time Table",
     href: "/ceo/timetable",
+  },
+  {
+    icon: List,
+    label: "Jobs",
+    href: "/ceo/jobs",
   },
   {
     icon: FileUser,

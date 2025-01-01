@@ -39,15 +39,22 @@ interface BannerProps extends VariantProps<typeof bannerVariants> {
     label: string;
     link: string;
   };
+  className?: string;
 }
 
-const Banner = ({ label, variant, button, buttonLink }: BannerProps) => {
+const Banner = ({
+  label,
+  variant,
+  button,
+  buttonLink,
+  className,
+}: BannerProps) => {
   const Icon = iconMap[variant || "warning"];
   return (
     <div
       className={`md:text-sm text-xs justify-between ${bannerVariants({
         variant,
-      })}`}
+      })} ${className}`}
     >
       <div className='flex items-center'>
         <Icon className='w-6 h-6 md:block hidden mr-2' />
@@ -73,6 +80,3 @@ const Banner = ({ label, variant, button, buttonLink }: BannerProps) => {
 };
 
 export default Banner;
-
-
-

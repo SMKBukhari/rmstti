@@ -135,6 +135,8 @@ model ApplicationStatus {
 
 model JobApplications {
   id                     String             @id @unique @default(cuid())
+  jobId                  String
+  job                    Job                @relation(fields: [jobId], references: [id], onDelete: Cascade)
   userId                 String
   user                   UserProfile        @relation(fields: [userId], references: [userId], onDelete: Cascade)
   applicationStatusId    String?
@@ -249,14 +251,47 @@ model TimeTable {
 
 // Company related models
 model company {
-  id          String      @id @unique @default(cuid())
-  name        String      @unique
-  logo        String?
-  email       String?
-  contact     String?
-  address     String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @default(now())
+  id        String   @id @unique @default(cuid())
+  name      String   @unique
+  logo      String?
+  email     String?
+  contact   String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Job {
+  id                String            @id @unique @default(cuid())
+  userId            String
+  title             String
+  description       String?           @db.LongText
+  shortDescription  String?           @db.Text
+  imageName         String?
+  imageUrl          String?
+  imagePublicId     String?
+  isPusblished      Boolean           @default(false)
+  tags              String?
+  savedUsers        String?
+  shiftTiming       String?
+  salary            String?
+  yearsOfExperience String?
+  workMode          String?
+  attachments       Attachments[]
+  applications      JobApplications[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @default(now())
+}
+
+model Attachments {
+  id        String   @id @unique @default(cuid())
+  name      String
+  url       String
+  publicId  String
+  jobId     String
+  job       Job?     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }
 
 enum Gender {

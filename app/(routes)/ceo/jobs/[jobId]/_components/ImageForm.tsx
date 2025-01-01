@@ -2,11 +2,20 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { UserProfile } from "@prisma/client";
+import { Job, UserProfile } from "@prisma/client";
 import axios, { AxiosProgressEvent } from "axios";
-import { File, FilePlus, Loader2, Plus, Trash, X } from "lucide-react";
+import {
+  File,
+  FilePlus,
+  ImageIcon,
+  Loader2,
+  Plus,
+  Trash,
+  X,
+} from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 type Modal = {
@@ -15,7 +24,6 @@ type Modal = {
   children: React.ReactNode;
 };
 
-// Modal component (can be reused in other components)
 const Modal = ({ isOpen, onClose, children }: Modal) => {
   if (!isOpen) return null;
 
@@ -35,19 +43,25 @@ const Modal = ({ isOpen, onClose, children }: Modal) => {
   );
 };
 
-const UserResumeUpload = ({ user }: { user: UserProfile | null }) => {
+interface ImageFormProps {
+  initialData: Job | null;
+  jobId: string | undefined;
+  user: UserProfile | null;
+}
+
+const ImageForm = ({ initialData, jobId, user }: ImageFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [isResumeLoading, setIsResumeLoading] = useState(true);
-  const [fileUrl, setFileUrl] = useState<string | null>(null);
-  const [iframeUrl, setIframeUrl] = useState<string>("");
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [isImageLoading, setIsImageLoading] = useState(true);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
   const toggleEditing = () => setIsEditing((current) => !current);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFile = e.target.files[0];
@@ -57,16 +71,16 @@ const UserResumeUpload = ({ user }: { user: UserProfile | null }) => {
   };
 
   const handleUpload = async () => {
-    if (!file || !user) return;
+    if (!file || !jobId) return;
 
     setUploading(true);
     const formData = new FormData();
-    formData.append("resume", file);
-    formData.append("userId", user.userId);
+    formData.append("image", file);
+    formData.append("jobId", jobId);
 
     try {
       const response = await axios.post(
-        `/api/cldResume/uploadResume`,
+        `/api/user/${user?.userId}/createNewJob/${jobId}/cldJobImage`,
         formData,
         {
           headers: {
@@ -80,10 +94,11 @@ const UserResumeUpload = ({ user }: { user: UserProfile | null }) => {
           },
         }
       );
+      console.log(formData + " " + response);
 
-      toast.success(`${user.fullName}'s resume uploaded successfully!`);
+      toast.success("Job cover image uploaded successfully!");
       setIsEditing(false);
-      setFileUrl(response.data.resumeUrl);
+      setImageUrl(response.data.imageUrl);
       router.refresh();
     } catch (error: unknown) {
       toast.error(
@@ -99,101 +114,68 @@ const UserResumeUpload = ({ user }: { user: UserProfile | null }) => {
 
   const handleDelete = async () => {
     setIsLoading(true);
-    const payload = {
-      userId: user?.userId,
-      filePublicId: user?.resumePublicId,
-    };
-
     try {
-      const response = await axios.post("/api/cldResume/deleteResume", payload);
-      console.log("API Response:", response.data);
-      toast.success("Resume deleted successfully");
-      setFileUrl(null);
-      setIsLoading(false);
+      await axios.delete(
+        `/api/user/${user?.userId}/createNewJob/${jobId}/cldJobImage`
+      );
+      toast.success("Job cover image deleted successfully");
+      setImageUrl(null);
       router.refresh();
     } catch (error) {
       console.error("Error in API request:", error);
-      toast.error("Failed to delete Resume");
+      toast.error("Failed to delete job cover image");
+    } finally {
       setIsLoading(false);
-      router.refresh();
     }
-  };
-
-  useEffect(() => {
-    setIsResumeLoading(true);
-    if (fileUrl || user?.resumeUrl || "".includes("cloudinary.com")) {
-      setIframeUrl(
-        `${fileUrl || user?.resumeUrl || ""}#toolbar=0&navpanes=0&scrollbar=0`
-      );
-    } else {
-      setIframeUrl(fileUrl || user?.resumeUrl || "");
-    }
-  }, [user?.resumeUrl, fileUrl]);
-
-  const handleIframeLoad = () => {
-    setIsResumeLoading(false);
   };
 
   return (
     <Card className='w-full flex flex-col items-center justify-center gap-10 px-10 py-10 pt-13 bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-xl mt-5'>
       <div className='flex justify-between w-full'>
         <h2 className='text-xl font-medium text-muted-foreground self-start'>
-          Upload Resume<span className='text-red-500 ml-1'>*</span>
+          Job Cover Image
         </h2>
-        {!isEditing && (
-          <Button onClick={toggleEditing} variant={"primary"}>
-            {isEditing ? (
-              <div>Cancel</div>
-            ) : (
-              <div className='text-white dark:text-white hover:font-semibold flex items-center'>
-                <Plus className='w-4 text-white dark:text-white hover:font-semibold h-4 mr-2' />
-                Add
-              </div>
-            )}
+        {initialData?.imageUrl ? (
+          <Button
+            variant={"destructive"}
+            onClick={handleDelete}
+            disabled={isLoading}
+          >
+            {isLoading ? "Deleting..." : "Delete"}
           </Button>
+        ) : (
+          !isEditing && (
+            <Button onClick={toggleEditing} variant={"primary"}>
+              {isEditing ? (
+                <div>Cancel</div>
+              ) : (
+                <div className='text-white dark:text-white hover:font-semibold flex items-center'>
+                  <Plus className='w-4 text-white dark:text-white hover:font-semibold h-4 mr-2' />
+                  {initialData?.imageUrl ? "Change" : "Add"}
+                </div>
+              )}
+            </Button>
+          )
         )}
       </div>
 
       {!isEditing &&
-        (user?.resumeUrl === null ? (
-          <div className='flex justify-center items-center'>
-            <div className='text-neutral-400 flex justify-center items-center flex-col'>
-              <p>Resume not added yet</p>
-              <p className='text-sm text-neutral-500'>
-                You need to add your resume to apply for any job.
-              </p>
-            </div>
+        (initialData?.imageUrl ? (
+          <div className='relative w-full h-60 aspect-square mt-2'>
+            <Image
+              alt='Cover Image'
+              fill
+              className='w-full h-full object-cover'
+              src={initialData?.imageUrl}
+            />
           </div>
         ) : (
-          <div className='space-y-2 grid grid-cols-2 w-full'>
-            <div className='w-full'>
-              <div className='text-xs flex items-center gap-1 whitespace-nowrap md:py-1 px-2 rounded-md bg-neutral-200 dark:bg-neutral-900 md:col-span-11 col-span-4'>
-                <File className='w-10 h-10 mr-2' />
-                <p className='text-xs w-full truncate'>{user?.resumeName}</p>
-                <Button
-                  variant={"ghost"}
-                  size={"sm"}
-                  className=''
-                  type='button'
-                  onClick={() => setIsModalOpen(true)} // Open modal on button click
-                >
-                  View
-                </Button>
-                <Button
-                  size={"icon"}
-                  variant={"ghost"}
-                  className='hover:bg-red-800'
-                  onClick={handleDelete}
-                >
-                  {isLoading ? (
-                    <div className='w-4 h-4'>
-                      <Loader2 className='w-4 h-4 animate-spin' />
-                    </div>
-                  ) : (
-                    <Trash className='w-4 h-4' />
-                  )}
-                </Button>
-              </div>
+          <div className='flex justify-center items-center'>
+            <div className='text-neutral-400 flex justify-center items-center flex-col'>
+              <p>No cover image added yet</p>
+              <p className='text-sm text-neutral-500'>
+                Add a cover image to make your job posting more attractive.
+              </p>
             </div>
           </div>
         ))}
@@ -206,7 +188,7 @@ const UserResumeUpload = ({ user }: { user: UserProfile | null }) => {
                 {!uploading && (
                   <>
                     <FilePlus className='w-3 h-3 mr-2' />
-                    <p>{file ? file.name : "Add a File"}</p>
+                    <p>{file ? file.name : "Add an Image"}</p>
                   </>
                 )}
                 {uploading && (
@@ -226,7 +208,7 @@ const UserResumeUpload = ({ user }: { user: UserProfile | null }) => {
               <input
                 key={file ? file.name : "new"}
                 type='file'
-                accept='.pdf'
+                accept='image/*'
                 className='w-0 h-0'
                 onChange={handleFileChange}
                 disabled={uploading}
@@ -239,32 +221,34 @@ const UserResumeUpload = ({ user }: { user: UserProfile | null }) => {
             onClick={handleUpload}
             disabled={uploading}
           >
-            {uploading ? "Uploading..." : "Upload Resume"}
+            {uploading ? "Uploading..." : "Upload Image"}
           </Button>
         </>
       )}
 
-      {/* Modal for PDF Viewer */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        {isResumeLoading && (
+        {isImageLoading && (
           <div className='absolute inset-0 flex items-center justify-center bg-gray-100'>
             <div className='text-center'>
               <Loader2 className='w-10 h-10 animate-spin text-blue-500 mx-auto' />
-              <p className='mt-2 text-gray-600'>Loading PDF...</p>
+              <p className='mt-2 text-gray-600'>Loading Image...</p>
             </div>
           </div>
         )}
-        {iframeUrl && (
-          <iframe
-            src={iframeUrl}
-            className='w-full h-full border-none'
-            title='PDF Preview'
-            onLoad={handleIframeLoad}
-          />
+        {initialData?.imageUrl && (
+          <div className='relative w-full h-60 aspect-square mt-2'>
+            <Image
+              src={initialData?.imageUrl}
+              alt='Job Cover Image'
+              fill
+              onLoad={() => setIsImageLoading(false)}
+              className='rounded-md'
+            />
+          </div>
         )}
       </Modal>
     </Card>
   );
 };
 
-export default UserResumeUpload;
+export default ImageForm;

@@ -19,7 +19,7 @@ interface CellActionsProps {
   email: string;
 }
 
-const CellActions = ({ user, id, fullName, email }: CellActionsProps) => {
+const CellActions = ({ user, id, fullName }: CellActionsProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -39,10 +39,10 @@ const CellActions = ({ user, id, fullName, email }: CellActionsProps) => {
         applicantId: id,
         interviewDateTime: data.interviewDateTime,
       });
+      router.refresh();
       toast.success(`Interview scheduled successfully for ${fullName}.`);
       setDialogOpen(false);
       setIsLoading(false);
-      router.refresh();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         if (error.response && error.response.data) {
