@@ -1,14 +1,12 @@
 import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export const PATCH = async (
   req: Request,
-  { params }: { params: { jobId: string } }
+  { params }: { params: { jobId: string; userId: string } }
 ) => {
   try {
-    const { userId } = auth();
-    const { jobId } = params;
+    const { jobId, userId } = params;
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -28,7 +26,15 @@ export const PATCH = async (
       return new NextResponse("Not Found", { status: 404 });
     }
 
-    const userIndex = job.savedUsers.indexOf(userId);
+    // Parse savedUsers into an array if it's a string, or initialize as an empty array
+    const savedUsers: string[] =
+      typeof job.savedUsers === "string"
+        ? JSON.parse(job.savedUsers)
+        : Array.isArray(job.savedUsers)
+        ? job.savedUsers
+        : [];
+
+    const userIndex = savedUsers.indexOf(userId);
 
     let updatedJob;
 
@@ -38,9 +44,7 @@ export const PATCH = async (
           id: jobId,
         },
         data: {
-          savedUsers: {
-            set: job.savedUsers.filter((id) => id !== userId),
-          },
+          savedUsers: JSON.stringify(savedUsers.filter((id) => id !== userId)), // Convert back to string
         },
       });
     }

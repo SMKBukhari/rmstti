@@ -1,48 +1,56 @@
 import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export const PATCH = async (
   req: Request,
-  { params }: { params: { jobId: string } }
+  { params }: { params: { jobId: string, userId:string } }
 ) => {
-    try {
+  try {
+    const { jobId, userId } = params;
 
-        const {userId} = auth();
-        const {jobId} = params;
-
-        if (!userId) {
-            return new NextResponse("Unauthorized", { status: 401 });
-        }
-
-        if (!jobId) {
-            return new NextResponse("ID is missing", { status: 404 });
-        }
-
-        const job = await db.job.findUnique({
-            where: {
-                id: jobId,
-            },
-        })
-
-        if (!job) {
-            return new NextResponse("Not Found", { status: 404 });
-        }
-
-        const updatedData = {
-            savedUsers: job.savedUsers ? {push:userId} : [userId]
-        }
-
-        const updatedJob = await db.job.update({
-            where: {
-                id: jobId,
-            },
-            data: updatedData,
-        })
-        
-        return NextResponse.json(updatedJob);
-    } catch (error) {
-        console.log(`[JOB_PUBLISH_PATCH]: ${error}`);
-        return new NextResponse("Internal Server Error", { status: 500 });
+    if (!userId) {
+      return new NextResponse("Unauthorized", { status: 401 });
     }
+
+    if (!jobId) {
+      return new NextResponse("ID is missing", { status: 404 });
+    }
+
+    const job = await db.job.findUnique({
+      where: {
+        id: jobId,
+      },
+    });
+
+    if (!job) {
+      return new NextResponse("Not Found", { status: 404 });
+    }
+
+    // Parse savedUsers into an array if it's a string or initialize as an empty array
+    const savedUsers: string[] =
+      typeof job.savedUsers === "string"
+        ? JSON.parse(job.savedUsers)
+        : Array.isArray(job.savedUsers)
+        ? job.savedUsers
+        : [];
+
+    // Add the userId if not already present
+    if (!savedUsers.includes(userId)) {
+      savedUsers.push(userId);
+    }
+
+    const updatedJob = await db.job.update({
+      where: {
+        id: jobId,
+      },
+      data: {
+        savedUsers: JSON.stringify(savedUsers), // Convert array back to JSON string for storage
+      },
+    });
+
+    return NextResponse.json(updatedJob);
+  } catch (error) {
+    console.log(`[JOB_PUBLISH_PATCH]: ${error}`);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
 };
