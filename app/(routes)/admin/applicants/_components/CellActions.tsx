@@ -19,7 +19,7 @@ interface CellActionsProps {
   email: string;
 }
 
-const CellActions = ({ user, id, fullName, email }: CellActionsProps) => {
+const CellActions = ({ user, id, fullName }: CellActionsProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();

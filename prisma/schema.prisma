@@ -271,12 +271,11 @@ model Job {
   imageUrl          String?
   imagePublicId     String?
   isPusblished      Boolean           @default(false)
-  tags              String?
-  savedUsers        String?
   shiftTiming       String?
   salary            String?
   yearsOfExperience String?
   workMode          String?
+  department        String?
   attachments       Attachments[]
   applications      JobApplications[]
   createdAt         DateTime          @default(now())

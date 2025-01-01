@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import ComboBox from "@/components/ui/combo-box";
 import {
   Form,
   FormControl,
@@ -9,9 +10,9 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Job, UserProfile } from "@prisma/client";
+import { Department, Job, UserProfile } from "@prisma/client";
 import axios from "axios";
 import { Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -20,24 +21,30 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-interface JobSalaryFormProps {
+interface JobDepartmentProps {
   initialData: Job | null;
   jobId: string | undefined;
   user: UserProfile | null;
+  departments: Department[] | null;
 }
 
 const formSchema = z.object({
-  salary: z.string().min(1),
+  department: z.string().min(1),
 });
 
-const JobSalaryForm = ({ initialData, jobId, user }: JobSalaryFormProps) => {
+const JobDepartment = ({
+  initialData,
+  jobId,
+  user,
+  departments,
+}: JobDepartmentProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      salary: initialData?.salary || "",
+      department: initialData?.department || "",
     },
   });
 
@@ -51,7 +58,7 @@ const JobSalaryForm = ({ initialData, jobId, user }: JobSalaryFormProps) => {
       );
       router.refresh();
       setIsEditing(false);
-      toast.success("Job Hourly Rate updated successfully");
+      toast.success("Job Department updated successfully.");
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         if (error.response && error.response.data) {
@@ -67,10 +74,14 @@ const JobSalaryForm = ({ initialData, jobId, user }: JobSalaryFormProps) => {
 
   const toggleEiditing = () => setIsEditing((current) => !current);
 
+  const selectedOption = departments?.find(
+    (option) => option.name === initialData?.department
+  );
+
   return (
     <Card className='mt-6 rounded-md p-4'>
       <div className='font-medium flex items-center justify-between'>
-        Offer Salary
+        Select Department
         <Button onClick={toggleEiditing} variant={"ghost"}>
           {isEditing ? (
             <div className='text-neutral-500'>Cancel</div>
@@ -83,12 +94,15 @@ const JobSalaryForm = ({ initialData, jobId, user }: JobSalaryFormProps) => {
         </Button>
       </div>
 
-      {/* Display the Hourly Rate if not Editing */}
+      {/* Display the Title if not Editing */}
       {!isEditing && (
-        <p className='text-sm mt-2'>
-          {initialData?.salary
-            ? `Rs. ${initialData?.salary}/month`
-            : "Rs. 0/month"}
+        <p
+          className={cn(
+            "text-sm mt-2",
+            !initialData?.workMode && "text-neutral-500 italic"
+          )}
+        >
+          {selectedOption?.name || "No Department Added"}
         </p>
       )}
 
@@ -101,13 +115,20 @@ const JobSalaryForm = ({ initialData, jobId, user }: JobSalaryFormProps) => {
           >
             <FormField
               control={form.control}
-              name='salary'
+              name='department'
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input
-                      disabled={isSubmitting}
-                      placeholder='Type the salary in number'
+                    <ComboBox
+                      options={
+                        departments
+                          ? departments.map((d) => ({
+                              label: d.name,
+                              value: d.name,
+                            }))
+                          : []
+                      }
+                      heading='Work Mode'
                       {...field}
                     />
                   </FormControl>
@@ -132,4 +153,4 @@ const JobSalaryForm = ({ initialData, jobId, user }: JobSalaryFormProps) => {
   );
 };
 
-export default JobSalaryForm;
+export default JobDepartment;

@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 const roboto = Roboto({
   subsets: ["latin"],
-  weight: ["100","300","400","500","700","900"],
+  weight: ["100", "300", "400", "500", "700", "900"],
   variable: "--font-roboto",
 });
 
@@ -25,7 +25,7 @@ export default function RootLayout({
     <html lang='en' suppressHydrationWarning>
       <body
         // className={`${roboto.className} antialiased bg-[#f1f1f1] dark:bg-[#1A1A1A] overflow-hidden`}
-        className={`${roboto.className} antialiased overflow-hidden`}
+        className={`${roboto.className} antialiased`}
       >
         <Providers>
           <main>{children}</main>

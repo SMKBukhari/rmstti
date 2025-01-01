@@ -4,7 +4,7 @@ import DialogForm from "@/components/DialogForm";
 import { Button } from "@/components/ui/button";
 import { JobApplicationSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserProfile } from "@prisma/client";
+import { Department, UserProfile } from "@prisma/client";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -15,9 +15,10 @@ import { z } from "zod";
 interface UserBannerSuccessProps {
   user: UserProfile | null;
   label: string;
+  department: Department[] | null;
 }
 
-const UserBannerSuccess = ({ label, user }: UserBannerSuccessProps) => {
+const UserBannerSuccess = ({ label, user, department }: UserBannerSuccessProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -101,11 +102,9 @@ const UserBannerSuccess = ({ label, user }: UserBannerSuccessProps) => {
             label: "Department",
             type: "select",
             heading: "Departments",
-            comboboxOptions: [
-              { label: "IT Department", value: "IT Department" },
-              { label: "Research Department", value: "Research Department" },
-              { label: "Magazine Department", value: "Magazine Department" },
-            ],
+            comboboxOptions: department
+            ? department.map((d) => ({ label: d.name, value: d.name }))
+            : [],
           },
           {
             name: "coverLetter",

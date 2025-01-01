@@ -8,19 +8,15 @@ import ApplicantBanner from "./_components/applicantBanner";
 import ApplicantInterviewBanner from "./_components/applicantInterviewDateBanner";
 import UserBannerWarningRejected from "./_components/userBannerWarningRejected";
 import UserBannerJobOffer from "./_components/userBannerJobOffer";
+import JobCardItem from "@/components/LandingPage/JobCardItem";
 
 const page = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
-  
 
   if (!userId) {
     redirect("/signIn");
   }
-
-  // if (userId.length < 24) {
-  //   redirect("/signIn");
-  // }
 
   const user = await db.userProfile.findUnique({
     where: {
@@ -32,6 +28,7 @@ const page = async () => {
       applicationStatus: true,
       skills: true,
       role: true,
+      JobApplications: true,
     },
   });
 
@@ -40,6 +37,9 @@ const page = async () => {
       id: user?.currentJobApplicationId || "",
     },
   });
+
+  const jobs = await db.job.findMany();
+  const departments = await db.department.findMany();
 
   if (user?.isVerified === false) {
     redirect(`/verify/${userId}`);
@@ -78,7 +78,11 @@ const page = async () => {
         !isHired &&
         !intervieweeRole &&
         (isComplete ? (
-          <UserBannerSuccess label='Submit' user={user} />
+          <UserBannerSuccess
+            label='Submit'
+            user={user}
+            department={departments}
+          />
         ) : (
           <UserBannerWarning
             completedFields={completedFields}
@@ -96,9 +100,16 @@ const page = async () => {
       {intervieweeRole && isOffered && (
         <UserBannerJobOffer label='Submit' user={user} />
       )}
-
-      <h1>Dashboard</h1>
-      <p>Welcome to your dashboard</p>
+      <div className='mt-10 grid gap-8 sm:grid-cols-1 grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
+        {jobs?.map((job) => (
+          <JobCardItem
+            key={job.id}
+            job={job}
+            isComplete={isComplete}
+            userProfile={user}
+          />
+        ))}
+      </div>
     </div>
   );
 };

@@ -57,9 +57,9 @@ const ShortDescription = ({
         `/api/user/${user?.userId}/createNewJob/${jobId}`,
         values
       );
-      toast.success("Short Description updated successfully!");
-      toggleEiditing();
       router.refresh();
+      setIsEditing(false);
+      toast.success("Short Description updated successfully!");
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         if (error.response && error.response.data) {
@@ -69,7 +69,7 @@ const ShortDescription = ({
         }
       }
     } finally {
-      toggleEiditing();
+      setIsEditing(false);
     }
   };
 

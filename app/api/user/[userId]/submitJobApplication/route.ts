@@ -9,7 +9,7 @@ export const POST = async (
 ) => {
   try {
     const { userId } = params;
-    const { department, coverLetter, reference, referenceContact } =
+    const { jobId, department, coverLetter, reference, referenceContact } =
       await req.json();
 
     // Get the user profile
@@ -19,6 +19,14 @@ export const POST = async (
 
     if (!user) {
       return new NextResponse("User not found", { status: 404 });
+    }
+
+    const job = await db.job.findUnique({
+      where: { id: jobId },
+    });
+
+    if (!job) {
+      return new NextResponse("Job not found", { status: 404 });
     }
 
     // Find the "Applied" status ID
@@ -59,19 +67,15 @@ export const POST = async (
     const notifications = [
       {
         userId: user.userId,
-        title: "Job Application Submitted",
-        message: `Your job application has been submitted for ${
-          department || "IT Department"
-        } successfully.`,
+        title: `Job Application Submitted for ${job.title}`,
+        message: `Your job application has been submitted for ${job.title} successfully.`,
         createdBy: NotificationCreator.Account,
         type: NotificationType.General,
       },
       ...ceo.map((ceo) => ({
         userId: ceo.userId,
-        title: "New Job Application",
-        message: `A new job application has been submitted by ${
-          user.fullName
-        } for ${department || "IT Department"}.`,
+        title: `New Job Application for ${job.title}`,
+        message: `A new job application has been submitted by ${user.fullName} for ${job.title}.`,
         createdBy: NotificationCreator.Applicant,
         senderImage: user.userImage,
         link: `/admin/applicants/${user.userId}`,
@@ -79,10 +83,8 @@ export const POST = async (
       })),
       ...admins.map((admin) => ({
         userId: admin.userId,
-        title: "New Job Application",
-        message: `A new job application has been submitted by ${
-          user.fullName
-        } for ${department || "IT Department"}.`,
+        title: `New Job Application for ${job.title}`,
+        message: `A new job application has been submitted by ${user.fullName} for ${job.title}.`,
         createdBy: NotificationCreator.Applicant,
         senderImage: user.userImage,
         link: `/admin/applicants/${user.userId}`,
@@ -94,6 +96,7 @@ export const POST = async (
     const [jobApplication, updatedUser] = await db.$transaction([
       db.jobApplications.create({
         data: {
+          jobId: job.id,
           userId: user.userId,
           applicationStatusId: applicationStatus.id,
           resumeName: user.resumeName,
@@ -122,16 +125,19 @@ export const POST = async (
     const emailBody = await compileApplicationReceivedMail(user.fullName);
     const emailResponse = await sendMail({
       to: user.email,
-      subject: "Application Received (The Truth International)",
+      subject: `Application Received for ${job.title} (The Truth International)`,
       body: emailBody,
     });
 
     if (!emailResponse?.messageId) {
-      console.warn("Email sending failed, but application was submitted successfully.");
+      console.warn(
+        "Email sending failed, but application was submitted successfully."
+      );
     }
 
     return NextResponse.json({
-      message: "Application submitted successfully and user role updated to Applicant.",
+      message:
+        "Application submitted successfully and user role updated to Applicant.",
       jobApplication,
       updatedUser,
       emailSent: !!emailResponse?.messageId,
@@ -141,4 +147,3 @@ export const POST = async (
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 };
-
