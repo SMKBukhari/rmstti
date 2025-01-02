@@ -67,15 +67,15 @@ const AddNewEmployee = ({ user }: AddNewEmployeeProps) => {
     <>
       <div className='flex w-full items-end justify-end'>
         <Button variant={"primary"} onClick={() => setDialogOpen(true)}>
-          <Plus className='w-5 h-5 mr-2' /> Raise Request
+          <Plus className='w-5 h-5 mr-2' /> Add New Employee
         </Button>
       </div>
 
       <DialogForm
         isOpen={isDialogOpen}
         onOpenChange={setDialogOpen}
-        title='Raise a Leave Request'
-        description='Please fill in the details below to raise a leave request.'
+        title='Add New Employee'
+        description='Please fill in the details below to add a new employee.'
         fields={[
           {
             type: "input",
