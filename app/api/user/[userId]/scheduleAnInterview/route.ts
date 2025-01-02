@@ -77,7 +77,7 @@ export const POST = async (
         )} by ${user.userId}.`,
         createdBy: NotificationCreator.Admin, // Notification from the system.
         senderImage: user.userImage,
-        link: `/admin/interviewees`,
+        link: `/ceo/interviewees`,
         type: NotificationType.General,
       })),
       ...adminExcepThisUser.map((admin) => ({

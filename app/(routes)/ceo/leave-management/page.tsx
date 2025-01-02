@@ -6,7 +6,6 @@ import { format } from "date-fns";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { columns, LeaveRequestsColumns } from "./_components/columns";
-import RaiseRequest from "./_components/RaiseRequest";
 
 const ApplicantsPage = async () => {
   const cookieStore = cookies();
@@ -20,12 +19,12 @@ const ApplicantsPage = async () => {
     where: {
       userId: userId,
     },
+    include: {
+      department: true,
+    },
   });
 
   const leaveRequests = await db.leaveRequest.findMany({
-    where: {
-      userId: user?.userId,
-    },
     include: {
       user: true,
       leaveType: true,
@@ -37,6 +36,7 @@ const ApplicantsPage = async () => {
     (leaveRequest) => ({
       user: user,
       id: leaveRequest.id,
+      fullName: leaveRequest.user.fullName ?? "N/A",
       leaveType: leaveRequest.leaveType.name ?? "N/A",
       startDate: leaveRequest.startDate
         ? format(new Date(leaveRequest.startDate), "MMMM do, yyyy")
@@ -46,32 +46,25 @@ const ApplicantsPage = async () => {
         : "N/A",
       reason: leaveRequest.reason ?? "N/A",
       status: leaveRequest.status,
+      userImage: leaveRequest.user.userImage ?? "N/A",
+      approvedBy: leaveRequest.approvedBy ?? "N/A",
+      rejectedBy: leaveRequest.rejectedBy ?? "N/A",
     })
   );
-
-  const leaveTypes = await db.leaveType.findMany();
 
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
       <div className='flex items-center justify-between w-full'>
-        <CustomBreadCrumb breadCrumbPage='Raise Requests' breadCrumbItem={
-          [
-            {
-              label: 'Leave Management',
-              link: '/manager/leave-management/raise-requests',
-            },
-          ]
-        } />
+        <CustomBreadCrumb
+          breadCrumbPage='Manage Leave Requests'
+        />
       </div>
-
-      <RaiseRequest leaveType={leaveTypes} user={user} />
 
       <div className='mt-6 w-full'>
         <DataTable
           columns={columns}
           data={formattedLeaveRequests}
           searchKey='leaveType'
-          routePrefix='manager/leave-management/raise-requests'
         />
       </div>
     </div>

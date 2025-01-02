@@ -78,7 +78,7 @@ export const POST = async (
         message: `A new job application has been submitted by ${user.fullName} for ${job.title}.`,
         createdBy: NotificationCreator.Applicant,
         senderImage: user.userImage,
-        link: `/admin/applicants/${user.userId}`,
+        link: `/ceo/applicants/${user.userId}`,
         type: NotificationType.General,
       })),
       ...admins.map((admin) => ({

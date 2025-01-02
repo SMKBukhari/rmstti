@@ -3,7 +3,7 @@ import DialogForm from "@/components/DialogForm";
 import { Button } from "@/components/ui/button";
 import { AddNewEmployeeSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserProfile } from "@prisma/client";
+import { Department, Role, UserProfile } from "@prisma/client";
 import axios from "axios";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -14,9 +14,11 @@ import { z } from "zod";
 
 interface AddNewEmployeeProps {
   user: UserProfile | null;
+  department: Department[] | null;
+  role: Role[] | null;
 }
 
-const AddNewEmployee = ({ user }: AddNewEmployeeProps) => {
+const AddNewEmployee = ({ user, department, role }: AddNewEmployeeProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -45,7 +47,7 @@ const AddNewEmployee = ({ user }: AddNewEmployeeProps) => {
         ...data,
       });
       console.log(data);
-      toast.success(`Leave request raised successfully.`);
+      toast.success(`Employee added successfully.`);
       setDialogOpen(false);
       setIsLoading(false);
       router.refresh();
@@ -126,10 +128,12 @@ const AddNewEmployee = ({ user }: AddNewEmployeeProps) => {
             label: "Date of Birth",
           },
           {
-            type: "input",
+            type: "select",
             name: "department",
             label: "Department",
-            placeholder: "Enter department",
+            comboboxOptions: department
+              ? department.map((d) => ({ label: d.name, value: d.name }))
+              : [],
           },
           {
             type: "input",
@@ -138,10 +142,12 @@ const AddNewEmployee = ({ user }: AddNewEmployeeProps) => {
             placeholder: "Enter designation",
           },
           {
-            type: "input",
+            type: "select",
             name: "role",
             label: "Role",
-            placeholder: "Enter role",
+            comboboxOptions: role
+              ? role.map((r) => ({ label: r.name, value: r.name }))
+              : [],
           },
           {
             type: "input",

@@ -21,6 +21,10 @@ const ApplicantsPage = async () => {
     },
   });
 
+  const departments = await db.department.findMany();
+
+  const role = await db.role.findMany();
+
   const applicationStatus = await db.applicationStatus.findFirst({
     where: { name: "Hired" },
   });
@@ -54,7 +58,7 @@ const ApplicantsPage = async () => {
         <CustomBreadCrumb breadCrumbPage='Employees' />
       </div>
 
-      <AddNewEmployee user={user} />
+      <AddNewEmployee user={user} department={departments} role={role} />
 
       <div className='mt-6 w-full'>
         <DataTable

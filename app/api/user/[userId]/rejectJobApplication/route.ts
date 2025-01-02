@@ -9,7 +9,8 @@ export const POST = async (
 ) => {
   try {
     const { userId } = params;
-    const { applicantId, notifcationTitle, notificationMessage } = await req.json();
+    const { applicantId, notifcationTitle, notificationMessage } =
+      await req.json();
 
     // Get the user profile
     const user = await db.userProfile.findFirst({
@@ -65,12 +66,10 @@ export const POST = async (
       ...ceo.map((ceo) => ({
         userId: ceo.userId,
         title: notifcationTitle,
-        message: `Applicant ${
-          applicant.fullName
-        } has been rejected by ${user.userId}.`,
+        message: `Applicant ${applicant.fullName} has been rejected by ${user.userId}.`,
         createdBy: NotificationCreator.Admin, // Notification from the system.
         senderImage: user.userImage,
-        link: `/admin/interviewees`,
+        link: `/ceo/interviewees`,
         type: NotificationType.General,
       })),
       ...adminExcepThisUser.map((admin) => ({
@@ -130,9 +129,7 @@ export const POST = async (
       },
     });
 
-    const emailBody = await compileRejectedApplicationMail(
-      applicant.fullName,
-    );
+    const emailBody = await compileRejectedApplicationMail(applicant.fullName);
     const response = await sendMail({
       to: applicant.email,
       subject: "Application Status Update",

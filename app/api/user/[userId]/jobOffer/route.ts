@@ -78,7 +78,7 @@ export const POST = async (
         message: `An job offer has been made to ${applicant.fullName} for the position of ${designation} in the ${department} department by ${user.fullName}.`,
         createdBy: NotificationCreator.Admin, // Notification from the system.
         senderImage: user.userImage,
-        link: `/admin/interviewees`,
+        link: `/ceo/interviewees`,
         type: NotificationType.General,
       })),
       ...adminExcepThisUser.map((admin) => ({

@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { NotificationCreator, NotificationType } from "@prisma/client";
 // import { NotificationCreator, NotificationType } from "@prisma/client";
 import { NextResponse } from "next/server";
 
@@ -32,71 +33,46 @@ export const POST = async (
       return new NextResponse("User not found", { status: 404 });
     }
 
-    // const admins = await db.userProfile.findMany({
-    //   where: {
-    //     role: { name: "Admin" },
-    //     userId: {
-    //       not: user.userId,
-    //     },
-    //   },
-    // });
+    const applicationStatus = await db.applicationStatus.findFirst({
+      where: { name: "Hired" },
+    });
 
-    // const ceo = await db.userProfile.findMany({
-    //   where: { role: { name: "CEO" } },
-    // });
+    const departmentExist = await db.department.findFirst({
+      where: { name: "IT Department" },
+    });
 
-    // const manager = await db.userProfile.findFirst({
-    //   where: {
-    //     department: {
-    //       name: department,
-    //     },
-    //     userId: {
-    //       not: user.userId,
-    //     },
-    //   },
-    // });
+    const roleExist = await db.role.findFirst({
+      where: { name: "Employee" },
+    });
 
-    // const notifications = [
-    //   {
-    //     userId,
-    //     title: "Leave Request Submitted",
-    //     message: `Your leave request for ${leaveType} from ${startDate} to ${endDate} has been submitted.`,
-    //     createdBy: NotificationCreator.Account,
-    //     type: NotificationType.General,
-    //     link: "/admin/leave-management/raise-requests",
-    //   },
-    //   ...(manager
-    //     ? [
-    //         {
-    //           userId: manager.userId,
-    //           title: "New Leave Request Raised",
-    //           message: `${user.fullName} has submitted a leave request for ${leaveType} from ${startDate} to ${endDate}.`,
-    //           createdBy: NotificationCreator.Employee,
-    //           senderImage: user.userImage,
-    //           link: `/manager/leave-management/manage-requests`,
-    //           type: NotificationType.General,
-    //         },
-    //       ]
-    //     : []),
-    //   ...admins.map((admin) => ({
-    //     userId: admin.userId,
-    //     title: "New Leave Request Raised",
-    //     message: `${user.fullName} has submitted a leave request for ${leaveType} from ${startDate} to ${endDate}.`,
-    //     createdBy: NotificationCreator.Employee,
-    //     senderImage: user.userImage,
-    //     link: `/admin/leave-management/manage-requests`,
-    //     type: NotificationType.General,
-    //   })),
-    //   ...ceo.map((ceo) => ({
-    //     userId: ceo.userId,
-    //     title: "New Leave Request Raised",
-    //     message: `${user.fullName} has submitted a leave request for ${leaveType} from ${startDate} to ${endDate}.`,
-    //     createdBy: NotificationCreator.Employee,
-    //     senderImage: user.userImage,
-    //     link: `/ceo/leave-management/manage-requests`,
-    //     type: NotificationType.General,
-    //   })),
-    // ];
+    const admins = await db.userProfile.findMany({
+      where: {
+        role: { name: "Admin" },
+        userId: {
+          not: user.userId,
+        },
+      },
+    });
+
+    const ceo = await db.userProfile.findMany({
+      where: {
+        role: { name: "CEO" },
+        userId: {
+          not: user.userId,
+        },
+      },
+    });
+
+    const manager = await db.userProfile.findFirst({
+      where: {
+        department: {
+          name: department,
+        },
+        userId: {
+          not: user.userId,
+        },
+      },
+    });
 
     const createNewEmployee = await db.userProfile.create({
       data: {
@@ -106,13 +82,13 @@ export const POST = async (
         ConfirmPassword: password,
         role: {
           connect: {
-            name: role,
+            name: role ? role : roleExist?.name,
           },
         },
         designation: designation,
         department: {
           connect: {
-            name: department,
+            name: department ? department : departmentExist?.name,
           },
         },
         isHired: true,
@@ -122,16 +98,69 @@ export const POST = async (
         contactNumber,
         gender,
         salary,
+        applicationStatus: {
+          connect: {
+            id: applicationStatus?.id,
+          },
+        },
       },
     });
 
-    // await db.notifications.createMany({
-    //   data: notifications,
-    // });
+    const newEmployee = await db.userProfile.findFirst({
+      where: {
+        userId: createNewEmployee.userId,
+      },
+    });
+
+    const notifications = [
+      {
+        userId: newEmployee?.userId as string,
+        title: "You are Hired",
+        message: `Congratulations! You are hired as a ${role} in ${department}.`,
+        createdBy: NotificationCreator.Account,
+        type: NotificationType.General,
+        link: "/profile",
+      },
+      ...(manager
+        ? [
+            {
+              userId: manager.userId,
+              title: "New Employee Hired",
+              message: `${newEmployee?.fullName} has been hired as a ${role} in ${department}.`,
+              createdBy: NotificationCreator.Employee,
+              senderImage: user.userImage,
+              link: `/manager/team-members`,
+              type: NotificationType.General,
+            },
+          ]
+        : []),
+      ...admins.map((admin) => ({
+        userId: admin.userId,
+        title: "New Employee Hired",
+        message: `${newEmployee?.fullName} has been hired as a ${role} in ${department}.`,
+        createdBy: NotificationCreator.Employee,
+        senderImage: user.userImage,
+        link: `/admin/employees`,
+        type: NotificationType.General,
+      })),
+      ...ceo.map((ceo) => ({
+        userId: ceo.userId,
+        title: "New Employee Hired",
+        message: `${newEmployee?.fullName} has been hired as a ${role} in ${department}.`,
+        createdBy: NotificationCreator.Employee,
+        senderImage: user.userImage,
+        link: `/ceo/employees`,
+        type: NotificationType.General,
+      })),
+    ];
+
+    await db.notifications.createMany({
+      data: notifications,
+    });
 
     return NextResponse.json(createNewEmployee, { status: 201 });
   } catch (error) {
-    console.error(`RAISE_LEAVE_REQUEST_ERROR: ${error}`);
+    console.error(`ADD_NEW_EMPLOYEE_ERROR: ${error}`);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 };
