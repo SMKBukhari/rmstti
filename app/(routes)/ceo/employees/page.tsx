@@ -5,6 +5,7 @@ import React from "react";
 import { columns, EmployeeColumns } from "./_components/columns";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import AddNewEmployee from "./_components/AddNewEmployee";
 
 const ApplicantsPage = async () => {
   const cookieStore = cookies();
@@ -52,6 +53,8 @@ const ApplicantsPage = async () => {
       <div className='flex items-center justify-between w-full'>
         <CustomBreadCrumb breadCrumbPage='Employees' />
       </div>
+
+      <AddNewEmployee user={user} />
 
       <div className='mt-6 w-full'>
         <DataTable

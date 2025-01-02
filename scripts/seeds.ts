@@ -82,6 +82,7 @@ const departmentSeed = async () => {
         { name: "IT Department" },
         { name: "Research Department" },
         { name: "Magazine Department" },
+        { name: "Youtube Department" },
       ],
     });
     console.log("Departments seeded successfully.");

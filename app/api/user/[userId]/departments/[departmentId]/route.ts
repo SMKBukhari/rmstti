@@ -46,62 +46,47 @@ export const DELETE = async (
   }
 };
 
-export const PATCH = async (
+export async function PATCH(
   req: Request,
-  { params }: { params: { skillId: string; userId: string } }
-) => {
+  { params }: { params: { userId: string; departmentId: string } }
+) {
   try {
-    // Parse the request body to get the Education details
-    const { skills } = await req.json();
+    const { userId, departmentId } = params;
+    const { name } = await req.json();
 
-    // Ensure Education is provided and is an object
-    if (!skills || typeof skills !== "object") {
-      return new NextResponse("Invalid data format", { status: 400 });
-    }
-
-    const { skillId, userId } = params;
-
-    // Check if the Education exists in the database
-    const skill = await db.skills.findUnique({
+    const department = await db.department.findUnique({
       where: {
-        id: skillId,
+        id: departmentId,
       },
     });
 
-    // If the Education is not found, return a 404 response
-    if (!skill) {
-      return new NextResponse("Skill not found!", { status: 404 });
+    if (!department) {
+      return new NextResponse("Department not found", { status: 404 });
     }
 
-    const updatedSkillName = skill.name;
-
-    // Update the Education with the new data
-    const updateEducation = await db.skills.update({
+    const updatedDepartment = await db.department.update({
       where: {
-        id: skillId,
+        id: departmentId,
       },
       data: {
-        name: skills.name,
-        experienceLevel: skills.experienceLevel,
+        name,
       },
     });
 
-    const sendNotification = await db.notifications.create({
+    await db.notifications.create({
       data: {
-        id: crypto.randomBytes(12).toString("hex"),
         userId,
-        title: "Skill Updated",
-        message: `Your skill ${updatedSkillName} has been updated successfully`,
+        title: "Department Updated",
+        message: `Department "${department.name}" has been updated to "${name}".`,
         createdBy: "Account",
         isRead: false,
         type: "General",
       },
     });
 
-    // Return the updated Education
-    return NextResponse.json({ updateEducation, sendNotification });
+    return NextResponse.json(updatedDepartment);
   } catch (error) {
-    console.error(`[SKILL_UPDATE_ERROR]: ${error}`);
+    console.error("[DEPARTMENT_UPDATE_ERROR]:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
-};
+}

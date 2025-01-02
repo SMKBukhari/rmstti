@@ -1,4 +1,5 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -14,9 +15,9 @@ import { DepartmentsSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Department, Skills, UserProfile } from "@prisma/client";
 import axios from "axios";
-import { Loader2, Plus, X } from 'lucide-react';
+import { Loader2, Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -31,30 +32,26 @@ const CreateDepartments = ({
   departments,
 }: GeneralTabCreateDepartmentsProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingSkillId, setEditingSkillId] = useState<string | null>(null);
-  const toggleEditing = (skillId?: string) => {
-    if (skillId) {
-      setEditingSkillId(skillId);
-      setIsEditing(true);
-    } else {
-      setIsEditing((prev) => !prev);
-      setEditingSkillId(null);
-    }
-  };
+  const [isAdding, setIsAdding] = useState(false);
+  const [editingDepartmentId, setEditingDepartmentId] = useState<string | null>(
+    null
+  );
+  const [editingName, setEditingName] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof DepartmentsSchema>>({
     resolver: zodResolver(DepartmentsSchema),
   });
 
-  const cancelEditing = () => {
-    setEditingSkillId(null); // Clear the editing experience ID
-  };
-
   const { isSubmitting, isValid } = form.formState;
-  
+
+  useEffect(() => {
+    if (editingDepartmentId && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [editingDepartmentId]);
 
   const onSubmit = async (values: z.infer<typeof DepartmentsSchema>) => {
     try {
@@ -62,9 +59,9 @@ const CreateDepartments = ({
       await axios.post(`/api/user/${user?.userId}/departments`, {
         name: values.name,
       });
-      toast.success(`New Department added.`);
-      toggleEditing();
+      setIsAdding(false);
       router.refresh();
+      toast.success(`New Department added.`);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         if (error.response && error.response.data) {
@@ -78,38 +75,31 @@ const CreateDepartments = ({
     }
   };
 
-  const saveSkill = async (values: z.infer<typeof DepartmentsSchema>) => {
+  const updateDepartment = async (departmentId: string, newName: string) => {
     try {
-      // Update existing experience via API call
       await axios.patch(
-        `/api/user/${user?.userId}/departments/${editingSkillId}`,
-        { departments: [values] }
+        `/api/user/${user?.userId}/departments/${departmentId}`,
+        { name: newName }
       );
-      toast.success(`${user?.fullName} Experience updated successfully.`);
-      cancelEditing(); // Reset editing state
+      setEditingDepartmentId(null);
       router.refresh();
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        if (error.response && error.response.data) {
-          toast.error(error.response.data);
-        } else {
-          toast.error("An unexpected error occurred. Please try again.");
-        }
-      }
+      toast.success("Department updated successfully!");
+    } catch (error) {
+      console.error("Error updating department:", error);
+      toast.error("Failed to update department. Please try again.");
     }
   };
 
   const onDelete = async (department: Department) => {
     try {
       setDeletingId(department.id);
-
       await axios.delete(
         `/api/user/${user?.userId}/departments/${department.id}`
       );
+      router.refresh();
       toast.success(
         `${department.name} department has been deleted successfully from your organization.`
       );
-      router.refresh();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         if (error.response && error.response.data) {
@@ -122,6 +112,28 @@ const CreateDepartments = ({
       setDeletingId(null);
     }
   };
+
+  const handleEditStart = (department: Department) => {
+    setEditingDepartmentId(department.id);
+    setEditingName(department.name);
+  };
+
+  const handleEditEnd = (departmentId: string) => {
+    if (editingName.trim() !== "") {
+      updateDepartment(departmentId, editingName);
+    }
+    setEditingDepartmentId(null);
+  };
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    departmentId: string
+  ) => {
+    if (e.key === "Enter") {
+      handleEditEnd(departmentId);
+    }
+  };
+
   return (
     <Card className='w-full flex flex-col items-center justify-center gap-10 px-10 py-10 pt-13 bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-xl mt-5 mb-5'>
       <div className='flex justify-between w-full'>
@@ -129,8 +141,8 @@ const CreateDepartments = ({
           Departments
           <span className='text-red-500 ml-1'>*</span>
         </h2>
-        <Button onClick={() => toggleEditing()} variant={"primary"}>
-          {isEditing || editingSkillId ? (
+        <Button onClick={() => setIsAdding(!isAdding)} variant={"primary"}>
+          {isAdding ? (
             <div className=''>Cancel</div>
           ) : (
             <div className='text-white dark:text-white hover:font-semibold flex items-center'>
@@ -140,37 +152,55 @@ const CreateDepartments = ({
           )}
         </Button>
       </div>
-      {!isEditing && !editingSkillId ? (
+      {!isAdding ? (
         departments?.length === 0 ? (
-          <div className="flex justify-center items-center">
-            <div className="text-neutral-400 flex justify-center items-center flex-col">
+          <div className='flex justify-center items-center'>
+            <div className='text-neutral-400 flex justify-center items-center flex-col'>
               <p>No departments added yet</p>
-              <p className="text-sm text-neutral-500">
+              <p className='text-sm text-neutral-500'>
                 You need to add departments for your organization.
               </p>
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full'>
             {departments?.map((item) => (
-              <Card key={item.id} className="p-4 flex flex-col">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-lg font-semibold">{item.name}</h3>
+              <Card key={item.id} className='p-4 flex flex-col'>
+                <div className='flex justify-between items-center mb-2'>
+                  {editingDepartmentId === item.id ? (
+                    <Input
+                      ref={inputRef}
+                      value={editingName}
+                      onChange={(e) => setEditingName(e.target.value)}
+                      onBlur={() => handleEditEnd(item.id)}
+                      onKeyDown={(e) => handleKeyDown(e, item.id)}
+                      className='text-lg font-semibold'
+                    />
+                  ) : (
+                    <h3
+                      className='text-lg font-semibold cursor-pointer'
+                      onClick={() => handleEditStart(item)}
+                    >
+                      {item.name}
+                    </h3>
+                  )}
                   <Button
-                    variant="ghost"
-                    size="icon"
+                    variant='ghost'
+                    size='icon'
                     onClick={() => onDelete(item)}
                     disabled={deletingId === item.id}
                   >
                     {deletingId === item.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className='h-4 w-4 animate-spin' />
                     ) : (
-                      <X className="h-4 w-4" />
+                      <X className='h-4 w-4' />
                     )}
                   </Button>
                 </div>
-                <div className="text-2xl font-bold mb-2">{item.users.length}</div>
-                <div className="text-sm text-muted-foreground">Total Users</div>
+                <div className='text-2xl font-bold mb-2'>
+                  {item.users.length}
+                </div>
+                <div className='text-sm text-muted-foreground'>Total Users</div>
               </Card>
             ))}
           </div>
@@ -179,7 +209,7 @@ const CreateDepartments = ({
         <Form {...form}>
           <form
             className='space-y-8 w-full'
-            onSubmit={form.handleSubmit(isEditing ? onSubmit : saveSkill)}
+            onSubmit={form.handleSubmit(onSubmit)}
           >
             <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
               <FormField
@@ -206,7 +236,7 @@ const CreateDepartments = ({
                 <Button
                   variant={"primary"}
                   disabled={!isValid || isSubmitting}
-                  typeof='submit'
+                  type='submit'
                 >
                   <Loader2 className='h-5 w-5 text-primary animate-spin' />
                 </Button>
@@ -214,7 +244,7 @@ const CreateDepartments = ({
                 <Button
                   variant={"primary"}
                   disabled={!isValid || isSubmitting}
-                  typeof='submit'
+                  type='submit'
                 >
                   Save
                 </Button>
@@ -228,4 +258,3 @@ const CreateDepartments = ({
 };
 
 export default CreateDepartments;
-

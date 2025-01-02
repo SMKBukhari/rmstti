@@ -217,3 +217,17 @@ export const LeaveDeleteSchema = z.object({
 export const DepartmentsSchema = z.object({
   name: z.string(),
 });
+
+export const AddNewEmployeeSchema = z.object({
+  fullName: z.string(),
+  email: z.string().email(),
+  password: z.string().min(6),
+  gender: z.enum(["Male","Female","Other"]).optional(),
+  contactNumber: z.string().length(11).optional(),
+  DOB: z.date().optional(),
+  department: z.string().optional(),
+  designation: z.string().optional(),
+  role: z.string().optional(),
+  salary: z.string().optional(),
+  DOJ: z.date().optional(),
+});
