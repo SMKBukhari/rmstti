@@ -64,9 +64,12 @@ export default async function EmployeeQRScanPage({
             <Separator className='my-8' />
 
             <CompanyInfo
-              name={employee.company?.name ?? ""}
-              address={employee.company?.address ?? ""}
-              contact={employee.company?.contact ?? ""}
+              name={employee.company?.name ?? "The Truth International"}
+              address={
+                employee.company?.address ??
+                "205 (D) Evacuee Trust Complex, Agha Khan Rd, F-5/1 F-5, Islamabad, Islamabad Capital Territory"
+              }
+              contact={employee.company?.contact ?? "0512820180"}
             />
           </div>
         </Card>
