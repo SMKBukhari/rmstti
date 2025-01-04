@@ -148,6 +148,28 @@ export const compileHiredMail = async (
   return htmlBody;
 };
 
+export const compileNewEmployeeInfoMail = async (
+  fullName: string,
+  email: string,
+  password: string,
+  designation: string,
+  department: string,
+  salary: string
+) => {
+  const template = handlebars.compile(JobOfferMail);
+
+  const htmlBody = template({
+    fullName: fullName,
+    email: email,
+    password: password,
+    designation: designation,
+    department: department,
+    salary: salary,
+  });
+
+  return htmlBody;
+};
+
 // export const sendTestEmail = async () => {
 //   const testEmail = "unveiltech.mk@gmail.com"; // Change this to a valid email address
 //   const subject = "Test Email - OTP";

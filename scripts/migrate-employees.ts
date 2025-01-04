@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import bcrypt from "bcryptjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -94,48 +95,82 @@ async function migrateEmployees(): Promise<void> {
     // Insert employees into the database
     for (const employee of employees) {
       try {
-        await db.userProfile.create({
-          data: {
-            fullName: `${employee.firstName} ${employee.lastName}`,
-            email:
-              employee.email === "N/A"
-                ? `${employee.firstName.toLowerCase()}@example.com`
-                : employee.email,
-            password: "12345678",
-            ConfirmPassword: "12345678",
-            role: {
-              connect: {
-                id: role?.id,
-              },
+        const hashedPassword = await bcrypt.hash("12345678", 10);
+
+        const employeeData: {
+          fullName: string;
+          email: string;
+          password: string;
+          ConfirmPassword: string;
+          role: { connect: { id: string | undefined } };
+          gender: "Male" | "Female" | "Other";
+          contactNumber: string;
+          DOB: Date | null;
+          userImage: string | null;
+          designation: string;
+          salary: string | null;
+          status: {
+            connectOrCreate: {
+              where: { name: string };
+              create: { name: string };
+            };
+          };
+          applicationStatus: { connect: { id: string | undefined } };
+          isVerified: boolean;
+          isHired: boolean;
+          DOJ?: Date;
+        } = {
+          fullName: `${employee.firstName} ${employee.lastName}`,
+          email:
+            employee.email === "N/A"
+              ? `${employee.firstName.toLowerCase()}@example.com`
+              : employee.email,
+          password: hashedPassword,
+          ConfirmPassword: hashedPassword,
+          role: {
+            connect: {
+              id: role?.id,
             },
-            gender: employee.gender,
-            contactNumber: employee.contactNumber || "",
-            DOB: employee.dateOfBirth,
-            userImage: employee.img,
-            designation: employee.position,
-            DOJ: employee.hireDate,
-            salary: employee.salary?.toString(),
-            status: {
-              connectOrCreate: {
-                where: { name: employee.employmentStatus },
-                create: { name: employee.employmentStatus },
-              },
-            },
-            applicationStatus: {
-              connect: {
-                id: applicationStatus?.id,
-              },
-            },
-            isVerified: true,
-            isHired: true,
           },
+          gender: employee.gender,
+          contactNumber: employee.contactNumber || "",
+          DOB: employee.dateOfBirth,
+          userImage: employee.img,
+          designation: employee.position,
+          salary: employee.salary?.toString() || null,
+          status: {
+            connectOrCreate: {
+              where: { name: employee.employmentStatus },
+              create: { name: employee.employmentStatus },
+            },
+          },
+          applicationStatus: {
+            connect: {
+              id: applicationStatus?.id,
+            },
+          },
+          isVerified: true,
+          isHired: true,
+        };
+
+        // Only add DOJ if it's a valid date
+        if (employee.hireDate && !isNaN(employee.hireDate.getTime())) {
+          employeeData.DOJ = employee.hireDate;
+        } else {
+          console.warn(
+            `Invalid DOJ for employee ${employee.firstName} ${employee.lastName}, skipping this field`
+          );
+        }
+
+        await db.userProfile.create({
+          data: employeeData,
         });
         console.log(
           `Successfully migrated: ${employee.firstName} ${employee.lastName}`
         );
       } catch (error) {
         console.error(
-          `Failed to migrate employee ${employee.firstName}:`,
+          `Failed to migrate employee ${employee.firstName} ${employee.lastName}:`,
           error
         );
       }

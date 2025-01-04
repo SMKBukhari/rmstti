@@ -1,3 +1,4 @@
+import EmployeeQRCode from "@/components/EmployeeQRCode";
 import AvatarGroup from "@/components/ui/avatar-group";
 import { Card } from "@/components/ui/card";
 import { Role, Status, UserProfile } from "@prisma/client";
@@ -123,6 +124,9 @@ const UserAboutSection = ({ user, teamMembers }: UserAboutSectionProps) => {
               <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`Behance: ${user.behance}`}</h3>
             </div>
           )}
+        </div>
+        <div className='flex gap-2'>
+          <EmployeeQRCode employeeId={user?.userId || ""} />
         </div>
         {user?.role?.name !== "User" && (teamMembers?.length ?? 0) > 0 && (
           <div className='flex flex-col gap-4'>

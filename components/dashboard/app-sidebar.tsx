@@ -37,7 +37,6 @@ import {
   Bell,
   ChevronRight,
   ChevronsUpDown,
-  GalleryVerticalEnd,
   LogOut,
   LucideIcon,
   Settings,
@@ -53,6 +52,7 @@ import {
 import { Role, UserProfile } from "@prisma/client";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
+import Image from "next/image";
 
 interface AppSidebarProps {
   user: (UserProfile & { role: Role | null }) | null;
@@ -79,7 +79,7 @@ export default function AppSidebar({ user }: AppSidebarProps) {
 
   const company = {
     name: "The Truth International",
-    logo: GalleryVerticalEnd,
+    logo: "/img/logo_white_tti.svg",
     designation: user?.designation,
   };
 
@@ -105,8 +105,8 @@ export default function AppSidebar({ user }: AppSidebarProps) {
     <Sidebar collapsible='icon'>
       <SidebarHeader>
         <div className='flex gap-2 py-2 text-sidebar-accent-foreground'>
-          <div className='flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground'>
-            <company.logo className='size-4' />
+          <div className='flex aspect-square size-8 items-center relative justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground'>
+            <Image src={company.logo} alt={company.name} width={10} height={10} />
           </div>
           <div className='grid flex-1 text-left text-sm leading-tight'>
             <span className='truncate font-semibold'>{company.name}</span>

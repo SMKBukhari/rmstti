@@ -1,7 +1,7 @@
 import AppSidebar from "@/components/dashboard/app-sidebar";
 import Header from "@/components/dashboard/header";
-import Navbar from "@/components/dashboard/Navbar";
-import Sidebar from "@/components/dashboard/Sidebar";
+// import Navbar from "@/components/dashboard/Navbar";
+// import Sidebar from "@/components/dashboard/Sidebar";
 import KBar from "@/components/kbar";
 import PageContainer from "@/components/page-container";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
