@@ -24,6 +24,7 @@ const SettingsPage = async () => {
       jobExperience: true,
       education: true,
       skills: true,
+      company: true,
     },
   });
 
@@ -77,6 +78,7 @@ const SettingsPage = async () => {
               userExperiences={userWithJobExperiences}
               userEducation={userWithEducations}
               userSkills={userWithSkills}
+              company={user || null}
             />
           </TabsContent>
           <TabsContent value='security'>

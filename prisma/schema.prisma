@@ -70,6 +70,8 @@ model UserProfile {
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @default(now())
   TimeTable               TimeTable[]
+  company                 company?           @relation(fields: [companyId], references: [id])
+  companyId               String?
 }
 
 model LeaveRequest {
@@ -251,14 +253,15 @@ model TimeTable {
 
 // Company related models
 model company {
-  id        String   @id @unique @default(cuid())
-  name      String   @unique
-  logo      String?
-  email     String?
-  contact   String?
-  address   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id          String        @id @unique @default(cuid())
+  name        String        @unique
+  logo        String?
+  email       String?
+  contact     String?
+  address     String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now())
+  UserProfile UserProfile[]
 }
 
 model Job {

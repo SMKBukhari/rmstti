@@ -1,5 +1,12 @@
 import * as z from "zod";
 
+export const CompanySchema = z.object({
+  name: z.string().optional(),
+  email: z.string().email().optional(),
+  address: z.string().optional(),
+  contact: z.string().optional(),
+});
+
 export const UserBasicInfor = z.object({
   fullName: z.string(),
   gender: z.enum(["Male", "Female", "Other", "Select"]),
@@ -222,7 +229,7 @@ export const AddNewEmployeeSchema = z.object({
   fullName: z.string(),
   email: z.string().email(),
   password: z.string().min(6),
-  gender: z.enum(["Male","Female","Other"]).optional(),
+  gender: z.enum(["Male", "Female", "Other"]).optional(),
   contactNumber: z.string().length(11).optional(),
   DOB: z.date().optional(),
   department: z.string().optional(),
