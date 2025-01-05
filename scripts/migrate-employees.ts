@@ -119,6 +119,7 @@ async function migrateEmployees(): Promise<void> {
           isVerified: boolean;
           isHired: boolean;
           DOJ?: Date;
+          company: { connect: { id: string } };
         } = {
           fullName: `${employee.firstName} ${employee.lastName}`,
           email:
@@ -151,6 +152,11 @@ async function migrateEmployees(): Promise<void> {
           },
           isVerified: true,
           isHired: true,
+          company: {
+            connect: {
+              id: "cm5iarhu10001z01406eaaial",
+            },
+          },
         };
 
         // Only add DOJ if it's a valid date
