@@ -72,6 +72,9 @@ model UserProfile {
   TimeTable               TimeTable[]
   company                 company?           @relation(fields: [companyId], references: [id])
   companyId               String?
+  officeTimingIn          String?
+  OfficeTimingOut         String?
+  Attendence              Attendence[]
 }
 
 model LeaveRequest {
@@ -111,11 +114,12 @@ model Role {
 }
 
 model WorkStatus {
-  id        String        @id @unique @default(cuid())
-  name      String        @unique
-  users     UserProfile[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @default(now())
+  id         String        @id @unique @default(cuid())
+  name       String        @unique
+  users      UserProfile[]
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @default(now())
+  Attendence Attendence[]
 }
 
 model Status {
@@ -262,6 +266,20 @@ model company {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @default(now())
   UserProfile UserProfile[]
+}
+
+model Attendence {
+  id           String      @id @unique @default(cuid())
+  userId       String
+  user         UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  date         DateTime
+  checkInTime  DateTime?
+  checkOutTime DateTime?
+  workingHours String?
+  workStatusId String?
+  workStatus   WorkStatus? @relation(fields: [workStatusId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @default(now())
 }
 
 model Job {

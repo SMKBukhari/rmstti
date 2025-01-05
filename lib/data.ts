@@ -4,6 +4,9 @@ import {
   BookUser,
   Building2,
   Calendar,
+  CalendarClock,
+  CalendarFold,
+  CalendarPlus,
   ChartNoAxesCombined,
   FileUser,
   Group,
@@ -69,11 +72,6 @@ export const configurationTabs = [
     label: "General",
     value: "general",
   },
-  {
-    icon: Lock,
-    label: "Security",
-    value: "security",
-  },
 ];
 
 const notificationRoute = {
@@ -111,6 +109,23 @@ export const adminRoutes = [
     icon: Group,
     label: "Team Members",
     href: "/admin/team-members",
+  },
+  {
+    icon: CalendarClock,
+    label: "Attendance Management",
+    href: "/admin/attendance-management",
+    subitems: [
+      {
+        icon: CalendarPlus,
+        label: "Mark Attendance",
+        href: "/admin/attendance-management/mark-attendance",
+      },
+      {
+        icon: CalendarFold,
+        label: "Manage Attendance",
+        href: "/admin/attendance-management/manage-attendance",
+      },
+    ],
   },
   {
     icon: NotebookText,
@@ -189,6 +204,11 @@ export const employeeRoutes = [
     href: "/employee/team-members",
   },
   {
+    icon: CalendarClock,
+    label: "Attendance",
+    href: "/employee/attendance",
+  },
+  {
     icon: NotebookText,
     label: "Leave Management",
     href: "/employee/leave-management",
@@ -216,6 +236,23 @@ export const managerRoutes = [
     icon: Group,
     label: "Team Members",
     href: "/manager/team-members",
+  },
+  {
+    icon: CalendarClock,
+    label: "Attendance",
+    href: "/manager/attendance",
+    subitems: [
+      {
+        icon: CalendarPlus,
+        label: "Mark Attendance",
+        href: "/manager/attendance-management/mark-attendance",
+      },
+      {
+        icon: CalendarFold,
+        label: "Manage Attendance",
+        href: "/manager/attendance-management/manage-attendance",
+      },
+    ],
   },
   {
     icon: NotebookText,
@@ -277,6 +314,11 @@ export const ceoRoutes = [
     icon: NotebookText,
     label: "Leave Management",
     href: "/ceo/leave-management",
+  },
+  {
+    icon: CalendarClock,
+    label: "Attendance Management",
+    href: "/ceo/attendance-management",
   },
   {
     icon: Calendar,

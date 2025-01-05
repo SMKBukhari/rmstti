@@ -1,7 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import ComboBox from "@/components/ui/combo-box";
 import {
   Form,
   FormControl,
@@ -11,51 +9,34 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { CountryOptions, GenderOptions, getCityOptions } from "@/lib/data";
-import { UserBasicInfor } from "@/schemas";
+import { Textarea } from "@/components/ui/textarea";
+import { CompanySchema, UserBasicInfor } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserProfile } from "@prisma/client";
+import { company, UserProfile } from "@prisma/client";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 interface GeneralTabBaiscInfoProps {
-  user: UserProfile | null;
+  company: (UserProfile & { company: company | null }) | null;
 }
 
-const BasicInfo = ({ user }: GeneralTabBaiscInfoProps) => {
+const BasicInfo = ({ company }: GeneralTabBaiscInfoProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [cities, setCities] = useState<{ label: string; value: string }[]>([]);
   const router = useRouter();
 
-  useEffect(() => {
-    if (user?.country) {
-      const cityOptions = getCityOptions(user.country);
-      setCities(cityOptions);
-    }
-  }, [user?.country]);
-
-  const initialValuesRef = useRef<z.infer<typeof UserBasicInfor>>({
-    fullName: user?.fullName || "",
-    gender:
-      (user?.gender as "Male" | "Female" | "Other" | "Select") || "Select", // Explicitly cast
-    contactNumber: user?.contactNumber || "",
-    DOB: user?.DOB || new Date(),
-    country: user?.country || "",
-    city: user?.city || "",
+  const initialValuesRef = useRef<z.infer<typeof CompanySchema>>({
+    name: company?.company?.name || "",
+    email: company?.company?.email || "",
+    contact: company?.company?.contact || "",
+    address: company?.company?.address || "",
   });
 
-  const handleCountryChange = (countryCode: string) => {
-    const cityOptions = getCityOptions(countryCode);
-    setCities(cityOptions);
-    form.setValue("city", "");
-  };
-
-  const form = useForm<z.infer<typeof UserBasicInfor>>({
+  const form = useForm<z.infer<typeof CompanySchema>>({
     resolver: zodResolver(UserBasicInfor),
     defaultValues: initialValuesRef.current,
   });
@@ -64,14 +45,11 @@ const BasicInfo = ({ user }: GeneralTabBaiscInfoProps) => {
     JSON.stringify(form.getValues()) !==
     JSON.stringify(initialValuesRef.current);
 
-  const onSubmit = async (values: z.infer<typeof UserBasicInfor>) => {
+  const onSubmit = async (values: z.infer<typeof CompanySchema>) => {
     try {
       setIsLoading(true);
-      await axios.patch(
-        `/api/user/${user?.userId}/updateUser`,
-        values
-      );
-      toast.success(`${user?.fullName} Your profile updated successfully."`);
+      await axios.post(`/api/user/${company?.userId}/company`, values);
+      toast.success(`Company details updated successfully`);
       router.refresh();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -86,7 +64,7 @@ const BasicInfo = ({ user }: GeneralTabBaiscInfoProps) => {
     }
   };
   return (
-    <Card className='flex w-full gap-4 lg:p-10 md:px-7 px-4'>
+    <div className='flex w-full gap-4 lg:p-10 md:px-7 px-4'>
       <Form {...form}>
         <form
           className='space-y-8 w-full'
@@ -95,11 +73,11 @@ const BasicInfo = ({ user }: GeneralTabBaiscInfoProps) => {
           <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
             <FormField
               control={form.control}
-              name='fullName'
+              name='name'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Full Name
+                    Company Name
                     <span className='text-red-500 ml-1'>*</span>
                   </FormLabel>
                   <FormControl>
@@ -115,18 +93,19 @@ const BasicInfo = ({ user }: GeneralTabBaiscInfoProps) => {
             />
             <FormField
               control={form.control}
-              name='gender'
+              name='email'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Gender
+                    Company Email
                     <span className='text-red-500 ml-1'>*</span>
                   </FormLabel>
                   <FormControl>
-                    <ComboBox
-                      options={GenderOptions}
-                      heading='Gender'
+                    <Input
                       {...field}
+                      disabled={isLoading}
+                      placeholder='e.g. companyabc@example.com'
+                      type='email'
                     />
                   </FormControl>
                   <FormMessage />
@@ -137,7 +116,7 @@ const BasicInfo = ({ user }: GeneralTabBaiscInfoProps) => {
           <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
             <FormField
               control={form.control}
-              name='contactNumber'
+              name='contact'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
@@ -148,7 +127,7 @@ const BasicInfo = ({ user }: GeneralTabBaiscInfoProps) => {
                     <Input
                       {...field}
                       disabled={isLoading}
-                      placeholder='03251234567'
+                      placeholder='55 555 5555'
                       type='number'
                     />
                   </FormControl>
@@ -158,78 +137,21 @@ const BasicInfo = ({ user }: GeneralTabBaiscInfoProps) => {
             />
             <FormField
               control={form.control}
-              name='DOB'
+              name='address'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    DOB
+                    Company Address
                     <span className='text-red-500 ml-1'>*</span>
                   </FormLabel>
                   <FormControl>
                     <FormControl>
-                      <Input
-                        type='date'
+                      <Textarea
+                        {...field}
                         disabled={isLoading}
-                        placeholder="e.g '2021-01-01'"
-                        value={
-                          field.value
-                            ? new Date(field.value).toISOString().split("T")[0]
-                            : ""
-                        }
-                        onChange={(e) =>
-                          field.onChange(new Date(e.target.value))
-                        }
-                        onBlur={field.onBlur}
-                        ref={field.ref}
+                        placeholder="e.g '1234 Main St, City, Country'"
                       />
                     </FormControl>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
-            <FormField
-              control={form.control}
-              name='country'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Country
-                    <span className='text-red-500 ml-1'>*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <ComboBox
-                      options={CountryOptions}
-                      heading='Country'
-                      value={field.value} // Pass the current value
-                      onChange={(value) => {
-                        field.onChange(value); // Call the onChange function from the field
-                        handleCountryChange(value); // Call your custom handler
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='city'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    City
-                    <span className='text-red-500 ml-1'>*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <ComboBox
-                      options={cities}
-                      heading='City'
-                      value={field.value} // Pass the current value
-                      onChange={field.onChange} // Call the onChange from the field
-                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -242,6 +164,7 @@ const BasicInfo = ({ user }: GeneralTabBaiscInfoProps) => {
               disabled={isLoading || !hasChanges}
               type='submit'
               className=''
+              onClick={() => onSubmit(form.getValues())}
             >
               {isLoading ? (
                 <Loader2 className='w-3 h-3 animate-spin' />
@@ -252,7 +175,7 @@ const BasicInfo = ({ user }: GeneralTabBaiscInfoProps) => {
           </div>
         </form>
       </Form>
-    </Card>
+    </div>
   );
 };
 

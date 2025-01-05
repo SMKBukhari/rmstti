@@ -4,7 +4,6 @@ import React from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import SettingsTab from "./_components/settingsTab/page";
 import GeneralTabPage from "./_components/generalTab/page";
 
 const SettingsPage = async () => {
@@ -24,6 +23,7 @@ const SettingsPage = async () => {
       jobExperience: true,
       education: true,
       skills: true,
+      company: true,
     },
   });
 
@@ -37,18 +37,6 @@ const SettingsPage = async () => {
     ...department,
     users: department.users || [],
   }));
-
-  const userWithJobExperiences = user
-    ? {
-        ...user,
-        jobExperiences: user.jobExperience || [],
-        userId: user.userId || "", // Ensure `userId` is a string
-      }
-    : null;
-
-  const userWithEducations = user
-    ? { ...user, educations: user.education || [] }
-    : null;
 
   const userWithSkills = user ? { ...user, skills: user.skills || [] } : null;
 
@@ -74,13 +62,9 @@ const SettingsPage = async () => {
             <GeneralTabPage
               user={user}
               departments={departmentsWithUsers}
-              userExperiences={userWithJobExperiences}
-              userEducation={userWithEducations}
               userSkills={userWithSkills}
+              company={user || null}
             />
-          </TabsContent>
-          <TabsContent value='security'>
-            <SettingsTab user={user} />
           </TabsContent>
         </div>
       </Tabs>

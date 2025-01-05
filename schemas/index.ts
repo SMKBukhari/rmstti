@@ -238,3 +238,7 @@ export const AddNewEmployeeSchema = z.object({
   salary: z.string().optional(),
   DOJ: z.date().optional(),
 });
+
+export const UpdateAttendanceStatusSchema = z.object({
+  status: z.string(),
+});

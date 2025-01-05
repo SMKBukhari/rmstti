@@ -10,6 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import {
   Form,
   FormField,
@@ -39,7 +40,7 @@ interface Field<T extends FieldValues> {
   name: Path<T>;
   label?: string;
   placeholder?: string;
-  type: "input" | "textarea" | "select" | "datetime" | "date";
+  type: "input" | "textarea" | "select" | "datetime" | "date" | "switchButton";
   comboboxOptions?: { label: string; value: string }[];
   heading?: string;
   disabled?: boolean;
@@ -78,7 +79,7 @@ const DialogForm = <T extends FieldValues>({
 }: DialogFormProps<T>) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-auto">
+      <DialogContent className='max-h-[90vh] overflow-auto'>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
@@ -137,7 +138,7 @@ const DialogForm = <T extends FieldValues>({
                                 <div className='p-4'>
                                   <DayPicker
                                     mode='single'
-                                    captionLayout="dropdown"
+                                    captionLayout='dropdown'
                                     selected={innerField.value}
                                     onSelect={innerField.onChange}
                                     disabled={(date: Date) => {
@@ -187,6 +188,20 @@ const DialogForm = <T extends FieldValues>({
                             />
                           </FormControl>
                         )}
+                        {field.type === "switchButton" && (
+                          <FormControl>
+                            <div className='flex items-center space-x-2'>
+                              <Switch
+                                checked={innerField.value}
+                                onCheckedChange={innerField.onChange}
+                                disabled={field.disabled || isSubmitting}
+                              />
+                              <span>
+                                {innerField.value ? "Enabled" : "Disabled"}
+                              </span>
+                            </div>
+                          </FormControl>
+                        )}
                         {field.type === "date" && (
                           <FormControl>
                             <Input
@@ -216,7 +231,7 @@ const DialogForm = <T extends FieldValues>({
               ))}
             </div>
             <div className='flex w-full'>
-              <DialogFooter className="w-full flex gap-3">
+              <DialogFooter className='w-full flex gap-3'>
                 {buttons.map((button, index) => (
                   <Button
                     key={index}
