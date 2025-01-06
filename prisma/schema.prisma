@@ -21,6 +21,7 @@ model UserProfile {
   DOB                     DateTime?
   city                    String?
   country                 String?
+  address                 String?
   userImage               String?
   departmentId            String?
   department              Department?        @relation(fields: [departmentId], references: [id])

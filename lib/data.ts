@@ -206,7 +206,7 @@ export const employeeRoutes = [
   {
     icon: CalendarClock,
     label: "Attendance",
-    href: "/employee/attendance",
+    href: "/employee/attendance-management",
   },
   {
     icon: NotebookText,

@@ -21,6 +21,8 @@ interface EmployeeData {
   address: string | null;
   img: string | null;
   employmentStatus: string;
+  city: string | null;
+  country: string | null;
 }
 
 async function migrateEmployees(): Promise<void> {
@@ -74,6 +76,8 @@ async function migrateEmployees(): Promise<void> {
           address: values[10] || null,
           img: values[12] || null,
           employmentStatus: values[33] === "Active" ? "Active" : "Former",
+          city: values[24] || null,
+          country: values[23] || null,
         };
 
         employees.push(employee);
@@ -120,6 +124,9 @@ async function migrateEmployees(): Promise<void> {
           isHired: boolean;
           DOJ?: Date;
           company: { connect: { id: string } };
+          city: string | null;
+          country: string | null;
+          address: string | null;
         } = {
           fullName: `${employee.firstName} ${employee.lastName}`,
           email:
@@ -157,6 +164,9 @@ async function migrateEmployees(): Promise<void> {
               id: "cm5iarhu10001z01406eaaial",
             },
           },
+          city: employee.city ? "Islamabad-PB" : null,
+          country: employee.country ? "PK" : null,
+          address: employee.address || null,
         };
 
         // Only add DOJ if it's a valid date
