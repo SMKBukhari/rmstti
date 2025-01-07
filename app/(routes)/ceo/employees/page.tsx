@@ -25,6 +25,9 @@ const ApplicantsPage = async () => {
 
   const role = await db.role.findMany();
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   const applicationStatus = await db.applicationStatus.findFirst({
     where: { name: "Hired" },
   });
@@ -35,6 +38,17 @@ const ApplicantsPage = async () => {
     include: {
       role: true,
       workstatus: true,
+      Attendence: {
+        where: {
+          date: {
+            gte: today,
+            lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          }
+        },
+        include: {
+          workStatus: true,
+        },
+      },
       department: true,
     },
   });
@@ -47,8 +61,8 @@ const ApplicantsPage = async () => {
     email: employee.email ?? "N/A",
     contact: employee.contactNumber ?? "N/A",
     role: employee.role?.name ?? "N/A",
+    status: employee.Attendence[0]?.workStatus?.name ?? "Not Checked in",
     department: employee.department?.name ?? "N/A",
-    status: employee.workstatus?.name ?? "N/A",
     userImage: employee.userImage ?? "N/A",
   }));
 
