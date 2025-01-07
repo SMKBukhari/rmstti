@@ -23,6 +23,7 @@ interface EmployeeData {
   employmentStatus: string;
   city: string | null;
   country: string | null;
+  department: string;
 }
 
 async function migrateEmployees(): Promise<void> {
@@ -78,6 +79,7 @@ async function migrateEmployees(): Promise<void> {
           employmentStatus: values[33] === "Active" ? "Active" : "Former",
           city: values[24] || null,
           country: values[23] || null,
+          department: values[27] || "",
         };
 
         employees.push(employee);
@@ -100,6 +102,19 @@ async function migrateEmployees(): Promise<void> {
     for (const employee of employees) {
       try {
         const hashedPassword = await bcrypt.hash("12345678", 10);
+        let newDepartment = employee.department;
+        if (employee.department === "IT Manager") {
+          newDepartment = "IT Department";
+        } else if (
+          employee.department === "Website" ||
+          employee.department === "Print Magazine"
+        ) {
+          newDepartment = "Magazine Department";
+        } else if (employee.department === "Research") {
+          newDepartment = "Research Department";
+        } else if (employee.department === "IT") {
+          newDepartment = "Youtube Department";
+        }
 
         const employeeData: {
           fullName: string;
@@ -127,6 +142,7 @@ async function migrateEmployees(): Promise<void> {
           city: string | null;
           country: string | null;
           address: string | null;
+          department: { connect: { name: string } };
         } = {
           fullName: `${employee.firstName} ${employee.lastName}`,
           email:
@@ -167,6 +183,11 @@ async function migrateEmployees(): Promise<void> {
           city: employee.city ? "Islamabad-PB" : null,
           country: employee.country ? "PK" : null,
           address: employee.address || null,
+          department: {
+            connect: {
+              name: newDepartment,
+            },
+          },
         };
 
         // Only add DOJ if it's a valid date
