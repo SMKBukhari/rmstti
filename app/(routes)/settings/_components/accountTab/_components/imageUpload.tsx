@@ -86,7 +86,7 @@ const ImageUpload = ({ user }: AccountTabImageUploadProps) => {
             )}
           </Button>
           <CldUploadWidget
-            uploadPreset='userImagesUpload'
+            uploadPreset='ImagesUpload'
             options={{
               folder: "userImages",
               resourceType: "image",
