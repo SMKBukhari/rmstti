@@ -8,7 +8,49 @@ import { InterviewScheduledMail } from "./designs/interviewScheduleMail";
 import { ApplicationRejectedMail } from "./designs/rejectJobApplicationMail ";
 import { JobOfferMail } from "./designs/jobOfferMail";
 
-const { SMTP_PASSWORD, SMTP_EMAIL } = process.env;
+// const { SMTP_PASSWORD, SMTP_EMAIL } = process.env;
+// export const sendMail = async ({
+//   to,
+//   subject,
+//   body,
+// }: {
+//   to: string;
+//   subject: string;
+//   body: string;
+// }) => {
+//   const transport = nodemailer.createTransport({
+//     service: "gmail",
+//     auth: {
+//       user: SMTP_EMAIL,
+//       pass: SMTP_PASSWORD,
+//     },
+//   });
+
+//   try {
+//     await transport.verify();
+//   } catch (error) {
+//     console.error(error);
+//     toast.error("Failed to send email");
+//     return;
+//   }
+
+//   try {
+//     const sendResult = await transport.sendMail({
+//       from: SMTP_EMAIL,
+//       to,
+//       subject,
+//       html: body,
+//     });
+//     return sendResult;
+//   } catch (error) {
+//     console.error(error);
+//     toast.error("Failed to send email");
+//     return;
+//   }
+// };
+
+const { SMTP_PASSWORD, SMTP_EMAIL, SMTP_HOST, SMTP_PORT } = process.env;
+
 export const sendMail = async ({
   to,
   subject,
@@ -19,7 +61,9 @@ export const sendMail = async ({
   body: string;
 }) => {
   const transport = nodemailer.createTransport({
-    service: "gmail",
+    host: SMTP_HOST,
+    port: Number(SMTP_PORT),
+    secure: true, // Use SSL
     auth: {
       user: SMTP_EMAIL,
       pass: SMTP_PASSWORD,
@@ -30,7 +74,7 @@ export const sendMail = async ({
     await transport.verify();
   } catch (error) {
     console.error(error);
-    toast.error("Failed to send email");
+    toast.error("Failed to verify email configuration");
     return;
   }
 
@@ -48,6 +92,7 @@ export const sendMail = async ({
     return;
   }
 };
+
 
 export const compileOTPMail = async (fullName: string, otp: string) => {
   const template = handlebars.compile(OTPMail);
