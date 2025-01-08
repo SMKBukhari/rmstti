@@ -7,9 +7,9 @@ export async function POST(
 ) {
   try {
     const { userId } = params;
-    const { action } = await request.json();
+    const { action, localTime } = await request.json();
 
-    const currentDate = new Date();
+    const currentDate = new Date(localTime);
     currentDate.setHours(0, 0, 0, 0);
 
     let attendance = await db.attendence.findFirst({
@@ -32,12 +32,12 @@ export async function POST(
           id: attendance?.id || '',
         },
         update: {
-          checkInTime: new Date(),
+          checkInTime: new Date(localTime),
         },
         create: {
           userId: userId,
           date: currentDate,
-          checkInTime: new Date(),
+          checkInTime: new Date(localTime),
         },
       });
 
@@ -57,7 +57,7 @@ export async function POST(
         );
       }
 
-      const checkOutTime = new Date();
+      const checkOutTime = new Date(localTime);
       attendance = await db.attendence.update({
         where: {
           id: attendance.id,

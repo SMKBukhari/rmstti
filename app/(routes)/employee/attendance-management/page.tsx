@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import React from "react";
 import { attendanceRecordsColumns, columns } from "./_components/columns";
 import { format } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import AttendanceUpdate from "./_components/AttendanceUpdate";
@@ -37,21 +38,29 @@ const AttendancePage = async () => {
   });
 
   const formattedAttendanceRecord: attendanceRecordsColumns[] =
-    attendanceRecords.map((attendanceRecord) => ({
-      user: user,
-      id: attendanceRecord.id || "N/A",
-      date:
-        attendanceRecord.date
-          ? format(new Date(attendanceRecord.date), "EEEE, MMMM d, yyyy")
+    attendanceRecords.map((attendanceRecord) => {
+      const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      const formatLocalTime = (time: Date | null) => {
+        if (!time) return "N/A";
+        const zonedTime = toZonedTime(time, userTimeZone);
+        return format(zonedTime, "hh:mm a");
+      };
+
+      return {
+        user: user,
+        id: attendanceRecord.id || "N/A",
+        date: attendanceRecord.date
+          ? format(
+              toZonedTime(attendanceRecord.date, userTimeZone),
+              "EEEE, MMMM d, yyyy"
+            )
           : "N/A",
-      checkIn: attendanceRecord.checkInTime
-        ? format(new Date(attendanceRecord.checkInTime), "hh:mm a")
-        : "N/A",
-      checkOut: attendanceRecord.checkOutTime
-        ? format(new Date(attendanceRecord.checkOutTime), "hh:mm a")
-        : "N/A",
-      workingHours: attendanceRecord.workingHours || "N/A",
-    }));
+        checkIn: formatLocalTime(attendanceRecord.checkInTime),
+        checkOut: formatLocalTime(attendanceRecord.checkOutTime),
+        workingHours: attendanceRecord.workingHours || "N/A",
+      };
+    });
 
   return (
     <div className='flex-col p-4 md:p-8 space-y-8'>
