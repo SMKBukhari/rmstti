@@ -3,8 +3,6 @@ import { DataTable } from "@/components/ui/data-table";
 import { db } from "@/lib/db";
 import React from "react";
 import { attendanceRecordsColumns, columns } from "./_components/columns";
-import { format } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import AttendanceUpdate from "./_components/AttendanceUpdate";
@@ -39,23 +37,23 @@ const AttendancePage = async () => {
 
   const formattedAttendanceRecord: attendanceRecordsColumns[] =
     attendanceRecords.map((attendanceRecord) => {
-      const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
       const formatLocalTime = (time: Date | null) => {
         if (!time) return "N/A";
-        const zonedTime = toZonedTime(time, userTimeZone);
-        return format(zonedTime, "hh:mm a");
+        return time.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
       };
 
       return {
         user: user,
         id: attendanceRecord.id || "N/A",
-        date: attendanceRecord.date
-          ? format(
-              toZonedTime(attendanceRecord.date, userTimeZone),
-              "EEEE, MMMM d, yyyy"
-            )
-          : "N/A",
+        date: attendanceRecord.date.toLocaleDateString([], {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
         checkIn: formatLocalTime(attendanceRecord.checkInTime),
         checkOut: formatLocalTime(attendanceRecord.checkOutTime),
         workingHours: attendanceRecord.workingHours || "N/A",

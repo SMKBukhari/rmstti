@@ -7,10 +7,12 @@ export async function POST(
 ) {
   try {
     const { userId } = params;
-    const { action, localTime } = await request.json();
+    const { action, localTime, timezoneOffset } = await request.json();
 
-    const currentDate = new Date(localTime);
-    currentDate.setHours(0, 0, 0, 0);
+    const localDate = new Date(localTime);
+    const utcTime = new Date(localDate.getTime() - timezoneOffset * 60000);
+    const currentDate = new Date(utcTime);
+    currentDate.setUTCHours(0, 0, 0, 0);
 
     let attendance = await db.attendence.findFirst({
       where: {
@@ -32,12 +34,12 @@ export async function POST(
           id: attendance?.id || '',
         },
         update: {
-          checkInTime: new Date(localTime),
+          checkInTime: utcTime,
         },
         create: {
           userId: userId,
           date: currentDate,
-          checkInTime: new Date(localTime),
+          checkInTime: utcTime,
         },
       });
 
@@ -57,16 +59,15 @@ export async function POST(
         );
       }
 
-      const checkOutTime = new Date(localTime);
       attendance = await db.attendence.update({
         where: {
           id: attendance.id,
         },
         data: {
-          checkOutTime: checkOutTime,
+          checkOutTime: utcTime,
           workingHours: calculateWorkingHours(
             attendance.checkInTime,
-            checkOutTime
+            utcTime
           ),
         },
       });
