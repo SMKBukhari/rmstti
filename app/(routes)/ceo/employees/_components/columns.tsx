@@ -1,45 +1,40 @@
-"use client";
+"use client"
 
-import { ColumnDef } from "@tanstack/react-table";
-import Link from "next/link";
-import CellActions from "./CellActions";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserProfile } from "@prisma/client";
+import { ColumnDef } from "@tanstack/react-table"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import Link from "next/link"
 
-export type EmployeeColumns = {
-  user: UserProfile | null;
-  id: string;
-  fullName: string;
-  email: string;
-  contact: string;
-  userImage: string;
-  department: string;
-  role: string;
-  status: string;
-};
+export type Employee = {
+  id: string
+  fullName: string
+  email: string
+  contact: string
+  userImage: string
+  department: string
+  role: string
+  status: string
+}
 
-export const columns: ColumnDef<EmployeeColumns>[] = [
+export const columns: ColumnDef<Employee>[] = [
   {
     accessorKey: "userImage",
     header: "",
     cell: ({ row }) => {
-      const { userImage, fullName } = row.original;
+      const employee = row.original
       return (
-        <Avatar className='w-10 h-10'>
-          <AvatarImage src={userImage} alt={fullName} />
-          <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
+        <Avatar className="w-10 h-10">
+          <AvatarImage src={employee.userImage} alt={employee.fullName} />
+          <AvatarFallback>{employee.fullName.charAt(0)}</AvatarFallback>
         </Avatar>
-      );
+      )
     },
   },
   {
     accessorKey: "fullName",
     header: "Full Name",
     cell: ({ row }) => {
-      const { fullName } = row.original;
-      return (
-        <Link href={`/admin/applicants/${row.original.id}`}>{fullName}</Link>
-      );
+      const employee = row.original
+      return <Link href={`/admin/employees/${employee.id}`}>{employee.fullName}</Link>
     },
   },
   {
@@ -62,13 +57,5 @@ export const columns: ColumnDef<EmployeeColumns>[] = [
     accessorKey: "status",
     header: "Status",
   },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const { user, id, fullName, email } = row.original;
-      return (
-        <CellActions user={user} id={id} fullName={fullName} email={email} />
-      );
-    },
-  },
-];
+]
+

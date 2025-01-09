@@ -1,16 +1,17 @@
-"use client";
+"use client"
 
+import React, { useState } from 'react'
 import {
   ColumnDef,
-  ColumnFiltersState,
-  SortingState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+  getPaginationRowModel,
+  SortingState,
+  getSortedRowModel,
+  ColumnFiltersState,
+  getFilteredRowModel,
+} from '@tanstack/react-table'
 
 import {
   Table,
@@ -19,34 +20,34 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+} from '@/components/ui/table'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select'
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  searchKey: string;
-  routePrefix?: string;
-  userId?: string;
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
+  filterableColumns?: {
+    id: string
+    title: string
+    options?: string[]
+  }[]
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  searchKey,
-  routePrefix,
-  userId,
+  filterableColumns = [],
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [rowSelection, setRowSelection] = useState<{ [key: string]: boolean }>(
-    {}
-  );
-  const router = useRouter();
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
   const table = useReactTable({
     data,
@@ -60,39 +61,48 @@ export function DataTable<TData, TValue>({
     state: {
       sorting,
       columnFilters,
-      rowSelection,
     },
-    onRowSelectionChange: (newRowSelection) => {
-      setRowSelection(newRowSelection);
-    },
-  });
-
-  const handleRowClick = (row: TData, event: React.MouseEvent) => {
-    if (!(event.target as HTMLElement).closest("button")) {
-      const link =
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (row as any).id === userId // Check if the row belongs to the signed-in user
-          ? "/profile"
-          : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            `/${routePrefix}/${(row as any).id}`;
-      router.push(link);
-    }
-  };
+  })
 
   return (
     <div>
-      <div className='flex items-center py-4'>
-        <Input
-          placeholder={`Filter ${searchKey}...`}
-          value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn(searchKey)?.setFilterValue(event.target.value)
-          }
-          className='max-w-sm'
-        />
+      <div className="flex items-center py-4 space-x-2">
+        {filterableColumns.map((column) => (
+          <div key={column.id} className="flex items-center space-x-2">
+            <p className="text-sm font-medium">{column.title}:</p>
+            {column.options ? (
+              <Select
+                value={(table.getColumn(column.id)?.getFilterValue() as string) ?? ""}
+                onValueChange={(value) =>
+                  table.getColumn(column.id)?.setFilterValue(value === "all" ? "" : value)
+                }
+              >
+                <SelectTrigger className="h-8 w-[150px]">
+                  <SelectValue placeholder={`Select ${column.title}`} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  {column.options?.map((option) => (
+                    <SelectItem key={option} value={option || "undefined"}>
+                      {option || "Undefined"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input
+                placeholder={`Filter ${column.title}...`}
+                value={(table.getColumn(column.id)?.getFilterValue() as string) ?? ""}
+                onChange={(event) =>
+                  table.getColumn(column.id)?.setFilterValue(event.target.value)
+                }
+                className="h-8 w-[150px]"
+              />
+            )}
+          </div>
+        ))}
       </div>
-
-      <div className='rounded-md border'>
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -116,29 +126,17 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  onClick={(event) => {
-                    if (routePrefix) {
-                      handleRowClick(row.original, event);
-                    }
-                  }}
-                  className={`${routePrefix ? "cursor-pointer" : ""}`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className='h-24 text-center'
-                >
+                <TableCell colSpan={columns.length} className="h-24 text-center">
                   No results.
                 </TableCell>
               </TableRow>
@@ -146,19 +144,18 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-
-      <div className='flex items-center justify-end space-x-2 py-4'>
+      <div className="flex items-center justify-end space-x-2 py-4">
         <Button
-          variant='outline'
-          size='sm'
+          variant="outline"
+          size="sm"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
           Previous
         </Button>
         <Button
-          variant='outline'
-          size='sm'
+          variant="outline"
+          size="sm"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >
@@ -166,5 +163,6 @@ export function DataTable<TData, TValue>({
         </Button>
       </div>
     </div>
-  );
+  )
 }
+
