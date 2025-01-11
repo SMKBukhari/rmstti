@@ -40,10 +40,19 @@ interface Field<T extends FieldValues> {
   name: Path<T>;
   label?: string;
   placeholder?: string;
-  type: "input" | "textarea" | "select" | "datetime" | "date" | "switchButton";
+  type:
+    | "input"
+    | "textarea"
+    | "select"
+    | "datetime"
+    | "date"
+    | "switchButton"
+    | "file";
   comboboxOptions?: { label: string; value: string }[];
   heading?: string;
   disabled?: boolean;
+  accept?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 interface ButtonConfig {
@@ -164,6 +173,19 @@ const DialogForm = <T extends FieldValues>({
                             <Input
                               {...innerField}
                               placeholder={field.placeholder}
+                              disabled={field.disabled || isSubmitting}
+                            />
+                          </FormControl>
+                        )}
+                        {field.type === "file" && (
+                          <FormControl>
+                            <Input
+                              type='file'
+                              accept={field.accept}
+                              onChange={(e) => {
+                                innerField.onChange(e.target.files);
+                                field.onChange?.(e); // Call custom onChange if provided
+                              }}
                               disabled={field.disabled || isSubmitting}
                             />
                           </FormControl>

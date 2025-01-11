@@ -25,6 +25,7 @@ export const PATCH = async (
       },
       include: {
         department: true,
+        role: true,
       },
     });
 
@@ -75,7 +76,13 @@ export const PATCH = async (
       },
       data: {
         status: "Rejected",
-        rejectedBy: `${user?.fullName} - ${user?.department?.name} Manager`,
+        // approvedBy: `${user?.role?.name === }${user?.fullName} - ${user?.department?.name} Manager`,
+        rejectedBy:
+          user?.role?.name === "CEO"
+            ? "CEO"
+            : user?.role?.name === "Manager"
+            ? `${user?.fullName} - ${user?.department?.name} Manager`
+            : `${user?.fullName} - ${user?.role?.name}`,
       },
       include: {
         user: true,
@@ -87,7 +94,7 @@ export const PATCH = async (
     });
 
     return NextResponse.json({
-      message: `Leave Request for ${updateLeaveRequest.user.fullName} Rejected`,
+      message: `Leave Request for ${updateLeaveRequest.user.fullName} Approved`,
       updateLeaveRequest,
     });
   } catch (error) {

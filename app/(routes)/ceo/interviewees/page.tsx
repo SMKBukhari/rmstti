@@ -28,6 +28,8 @@ const IntervieweePage = async () => {
     offeredStatus?.id,
   ].filter((id): id is string => id !== undefined);
 
+  const departments = await db.department.findMany();
+
   const user = await db.userProfile.findUnique({
     where: {
       userId: userId,
@@ -87,8 +89,23 @@ const IntervieweePage = async () => {
         <DataTable
           columns={columns}
           data={formattedApplicants}
-          searchKey='fullName'
           routePrefix='ceo/interviewees'
+          filterableColumns={[
+            {
+              id: "isInterviewed",
+              title: "Interviewed",
+              options: ["Yes", "No"],
+            },
+            {
+              id: "department",
+              title: "Department",
+              options: departments.map((dept) => dept.name).filter(Boolean),
+            },
+            {
+              id: "fullName",
+              title: "Name",
+            },
+          ]}
         />
       </div>
     </div>

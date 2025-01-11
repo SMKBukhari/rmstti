@@ -21,6 +21,8 @@ const ApplicantsPage = async () => {
     },
   });
 
+  const departments = await db.department.findMany();
+
   const applicationStatus = await db.applicationStatus.findFirst({
     where: { name: "Applied" },
   });
@@ -59,8 +61,18 @@ const ApplicantsPage = async () => {
         <DataTable
           columns={columns}
           data={formattedApplicants}
-          searchKey='fullName'
           routePrefix='admin/applicants'
+          filterableColumns={[
+            {
+              id: "fullName",
+              title: "Name",
+            },
+            {
+              id: "department",
+              title: "Department",
+              options: departments.map((dept) => dept.name).filter(Boolean),
+            },
+          ]}
         />
       </div>
     </div>

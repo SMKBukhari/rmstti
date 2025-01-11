@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { redirect } from "next/navigation";
 import UserAboutSection from "./_components/UserAboutSection";
 import UserExperienceEducationSection from "./_components/UserExperienceEducationSection";
 import UserCoverLetterSection from "./_components/UserCoverLetterSection";
@@ -15,14 +14,6 @@ const RejectedApplicantDetailsPage = async ({
 }) => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
-
-  if (!userId) {
-    redirect("/signIn");
-  }
-
-  // if (userId.length < 24) {
-  //   redirect("/signIn");
-  // }
 
   const user = await db.userProfile.findFirst({
     where: {
@@ -47,7 +38,6 @@ const RejectedApplicantDetailsPage = async ({
 
   const isRejectedApplicant =
     rejectedApplicant?.applicationStatus?.name === "Rejected";
-  const applicantRole = rejectedApplicant?.role?.name === "User";
 
   const userWithJobExperiences = rejectedApplicant
     ? {
@@ -73,19 +63,14 @@ const RejectedApplicantDetailsPage = async ({
       }
     : null;
 
-  if (!user) {
-    redirect("/admin/rejected");
-  }
-
-  if (!isRejectedApplicant || !applicantRole) {
-    redirect("/admin/rejected");
-  }
   return (
     <div className='w-full'>
       <div className='flex items-center justify-between w-full'>
         <CustomBreadCrumb
           breadCrumbPage={rejectedApplicant?.fullName || ""}
-          breadCrumbItem={[{ link: "/admin/rejected", label: "Rejected" }]}
+          breadCrumbItem={[
+            { link: "/admin/rejected", label: "Rejected Candidates" },
+          ]}
         />
       </div>
       <div className='grid md:grid-cols-3 grid-cols-1 md:gap-5 gap-0'>

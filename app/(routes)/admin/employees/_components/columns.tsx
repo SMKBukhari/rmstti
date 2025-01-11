@@ -5,6 +5,7 @@ import Link from "next/link";
 import CellActions from "./CellActions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserProfile } from "@prisma/client";
+import { Badge } from "@/components/ui/badge";
 
 export type EmployeeColumns = {
   user: UserProfile | null;
@@ -61,6 +62,24 @@ export const columns: ColumnDef<EmployeeColumns>[] = [
   {
     accessorKey: "status",
     header: "Status",
+    cell: ({ row }) => {
+      const status = row.getValue("status") as string;
+      return (
+        <Badge
+          variant={
+            status === "Active"
+              ? "default"
+              : status === "Terminated"
+              ? "destructive"
+              : status === "Resigned"
+              ? "outline"
+              : "secondary"
+          }
+        >
+          {status}
+        </Badge>
+      );
+    },
   },
   {
     id: "actions",

@@ -274,13 +274,22 @@ model Attendence {
   userId       String
   user         UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
   date         DateTime
-  checkInTime  DateTime?
-  checkOutTime DateTime?
   workingHours String?
   workStatusId String?
   workStatus   WorkStatus? @relation(fields: [workStatusId], references: [id])
+  checkLodId   String?
+  checkLog     CheckLog?   @relation(fields: [checkLodId], references: [id])
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @default(now())
+}
+
+model CheckLog {
+  id           String       @id @unique @default(cuid())
+  checkInTime  DateTime
+  checkOutTime DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @default(now())
+  Attendence   Attendence[]
 }
 
 model Job {

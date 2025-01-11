@@ -5,15 +5,10 @@ import React from "react";
 import { ApplicantsColumns, columns } from "./_components/columns";
 import { format } from "date-fns";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 const RejectedApplicantPage = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
-
-  if (!userId) {
-    redirect("/signIn");
-  }
 
   const user = await db.userProfile.findUnique({
     where: {
@@ -24,6 +19,8 @@ const RejectedApplicantPage = async () => {
   const applicationStatus = await db.applicationStatus.findFirst({
     where: { name: "Rejected" },
   });
+
+  const departments = await db.department.findMany();
 
   const rejectedApplicants = await db.jobApplications.findMany({
     where: {
@@ -53,15 +50,25 @@ const RejectedApplicantPage = async () => {
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
       <div className='flex items-center justify-between w-full'>
-        <CustomBreadCrumb breadCrumbPage='Applicants' />
+        <CustomBreadCrumb breadCrumbPage='Rejected Candidates' />
       </div>
 
       <div className='mt-6 w-full'>
         <DataTable
           columns={columns}
           data={formattedApplicants}
-          searchKey='fullName'
           routePrefix='admin/rejected'
+          filterableColumns={[
+            {
+              id: "department",
+              title: "Department",
+              options: departments.map((dept) => dept.name).filter(Boolean),
+            },
+            {
+              id: "fullName",
+              title: "Name",
+            },
+          ]}
         />
       </div>
     </div>

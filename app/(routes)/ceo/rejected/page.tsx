@@ -25,6 +25,8 @@ const RejectedApplicantPage = async () => {
     where: { name: "Rejected" },
   });
 
+  const departments = await db.department.findMany();
+
   const rejectedApplicants = await db.jobApplications.findMany({
     where: {
       applicationStatusId: applicationStatus?.id,
@@ -53,15 +55,25 @@ const RejectedApplicantPage = async () => {
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
       <div className='flex items-center justify-between w-full'>
-        <CustomBreadCrumb breadCrumbPage='Applicants' />
+        <CustomBreadCrumb breadCrumbPage='Rejected Candidates' />
       </div>
 
       <div className='mt-6 w-full'>
         <DataTable
           columns={columns}
           data={formattedApplicants}
-          searchKey='fullName'
           routePrefix='ceo/rejected'
+          filterableColumns={[
+            {
+              id: "department",
+              title: "Department",
+              options: departments.map((dept) => dept.name).filter(Boolean),
+            },
+            {
+              id: "fullName",
+              title: "Name",
+            },
+          ]}
         />
       </div>
     </div>

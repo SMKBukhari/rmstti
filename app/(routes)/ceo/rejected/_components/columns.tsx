@@ -27,7 +27,11 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
       const { userImage, fullName } = row.original;
       return (
         <Avatar className='w-10 h-10'>
-          <AvatarImage src={userImage} alt={fullName} />
+          <AvatarImage
+            className='object-cover object-center'
+            src={userImage}
+            alt={fullName}
+          />
           <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
         </Avatar>
       );

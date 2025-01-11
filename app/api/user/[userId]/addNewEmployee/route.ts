@@ -40,6 +40,10 @@ export const POST = async (
       where: { name: "Hired" },
     });
 
+    const status = await db.status.findFirst({
+      where: { name: "Active" },
+    });
+
     const departmentExist = await db.department.findFirst({
       where: { name: "IT Department" },
     });
@@ -104,6 +108,11 @@ export const POST = async (
         applicationStatus: {
           connect: {
             id: applicationStatus?.id,
+          },
+        },
+        status: {
+          connect: {
+            id: status?.id,
           },
         },
       },

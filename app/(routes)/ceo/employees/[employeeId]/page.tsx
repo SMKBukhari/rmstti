@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { redirect } from "next/navigation";
 import UserAboutSection from "./_components/UserAboutSection";
 import UserExperienceEducationSection from "./_components/UserExperienceEducationSection";
 import UserCoverLetterSection from "./_components/UserCoverLetterSection";
@@ -15,10 +14,6 @@ const ApplicantDetailsPage = async ({
 }) => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
-
-  if (!userId) {
-    redirect("/signIn");
-  }
 
   const user = await db.userProfile.findFirst({
     where: {
@@ -69,7 +64,7 @@ const ApplicantDetailsPage = async ({
       <div className='flex items-center justify-between w-full'>
         <CustomBreadCrumb
           breadCrumbPage={employee?.fullName || ""}
-          breadCrumbItem={[{ link: "/ceo/applicants", label: "Applicants" }]}
+          breadCrumbItem={[{ link: "/ceo/employees", label: "Employees" }]}
         />
       </div>
       <div className='grid md:grid-cols-3 grid-cols-1 md:gap-5 gap-0'>

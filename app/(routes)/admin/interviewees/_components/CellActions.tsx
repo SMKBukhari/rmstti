@@ -24,7 +24,6 @@ const CellActions = ({
   user,
   id,
   fullName,
-  email,
   appliedFor,
 }: CellActionsProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);

@@ -4,16 +4,11 @@ import { db } from "@/lib/db";
 import React from "react";
 import { format } from "date-fns";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { columns, LeaveRequestsColumns } from "./_components/columns";
 
 const ApplicantsPage = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
-
-  if (!userId) {
-    redirect("/signIn");
-  }
 
   const user = await db.userProfile.findUnique({
     where: {
@@ -23,6 +18,8 @@ const ApplicantsPage = async () => {
       department: true,
     },
   });
+
+  const leaveType = await db.leaveType.findMany();
 
   const leaveRequests = await db.leaveRequest.findMany({
     include: {
@@ -55,16 +52,22 @@ const ApplicantsPage = async () => {
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
       <div className='flex items-center justify-between w-full'>
-        <CustomBreadCrumb
-          breadCrumbPage='Manage Leave Requests'
-        />
+        <CustomBreadCrumb breadCrumbPage='Manage Leave Requests' />
       </div>
 
       <div className='mt-6 w-full'>
         <DataTable
           columns={columns}
           data={formattedLeaveRequests}
+          routePrefix='/ceo/leave-management/manage-requests'
           filterableColumns={[
+            {
+              id: "leaveType",
+              title: "Leave Type",
+              options: leaveType
+                .map((leaveType) => leaveType.name)
+                .filter(Boolean),
+            },
             {
               id: "fullName",
               title: "Name",

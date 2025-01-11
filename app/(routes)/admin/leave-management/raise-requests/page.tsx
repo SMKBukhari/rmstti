@@ -71,7 +71,12 @@ const ApplicantsPage = async () => {
           columns={columns}
           data={formattedLeaveRequests}
           searchKey='leaveType'
-          routePrefix='manager/leave-management/raise-requests'
+          filterableColumns={[
+            {
+              id: "fullName",
+              title: "Name",
+            },
+          ]}
         />
       </div>
     </div>

@@ -1,24 +1,27 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { UserProfile, WorkStatus } from "@prisma/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CellActions from "./CellActions";
+import { Badge } from "@/components/ui/badge";
+import { UserProfile, WorkStatus } from "@prisma/client";
 
-export type attendanceRecordsColumns = {
-  user: UserProfile | null;
-  workStatus: WorkStatus[] | null;
-  status: string;
+export type AttendanceRecord = {
   id: string;
   fullName: string;
+  status: string;
+  userImage: string;
   date: string;
   checkIn: string;
   checkOut: string;
   workingHours: string;
-  userImage: string;
+  department: string;
+  role: string;
+  workStatus: WorkStatus[] | null;
+  user: UserProfile | null;
 };
 
-export const columns: ColumnDef<attendanceRecordsColumns>[] = [
+export const columns: ColumnDef<AttendanceRecord>[] = [
   {
     accessorKey: "userImage",
     header: "",
@@ -39,6 +42,7 @@ export const columns: ColumnDef<attendanceRecordsColumns>[] = [
   {
     accessorKey: "date",
     header: "Date",
+    sortingFn: "datetime",
   },
   {
     accessorKey: "checkIn",
@@ -55,18 +59,42 @@ export const columns: ColumnDef<attendanceRecordsColumns>[] = [
   {
     accessorKey: "status",
     header: "Status",
+    cell: ({ row }) => {
+      const status = row.getValue("status") as string;
+      return (
+        <Badge
+          variant={
+            status === "Present"
+              ? "secondary"
+              : status === "Absent"
+              ? "destructive"
+              : "default"
+          }
+        >
+          {status}
+        </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: "department",
+    header: "Department",
+  },
+  {
+    accessorKey: "role",
+    header: "Role",
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const { user, id, workStatus, status, fullName } = row.original;
+      const { id, status, fullName, user, workStatus } = row.original;
       return (
         <CellActions
-          user={user}
           id={id}
           status={status}
-          workStatus={workStatus}
           fullName={fullName}
+          user={user}
+          workStatus={workStatus}
         />
       );
     },
