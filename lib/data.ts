@@ -1,5 +1,6 @@
 import { Country, City } from "country-state-city";
 import {
+  BadgeMinus,
   Bell,
   BookUser,
   Building2,
@@ -113,7 +114,7 @@ export const adminRoutes = [
   {
     icon: CalendarClock,
     label: "Attendance Management",
-    href: "/admin/attendance-management",
+    href: "/admin/attendance-management/manage-attendance",
     subitems: [
       {
         icon: CalendarPlus,
@@ -130,7 +131,7 @@ export const adminRoutes = [
   {
     icon: NotebookText,
     label: "Leave Management",
-    href: "/admin/leave-management",
+    href: "/admin/leave-management/manage-requests",
     subitems: [
       {
         icon: Hand,
@@ -175,6 +176,23 @@ export const adminRoutes = [
     href: "/admin/interviewees",
   },
   {
+    icon: BadgeMinus,
+    label: "Resignation Management",
+    href: "/admin/resign/manage-resignations",
+    subitems: [
+      {
+        icon: Hand,
+        label: "Raise Resignation Requests",
+        href: "/admin/resign/raise-request",
+      },
+      {
+        icon: NotepadTextDashed,
+        label: "Manage Resignation Requests",
+        href: "/admin/resign/manage-resignations",
+      },
+    ],
+  },
+  {
     icon: User,
     label: "Profile",
     href: "/profile",
@@ -212,6 +230,11 @@ export const employeeRoutes = [
     icon: NotebookText,
     label: "Leave Management",
     href: "/employee/leave-management",
+  },
+  {
+    icon: BadgeMinus,
+    label: "Resignation Requests",
+    href: "/employee/resign",
   },
   {
     icon: User,
@@ -287,6 +310,11 @@ export const managerRoutes = [
     href: "/manager/interviewees",
   },
   {
+    icon: BadgeMinus,
+    label: "Resignation Requests",
+    href: "/employee/resign",
+  },
+  {
     icon: User,
     label: "Profile",
     href: "/profile",
@@ -349,6 +377,11 @@ export const ceoRoutes = [
     icon: ChartNoAxesCombined,
     label: "Overview",
     href: "/ceo/dashboard/overview",
+  },
+  {
+    icon: BadgeMinus,
+    label: "Resignation Requests",
+    href: "/ceo/resign/manage-resignations",
   },
   {
     icon: User,

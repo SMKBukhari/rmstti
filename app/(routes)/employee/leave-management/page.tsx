@@ -5,16 +5,11 @@ import React from "react";
 import { columns, LeaveRequestsColumns } from "./_components/columns";
 import { format } from "date-fns";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import RaiseRequest from "./_components/RaiseRequest";
 
 const ApplicantsPage = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
-
-  if (!userId) {
-    redirect("/signIn");
-  }
 
   const user = await db.userProfile.findUnique({
     where: {
@@ -63,8 +58,21 @@ const ApplicantsPage = async () => {
         <DataTable
           columns={columns}
           data={formattedLeaveRequests}
-          searchKey='leaveType'
           routePrefix='employee/leave-management'
+          filterableColumns={[
+            {
+              id: "leaveType",
+              title: "Leave Type",
+              options: leaveTypes
+                .map((leaveType) => leaveType.name)
+                .filter(Boolean),
+            },
+            {
+              id: "status",
+              title: "Status",
+              options: ["Pending", "Approved", "Rejected"],
+            },
+          ]}
         />
       </div>
     </div>

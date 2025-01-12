@@ -33,7 +33,7 @@ const UserNavButton = ({ userProfile }: UserNavButtonProps) => {
       <PopoverTrigger className='flex items-center gap-2'>
         {userProfile?.userImage ? (
           <Avatar>
-            <AvatarImage src={userProfile.userImage} />
+            <AvatarImage className="object-cover w-full h-full object-center" src={userProfile.userImage} />
             <AvatarFallback>{avatarFallback}</AvatarFallback>
           </Avatar>
         ) : (

@@ -35,6 +35,7 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { TimePicker12 } from "@/components/TimePicker12Hours";
+import Editor from "./Editor";
 
 interface Field<T extends FieldValues> {
   name: Path<T>;
@@ -43,6 +44,7 @@ interface Field<T extends FieldValues> {
   type:
     | "input"
     | "textarea"
+    | "richtextarea"
     | "select"
     | "datetime"
     | "date"
@@ -61,6 +63,7 @@ interface ButtonConfig {
   variant?: "primary" | "secondary" | "destructive";
   isLoading?: boolean;
   type?: "button" | "submit";
+  disabled?: boolean;
 }
 
 interface DialogFormProps<T extends FieldValues> {
@@ -200,6 +203,16 @@ const DialogForm = <T extends FieldValues>({
                             />
                           </FormControl>
                         )}
+                        {field.type === "richtextarea" && (
+                          <FormControl>
+                            <Editor
+                              value={innerField.value}
+                              onChange={(content) =>
+                                innerField.onChange(content)
+                              }
+                            />
+                          </FormControl>
+                        )}
                         {field.type === "select" && field.comboboxOptions && (
                           <FormControl>
                             <ComboBox
@@ -260,7 +273,7 @@ const DialogForm = <T extends FieldValues>({
                     variant={button.variant || "secondary"}
                     onClick={button.onClick}
                     type={button.type || "button"}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || button.disabled}
                   >
                     {button.isLoading ? (
                       <Loader2 className='w-3 h-3 animate-spin' />

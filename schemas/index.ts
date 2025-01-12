@@ -242,3 +242,12 @@ export const AddNewEmployeeSchema = z.object({
 export const UpdateAttendanceStatusSchema = z.object({
   status: z.string(),
 });
+
+export const ResignationRequestSchema = z.object({
+  fullName: z.string(),
+  role: z.string(),
+  department: z.string(),
+  designation: z.string(),
+  date: z.date(),
+  reason: z.string(),
+});
