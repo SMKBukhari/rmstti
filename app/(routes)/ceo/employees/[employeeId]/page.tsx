@@ -4,8 +4,8 @@ import UserExperienceEducationSection from "./_components/UserExperienceEducatio
 import UserCoverLetterSection from "./_components/UserCoverLetterSection";
 import UserSkillsSection from "./_components/UserSkillsSection";
 import CustomBreadCrumb from "@/components/CustomBreadCrumb";
-import UserResumeSection from "./_components/UserResumeSection";
 import { cookies } from "next/headers";
+import { AttendanceChart } from "./_components/AttendanceChart";
 
 const ApplicantDetailsPage = async ({
   params,
@@ -32,6 +32,8 @@ const ApplicantDetailsPage = async ({
       jobExperience: true,
       education: true,
       JobApplications: true,
+      company: true,
+      department: true,
     },
   });
 
@@ -76,6 +78,7 @@ const ApplicantDetailsPage = async ({
           />
         </div>
         <div className='md:col-span-2'>
+          <AttendanceChart userId={employee?.userId ?? ""} />
           <UserExperienceEducationSection
             userExperiences={userWithJobExperiences}
             userEducations={userWithEducations}
@@ -84,7 +87,6 @@ const ApplicantDetailsPage = async ({
           <UserCoverLetterSection
             userJobApplications={userWithJobApplications}
           />
-          <UserResumeSection user={employee} />
         </div>
       </div>
     </div>

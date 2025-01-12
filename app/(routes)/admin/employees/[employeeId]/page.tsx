@@ -1,12 +1,11 @@
 import { db } from "@/lib/db";
-import { redirect } from "next/navigation";
 import UserAboutSection from "./_components/UserAboutSection";
 import UserExperienceEducationSection from "./_components/UserExperienceEducationSection";
 import UserCoverLetterSection from "./_components/UserCoverLetterSection";
 import UserSkillsSection from "./_components/UserSkillsSection";
 import CustomBreadCrumb from "@/components/CustomBreadCrumb";
-import UserResumeSection from "./_components/UserResumeSection";
 import { cookies } from "next/headers";
+import { AttendanceChart } from "./_components/AttendanceChart";
 
 const ApplicantDetailsPage = async ({
   params,
@@ -15,10 +14,6 @@ const ApplicantDetailsPage = async ({
 }) => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
-
-  if (!userId) {
-    redirect("/signIn");
-  }
 
   const user = await db.userProfile.findFirst({
     where: {
@@ -37,6 +32,8 @@ const ApplicantDetailsPage = async ({
       jobExperience: true,
       education: true,
       JobApplications: true,
+      company: true,
+      department: true,
     },
   });
 
@@ -81,6 +78,7 @@ const ApplicantDetailsPage = async ({
           />
         </div>
         <div className='md:col-span-2'>
+          <AttendanceChart userId={employee?.userId ?? ""} />
           <UserExperienceEducationSection
             userExperiences={userWithJobExperiences}
             userEducations={userWithEducations}
@@ -89,7 +87,6 @@ const ApplicantDetailsPage = async ({
           <UserCoverLetterSection
             userJobApplications={userWithJobApplications}
           />
-          <UserResumeSection user={employee} />
         </div>
       </div>
     </div>

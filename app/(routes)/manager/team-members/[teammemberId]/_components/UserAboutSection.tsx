@@ -1,25 +1,25 @@
 "use client";
 import ClientAvatar from "@/components/AvatarClient";
-import DialogForm from "@/components/DialogForm";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { ScheduleInterviewSchema } from "@/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { JobApplications, Role, Status, UserProfile } from "@prisma/client";
-import axios from "axios";
+import {
+  company,
+  Department,
+  JobApplications,
+  Role,
+  Status,
+  UserProfile,
+} from "@prisma/client";
 import { Country } from "country-state-city";
-import { Check, Crown, Flag, Loader2, Mail, User } from "lucide-react";
-import { redirect, useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
+import { Check, Crown, Flag, Mail, User } from "lucide-react";
+import CellActions from "../../_components/CellActions";
 
 interface UserAboutSectionProps {
   user: UserProfile | null;
   applicant:
-    | (UserProfile & { role: Role | null } & { status: Status | null })
+    | (UserProfile & { role: Role | null } & { status: Status | null } & {
+        company: company | null;
+      } & { department: Department | null })
     | null;
   userJobApplications:
     | (UserProfile & { jobApplications: JobApplications[] })
@@ -31,72 +31,9 @@ const UserAboutSection = ({
   applicant,
   userJobApplications,
 }: UserAboutSectionProps) => {
-  const [isDialogOpen, setDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isRejection, setIsRejection] = useState(false);
-  const router = useRouter();
   const countryName = applicant?.country
     ? Country.getCountryByCode(applicant.country)?.name || applicant.country
     : "Not Specified";
-
-  const form = useForm<z.infer<typeof ScheduleInterviewSchema>>({
-    resolver: zodResolver(ScheduleInterviewSchema),
-    defaultValues: {
-      interviewDateTime: new Date(),
-    },
-  });
-
-  const onSubmit = async (data: z.infer<typeof ScheduleInterviewSchema>) => {
-    try {
-      setIsLoading(true);
-      await axios.post(`/api/user/${user?.userId}/scheduleAnInterview`, {
-        applicantId: applicant?.userId,
-        interviewDateTime: data.interviewDateTime,
-      });
-      toast.success(
-        `Interview scheduled successfully for ${applicant?.fullName}.`
-      );
-      setDialogOpen(false);
-      setIsLoading(false);
-      router.refresh();
-      redirect("/admin/applicants");
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        if (error.response && error.response.data) {
-          toast.error(error.response.data);
-        } else {
-          toast.error("An unexpected error occurred. Please try again.");
-        }
-      }
-    } finally {
-      setDialogOpen(false);
-      setIsLoading(false);
-    }
-  };
-
-  const onReject = async () => {
-    try {
-      setIsRejection(true);
-      await axios.post(`/api/user/${user?.userId}/rejectJobApplication`, {
-        applicantId: applicant?.userId,
-        notifcationTitle: "Application Rejected",
-        notificationMessage:
-          "Your Application has been rejected. Please try again later.",
-      });
-      toast.success(`Applicant ${applicant?.fullName} rejected successfully.`);
-      router.refresh();
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        if (error.response && error.response.data) {
-          toast.error(error.response.data);
-        } else {
-          toast.error("An unexpected error occurred. Please try again.");
-        }
-      }
-    } finally {
-      setIsRejection(false);
-    }
-  };
 
   const avatarFallback =
     applicant?.fullName?.substring(0, 2).toUpperCase() || "U";
@@ -108,7 +45,7 @@ const UserAboutSection = ({
             <div className='lg:w-32 lg:h-32 md:w-24 md:h-24 sm:w-40 sm:h-40 w-32 h-32'>
               {applicant?.userImage ? (
                 <Avatar className='w-full h-full'>
-                  <AvatarImage src={applicant.userImage} />
+                  <AvatarImage className="w-full h-full object-cover object-center" src={applicant.userImage} />
                   <AvatarFallback>{avatarFallback}</AvatarFallback>
                 </Avatar>
               ) : (
@@ -175,47 +112,21 @@ const UserAboutSection = ({
             )}
           </div>
         ))}
-        <div className='flex sm:flex-row flex-col flex-wrap justify-end gap-4'>
-          <Button variant={"primary"} onClick={() => setDialogOpen(true)}>
-            Assign Task
-          </Button>
-          <Button variant={"destructive"} onClick={onReject}>
-            {isRejection ? (
-              <Loader2 className='w-5 h-5 animate-spin' />
-            ) : (
-              "Reject"
-            )}
-          </Button>
+        <div className='flex sm:flex-row w-full flex-col flex-wrap justify-end gap-4'>
+          <CellActions
+            company={applicant?.company?.name || ""}
+            department={applicant?.department?.name || ""}
+            designation={applicant?.designation || ""}
+            email={applicant?.email || ""}
+            fullName={applicant?.fullName || ""}
+            id={applicant?.userId || ""}
+            role={applicant?.role?.name || ""}
+            user={user}
+          />
         </div>
       </div>
 
-      <DialogForm
-        isOpen={isDialogOpen}
-        onOpenChange={setDialogOpen}
-        title='Schedule an Interview'
-        description='Select a date and time for the interview.'
-        fields={[
-          {
-            name: "interviewDateTime",
-            type: "datetime",
-          },
-        ]}
-        buttons={[
-          {
-            label: "Schedule",
-            type: "submit",
-            variant: "primary",
-            isLoading: isLoading,
-          },
-          {
-            label: "Cancel",
-            type: "button",
-            onClick: () => setDialogOpen(false),
-          },
-        ]}
-        onSubmit={onSubmit}
-        form={form}
-      />
+      
     </main>
   );
 };

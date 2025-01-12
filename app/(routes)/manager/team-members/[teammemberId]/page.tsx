@@ -32,6 +32,8 @@ const ApplicantDetailsPage = async ({
       jobExperience: true,
       education: true,
       JobApplications: true,
+      company: true,
+      department: true,
     },
   });
 
