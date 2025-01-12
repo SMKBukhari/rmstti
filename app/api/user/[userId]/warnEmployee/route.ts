@@ -8,11 +8,43 @@ export const POST = async (
 ) => {
   try {
     const userId = params.userId;
-    const { fullName, role, department, designation, date, reason } =
-      await req.json();
+    const {
+      id,
+      fullName,
+      role,
+      department,
+      designation,
+      senderName,
+      senderDesignation,
+      title,
+      warningMessage,
+    } = await req.json();
 
-    if (!fullName || !role || !department || !designation || !date || !reason) {
+    if (
+      !id ||
+      !fullName ||
+      !role ||
+      !department ||
+      !designation ||
+      !senderName ||
+      !senderDesignation ||
+      !title ||
+      !warningMessage
+    ) {
       return new NextResponse("All fields are required", { status: 400 });
+    }
+
+    const employee = await db.userProfile.findFirst({
+      where: {
+        userId: id,
+      },
+      include: {
+        Warnings: true,
+      },
+    });
+
+    if (!employee) {
+      return new NextResponse("Employee not found", { status: 404 });
     }
 
     const user = await db.userProfile.findFirst({
@@ -20,7 +52,7 @@ export const POST = async (
         userId,
       },
       include: {
-        ResignationRequests: true,
+        role: true,
       },
     });
 
@@ -39,38 +71,48 @@ export const POST = async (
     const notifications = [
       {
         userId,
-        title: "Resignation Request Submitted",
-        message: `Your resignation request has been submitted successfully. You will be notified once it has been reviewed.`,
+        title: "Warning Sent",
+        message: `You have sent a warning to ${employee.fullName}.`,
         createdBy: NotificationCreator.Account,
         type: NotificationType.General,
-        link: "/employee/resign",
       },
       ...admins.map((admin) => ({
         userId: admin.userId,
-        title: "New Resignation Request Raised",
-        message: `${fullName} has submitted a resignation request. Please review it.`,
+        title: "Warning Sent",
+        message: `${user.fullName} has sent a warning to ${employee.fullName}.`,
         createdBy: NotificationCreator.Employee,
         senderImage: user.userImage,
-        link: `/admin/resign/manage-resignations`,
+        link: `/admin/employees`,
         type: NotificationType.General,
       })),
       ...ceo.map((ceo) => ({
         userId: ceo.userId,
-        title: "New Resignation Request Raised",
-        message: `${fullName} has submitted a resignation request. Please review it.`,
+        title: "Warning Sent",
+        message: `${user.fullName} has sent a warning to ${employee.fullName}.`,
         createdBy: NotificationCreator.Employee,
         senderImage: user.userImage,
-        link: `/ceo/manage-resignations`,
+        link: `/ceo/employees`,
         type: NotificationType.General,
       })),
     ];
 
-    const raiseResignationRequest = await db.resignationRequests.create({
+    const warnEmployee = await db.warnings.create({
       data: {
-        reason,
+        title,
+        message: warningMessage,
+        senderName,
+        senderDesignation,
+        createdBy:
+          user.role?.name === "CEO"
+            ? NotificationCreator.CEO
+            : user.role?.name === "Admin"
+            ? NotificationCreator.Admin
+            : user.role?.name === "Manager"
+            ? NotificationCreator.Manager
+            : NotificationCreator.Account,
         user: {
           connect: {
-            userId,
+            userId: id,
           },
         },
       },
@@ -80,9 +122,9 @@ export const POST = async (
       data: notifications,
     });
 
-    return NextResponse.json(raiseResignationRequest, { status: 201 });
+    return NextResponse.json(warnEmployee, { status: 201 });
   } catch (error) {
-    console.error(`RAISE_RESIGNATION_REQUEST_ERROR: ${error}`);
+    console.error(`RAISE_LEAVE_REQUEST_ERROR: ${error}`);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 };

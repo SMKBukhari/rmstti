@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import React from "react";
 import TotalEmployee from "./_components/Cards/TotalEmployee";
 import TotalApplicant from "./_components/Cards/TotalApplicants";
+import { format } from "date-fns";
+import EmployeeBannerWarning from "./_components/userBannerWarning";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -49,11 +51,11 @@ const page = async () => {
   const previousMonthEnd = new Date(previousMonthStart);
   previousMonthEnd.setMonth(previousMonthEnd.getMonth() + 1);
   previousMonthEnd.setDate(0);
-  
+
   const users = await db.userProfile.findMany({
     include: {
       role: true,
-    }
+    },
   });
 
   // Filter the users to get the employees and applicants
@@ -67,41 +69,69 @@ const page = async () => {
       createdAt: {
         gte: previousMonthStart,
         lte: previousMonthEnd,
-      }
-    }
+      },
+    },
   });
 
   // Get the applicants from the previous month
   const previousMonthApplicants = await db.userProfile.findMany({
     where: {
       role: {
-        name: "Applicant"
+        name: "Applicant",
       },
       createdAt: {
         gte: previousMonthStart,
         lte: previousMonthEnd,
-      }
-    }
+      },
+    },
   });
 
   // Calculate the percentage change in the number of employees
   const currentCountEmployees = employees.length;
   const previousCountEmployees = previousMonthEmployees.length;
   const percentageChange = previousCountEmployees
-    ? ((currentCountEmployees - previousCountEmployees) / previousCountEmployees) * 100
+    ? ((currentCountEmployees - previousCountEmployees) /
+        previousCountEmployees) *
+      100
     : 0;
-    
+
   // Calculate the percentage change in the number of applicants
   const currentCountApplicants = applicants.length;
   const previousCountApplicants = previousMonthApplicants.length;
   const percentageChangeApplicants = previousCountApplicants
-    ? ((currentCountApplicants - previousCountApplicants) / previousCountApplicants) * 100
-    : 0;  
+    ? ((currentCountApplicants - previousCountApplicants) /
+        previousCountApplicants) *
+      100
+    : 0;
+
+  const today = format(new Date(), "yyyy-MM-dd");
+  const warning = await db.warnings.findFirst({
+    where: {
+      userId: userId,
+      createdAt: {
+        gte: new Date(today),
+        lt: new Date(new Date(today).setDate(new Date(today).getDate() + 1)),
+      },
+    },
+  });
   return (
     <>
+      {warning && (
+        <EmployeeBannerWarning
+          warningTitle={warning.title}
+          warningMessage={warning.message}
+          senderDesignation={warning.senderDesignation}
+        />
+      )}
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-        <TotalEmployee totalEmployees={currentCountEmployees} percentageChange={percentageChange} />
-        <TotalApplicant totalEmployees={currentCountApplicants} percentageChange={percentageChangeApplicants} />
+        <TotalEmployee
+          totalEmployees={currentCountEmployees}
+          percentageChange={percentageChange}
+        />
+        <TotalApplicant
+          totalEmployees={currentCountApplicants}
+          percentageChange={percentageChangeApplicants}
+        />
       </div>
     </>
   );

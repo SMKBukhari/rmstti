@@ -25,6 +25,8 @@ const TeamMembersPage = async () => {
           users: {
             include: {
               role: true,
+              company: true,
+              department: true,
             },
           },
         },
@@ -49,7 +51,10 @@ const TeamMembersPage = async () => {
       appliedAt: teamMember.updatedAt
         ? format(new Date(teamMember.updatedAt), "MMMM do, yyyy")
         : "N/A",
+      department: teamMember.department?.name ?? "N/A",
+      role: teamMember.role?.name ?? "N/A",
       designation: teamMember.designation ?? "N/A",
+      company: teamMember.company?.name ?? "N/A",
       userImage: teamMember.userImage ?? "N/A",
     })
   );
@@ -64,9 +69,14 @@ const TeamMembersPage = async () => {
         <DataTable
           columns={columns}
           data={formattedApplicants}
-          searchKey='fullName'
           routePrefix='manager/team-members'
           userId={user?.userId}
+          filterableColumns={[
+            {
+              id: "fullName",
+              title: "Full Name",
+            },
+          ]}
         />
       </div>
     </div>

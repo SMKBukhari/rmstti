@@ -15,6 +15,9 @@ export type ApplicantsColumns = {
   appliedAt: string;
   userImage: string;
   designation: string;
+  department: string;
+  company: string;
+  role: string;
 };
 
 export const columns: ColumnDef<ApplicantsColumns>[] = [
@@ -56,10 +59,20 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const { user, id, fullName, email } = row.original;
+      const { user, id, fullName, email, role, department, designation, company } =
+        row.original;
       return (
         id !== user?.userId && (
-          <CellActions user={user} id={id} fullName={fullName} email={email} />
+          <CellActions
+          user={user}
+          id={id}
+          fullName={fullName}
+          email={email}
+          department={department}
+          designation={designation}
+          role={role}
+          company={company}
+        />
         )
       );
     },

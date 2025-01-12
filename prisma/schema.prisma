@@ -77,6 +77,7 @@ model UserProfile {
   OfficeTimingOut         String?
   Attendence              Attendence[]
   ResignationRequests     ResignationRequests[]
+  Warnings                Warnings[]
 }
 
 model LeaveRequest {
@@ -119,6 +120,21 @@ model ResignationRequests {
   rejectedBy    String?
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @default(now())
+}
+
+model Warnings {
+  id                String              @id @unique @default(cuid())
+  userId            String
+  user              UserProfile         @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  title             String
+  message           String              @db.LongText
+  senderName        String
+  senderDesignation String
+  createdBy         NotificationCreator
+  senderImage       String?
+  link              String?
+  createdAt         DateTime            @default(now())
+  isRead            Boolean             @default(false)
 }
 
 model Role {

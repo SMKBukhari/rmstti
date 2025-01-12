@@ -15,8 +15,10 @@ export type Employee = {
   contact: string;
   userImage: string;
   department: string;
+  designation: string;
   role: string;
   status: string;
+  company: string;
 };
 
 export const columns: ColumnDef<Employee>[] = [
@@ -90,9 +92,19 @@ export const columns: ColumnDef<Employee>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const { user, id, fullName, email } = row.original;
+      const { user, id, fullName, email, role, department, designation, company } =
+        row.original;
       return (
-        <CellActions user={user} id={id} fullName={fullName} email={email} />
+        <CellActions
+          user={user}
+          id={id}
+          fullName={fullName}
+          email={email}
+          department={department}
+          designation={designation}
+          role={role}
+          company={company}
+        />
       );
     },
   },

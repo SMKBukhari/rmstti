@@ -52,6 +52,7 @@ const ApplicantsPage = async () => {
       workstatus: true,
       status: true,
       department: true,
+      company: true,
     },
   });
 
@@ -65,6 +66,8 @@ const ApplicantsPage = async () => {
       role: employee.role?.name ?? "N/A",
       status: employee.status?.name ?? "N/A",
       department: employee.department?.name ?? "N/A",
+      designation: employee.designation ?? "N/A",
+      company: employee?.company?.name ?? "N/A",
       userImage: employee.userImage ?? "N/A",
     }))
     .sort((a, b) => {

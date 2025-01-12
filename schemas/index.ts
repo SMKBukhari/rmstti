@@ -251,3 +251,14 @@ export const ResignationRequestSchema = z.object({
   date: z.date(),
   reason: z.string(),
 });
+
+export const WarningSchema = z.object({
+  fullName: z.string(),
+  role: z.string(),
+  department: z.string(),
+  designation: z.string(),
+  title: z.string(),
+  warningMessage: z.string(),
+  senderName: z.string(),
+  senderDesignation: z.string(),
+});

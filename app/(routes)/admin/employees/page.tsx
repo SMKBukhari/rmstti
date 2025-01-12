@@ -52,21 +52,24 @@ const ApplicantsPage = async () => {
       workstatus: true,
       status: true,
       department: true,
+      company: true,
     },
   });
 
   const formattedEmployees = employees
-    .map((employee) => ({
-      user: user,
-      id: employee.userId,
-      fullName: employee.fullName ?? "N/A",
-      email: employee.email ?? "N/A",
-      contact: employee.contactNumber ?? "N/A",
-      role: employee.role?.name ?? "N/A",
-      status: employee.status?.name ?? "N/A",
-      department: employee.department?.name ?? "N/A",
-      userImage: employee.userImage ?? "N/A",
-    }))
+  .map((employee) => ({
+    user: user,
+    id: employee.userId,
+    fullName: employee.fullName ?? "N/A",
+    email: employee.email ?? "N/A",
+    contact: employee.contactNumber ?? "N/A",
+    role: employee.role?.name ?? "N/A",
+    status: employee.status?.name ?? "N/A",
+    department: employee.department?.name ?? "N/A",
+    designation: employee.designation ?? "N/A",
+    company: employee?.company?.name ?? "N/A",
+    userImage: employee.userImage ?? "N/A",
+  }))
     .sort((a, b) => {
       const statusOrder = ["Active", "Former", "Resigned", "Terminated"];
       const aStatusIndex = statusOrder.indexOf(a.status);

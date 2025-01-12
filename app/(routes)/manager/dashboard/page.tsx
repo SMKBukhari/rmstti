@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import React from "react";
 import TotalEmployee from "./_components/Cards/TotalEmployee";
 import TotalApplicant from "./_components/Cards/TotalApplicants";
+import { format } from "date-fns";
+import EmployeeBannerWarning from "./_components/userBannerWarning";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -105,8 +107,26 @@ const page = async () => {
         previousCountApplicants) *
       100
     : 0;
+
+  const today = format(new Date(), "yyyy-MM-dd");
+  const warning = await db.warnings.findFirst({
+    where: {
+      userId: userId,
+      createdAt: {
+        gte: new Date(today),
+        lt: new Date(new Date(today).setDate(new Date(today).getDate() + 1)),
+      },
+    },
+  });
   return (
     <>
+      {warning && (
+        <EmployeeBannerWarning
+          warningTitle={warning.title}
+          warningMessage={warning.message}
+          senderDesignation={warning.senderDesignation}
+        />
+      )}
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
         <TotalEmployee
           totalEmployees={currentCountEmployees}
