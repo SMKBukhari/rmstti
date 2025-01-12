@@ -30,7 +30,7 @@ export const columns: ColumnDef<Employee>[] = [
       return (
         <Avatar className='w-10 h-10 object-cover'>
           <AvatarImage
-            className='object-cover'
+            className='object-cover object-center w-full h-full'
             src={employee.userImage}
             alt={employee.fullName}
           />
@@ -92,8 +92,16 @@ export const columns: ColumnDef<Employee>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const { user, id, fullName, email, role, department, designation, company } =
-        row.original;
+      const {
+        user,
+        id,
+        fullName,
+        email,
+        role,
+        department,
+        designation,
+        company,
+      } = row.original;
       return (
         <CellActions
           user={user}

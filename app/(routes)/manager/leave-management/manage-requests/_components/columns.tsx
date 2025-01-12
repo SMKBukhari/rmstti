@@ -26,7 +26,11 @@ export const columns: ColumnDef<LeaveRequestsColumns>[] = [
       const { userImage, fullName } = row.original;
       return (
         <Avatar className='w-10 h-10'>
-          <AvatarImage src={userImage} alt={fullName} />
+          <AvatarImage
+            className='w-full h-full object-cover object-center'
+            src={userImage}
+            alt={fullName}
+          />
           <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
         </Avatar>
       );

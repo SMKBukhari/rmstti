@@ -28,7 +28,7 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
       return (
         <Avatar className='w-10 h-10'>
           <AvatarImage
-            className='object-cover object-center'
+            className='object-cover object-center w-full h-full'
             src={userImage}
             alt={fullName}
           />

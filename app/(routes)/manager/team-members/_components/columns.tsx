@@ -28,7 +28,11 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
       const { userImage, fullName } = row.original;
       return (
         <Avatar className='w-10 h-10'>
-          <AvatarImage src={userImage} alt={fullName} />
+          <AvatarImage
+            className='w-full h-full object-cover object-center'
+            src={userImage}
+            alt={fullName}
+          />
           <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
         </Avatar>
       );
@@ -59,20 +63,28 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const { user, id, fullName, email, role, department, designation, company } =
-        row.original;
+      const {
+        user,
+        id,
+        fullName,
+        email,
+        role,
+        department,
+        designation,
+        company,
+      } = row.original;
       return (
         id !== user?.userId && (
           <CellActions
-          user={user}
-          id={id}
-          fullName={fullName}
-          email={email}
-          department={department}
-          designation={designation}
-          role={role}
-          company={company}
-        />
+            user={user}
+            id={id}
+            fullName={fullName}
+            email={email}
+            department={department}
+            designation={designation}
+            role={role}
+            company={company}
+          />
         )
       );
     },

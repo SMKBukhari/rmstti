@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
-import CellActions from "./CellActions";
+// import CellActions from "./CellActions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserProfile } from "@prisma/client";
 
@@ -25,7 +25,11 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
       const { userImage, fullName } = row.original;
       return (
         <Avatar className='w-10 h-10'>
-          <AvatarImage src={userImage} alt={fullName} />
+          <AvatarImage
+            className='w-full h-full object-cover object-center'
+            src={userImage}
+            alt={fullName}
+          />
           <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
         </Avatar>
       );
@@ -53,15 +57,15 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
     accessorKey: "designation",
     header: "Designation",
   },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const { user, id, fullName, email } = row.original;
-      return (
-        id !== user?.userId && (
-          <CellActions user={user} id={id} fullName={fullName} email={email} />
-        )
-      );
-    },
-  },
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => {
+  //     const { user, id, fullName, email } = row.original;
+  //     return (
+  //       id !== user?.userId && (
+  //         <CellActions user={user} id={id} fullName={fullName} email={email} />
+  //       )
+  //     );
+  //   },
+  // },
 ];

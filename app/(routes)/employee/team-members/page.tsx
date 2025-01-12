@@ -64,9 +64,12 @@ const TeamMembersPage = async () => {
         <DataTable
           columns={columns}
           data={formattedApplicants}
-          searchKey='fullName'
-          routePrefix='employee/team-members'
-          userId={user?.userId}
+          filterableColumns={[
+            {
+              id: "fullName",
+              title: "Full Name",
+            },
+          ]}
         />
       </div>
     </div>

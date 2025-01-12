@@ -29,7 +29,11 @@ export const columns: ColumnDef<EmployeeColumns>[] = [
       const { userImage, fullName } = row.original;
       return (
         <Avatar className='w-10 h-10'>
-          <AvatarImage src={userImage} alt={fullName} />
+          <AvatarImage
+            className='w-full h-full object-cover object-center'
+            src={userImage}
+            alt={fullName}
+          />
           <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
         </Avatar>
       );
@@ -86,8 +90,16 @@ export const columns: ColumnDef<EmployeeColumns>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const { user, id, fullName, email, role, department, designation, company } =
-        row.original;
+      const {
+        user,
+        id,
+        fullName,
+        email,
+        role,
+        department,
+        designation,
+        company,
+      } = row.original;
       return (
         <CellActions
           user={user}
