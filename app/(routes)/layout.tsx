@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import AppSidebar from "@/components/dashboard/app-sidebar";
 import Header from "@/components/dashboard/header";
 // import Navbar from "@/components/dashboard/Navbar";
@@ -8,6 +9,11 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { db } from "@/lib/db";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "HRMS-TTI | Dashboard",
+  description: "A Human Resource Management System for TTI",
+};
 
 const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
   const cookieStore = cookies();
