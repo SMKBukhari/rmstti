@@ -6,6 +6,8 @@ import TotalEmployee from "./_components/Cards/TotalEmployee";
 import TotalApplicant from "./_components/Cards/TotalApplicants";
 import { format } from "date-fns";
 import EmployeeBannerWarning from "./_components/userBannerWarning";
+import LeaveRequests from "./_components/Cards/LeaveRequests";
+import { AttendanceDashboard } from "./_components/AttendanceChart";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -55,17 +57,59 @@ const page = async () => {
   const users = await db.userProfile.findMany({
     include: {
       role: true,
+      status: true,
     },
   });
 
   // Filter the users to get the employees and applicants
-  const employees = users.filter((user) => user.isHired === true);
+  const employees = users.filter(
+    (user) => user.isHired === true && user.status?.name === "Active"
+  );
   const applicants = users.filter((user) => user.role?.name === "Applicant");
+
+  const leaveRequests = await db.leaveRequest.findMany({
+    where: {
+      status: {
+        in: ["Pending", "PendingHigherApproval"],
+      },
+    },
+  });
+
+  const currentMonthStart = new Date();
+  currentMonthStart.setDate(1);
+
+  const currentMonthLeaveRequests = await db.leaveRequest.findMany({
+    where: {
+      createdAt: {
+        gte: currentMonthStart,
+      },
+    },
+  });
+
+  const previousMonthLeaveRequests = await db.leaveRequest.findMany({
+    where: {
+      createdAt: {
+        gte: previousMonthStart,
+        lte: previousMonthEnd,
+      },
+    },
+  });
+
+  const currentLeaveCount = currentMonthLeaveRequests.length;
+  const previousLeaveCount = previousMonthLeaveRequests.length;
+
+  // Calculate percentage change
+  const percentageChangeLeaves = previousLeaveCount
+    ? ((currentLeaveCount - previousLeaveCount) / previousLeaveCount) * 100
+    : 0;
 
   // Get the employees and applicants from the previous month
   const previousMonthEmployees = await db.userProfile.findMany({
     where: {
       isHired: true,
+      status: {
+        name: "Active",
+      },
       createdAt: {
         gte: previousMonthStart,
         lte: previousMonthEnd,
@@ -132,6 +176,13 @@ const page = async () => {
           totalEmployees={currentCountApplicants}
           percentageChange={percentageChangeApplicants}
         />
+        <LeaveRequests
+          totalRequests={leaveRequests.length}
+          percentageChange={percentageChangeLeaves}
+        />
+      </div>
+      <div className='mt-10'>
+        <AttendanceDashboard />
       </div>
     </>
   );
