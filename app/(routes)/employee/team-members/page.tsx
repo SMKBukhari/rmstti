@@ -25,17 +25,22 @@ const TeamMembersPage = async () => {
           users: {
             include: {
               role: true,
+              status: true,
             },
           },
         },
       },
       role: true,
+      status: true,
     },
   });
 
   const teamMembers =
-    user?.role?.name !== "User"
-      ? user?.department?.users.filter((teamMember) => teamMember.userId) ?? []
+    user?.role?.name !== "User" && user?.status?.name === "Active"
+      ? user?.department?.users.filter(
+          (teamMember) =>
+            teamMember.userId && teamMember.status?.name === "Active" && teamMember.userId !== user.userId
+        ) ?? []
       : [];
 
   // Formatting the applicants data for the table

@@ -38,12 +38,6 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
   {
     accessorKey: "fullName",
     header: "Full Name",
-    cell: ({ row }) => {
-      const { fullName } = row.original;
-      return (
-        <Link href={`/admin/applicants/${row.original.id}`}>{fullName}</Link>
-      );
-    },
   },
   {
     accessorKey: "email",
