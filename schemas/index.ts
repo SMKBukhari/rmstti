@@ -262,3 +262,22 @@ export const WarningSchema = z.object({
   senderName: z.string(),
   senderDesignation: z.string(),
 });
+
+export const EditEmployeeSchema = z.object({
+  fullName: z.string(),
+  gender: z.enum(["Male", "Female", "Other", "Select"]),
+  contactNumber: z.string().length(11),
+  cnic: z.string().optional(),
+  DOB: z.date(),
+  city: z.string(),
+  country: z.string(),
+  address: z.string().optional(),
+  designation: z.string().optional(),
+  salary: z.string().optional(),
+  DOJ: z.date().optional(),
+  role: z.string().optional(),
+  department: z.string().optional(),
+  status: z.string().optional(),
+  officeTimingIn: z.string().optional(),
+  officeTimingOut: z.string().optional(),
+});

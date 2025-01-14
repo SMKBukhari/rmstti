@@ -23,6 +23,7 @@ export async function POST(
         "Attendance ID": attendanceId,
         "User Name": fullName,
         email: email,
+        cnic: cnic,
         Date: date,
         "Working Hours": workingHours,
         "Work Status": workStatusName,
@@ -42,7 +43,8 @@ export async function POST(
       let user = await db.userProfile.findFirst({
         where: { 
           email: email,
-          fullName: fullName
+          fullName: fullName,
+          cnic: cnic,
         },
       });
 
@@ -60,10 +62,10 @@ export async function POST(
           data: {
             email: email,
             fullName: fullName,
-            // Add other required fields with default values
-            password: "12345678", // You should generate a random password or handle this differently
+            cnic: cnic,
+            password: "12345678",
             contactNumber: "N/A",
-            gender: "Other", // Default value, update as needed
+            gender: "Other",
           },
         });
       }

@@ -70,7 +70,6 @@ model UserProfile {
   totalLeavesTaken        Int                   @default(0)
   leaveRequests           LeaveRequest[]
   createdAt               DateTime              @default(now())
-  updatedAt               DateTime              @default(now())
   TimeTable               TimeTable[]
   company                 company?              @relation(fields: [companyId], references: [id])
   companyId               String?
@@ -79,6 +78,7 @@ model UserProfile {
   Attendence              Attendence[]
   ResignationRequests     ResignationRequests[]
   Warnings                Warnings[]
+  updatedAt               DateTime              @default(now())
 }
 
 model LeaveRequest {

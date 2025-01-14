@@ -5,20 +5,32 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import CellActions from "./CellActions";
-import { UserProfile } from "@prisma/client";
+import { Role, Status, UserProfile } from "@prisma/client";
 
 export type Employee = {
   user: UserProfile | null;
+  roleCombo: Role[] | null;
+  statusCombo: Status[] | null;
   id: string;
   fullName: string;
   email: string;
-  contact: string;
-  userImage: string;
   department: string;
   designation: string;
+  userImage: string;
   role: string;
-  status: string;
   company: string;
+  gender: "Male" | "Female" | "Other" | "Select";
+  contactNumber: string;
+  cnic: string;
+  DOB: Date;
+  DOJ: Date;
+  city: string;
+  country: string;
+  address: string;
+  status: string;
+  salary: string;
+  officeTimingIn: string;
+  officeTimingOut: string;
 };
 
 export const columns: ColumnDef<Employee>[] = [
@@ -101,6 +113,20 @@ export const columns: ColumnDef<Employee>[] = [
         department,
         designation,
         company,
+        DOB,
+        DOJ,
+        address,
+        city,
+        country,
+        cnic,
+        contactNumber,
+        gender, 
+        officeTimingIn,
+        officeTimingOut,
+        roleCombo,
+        statusCombo,
+        salary,
+        status,
       } = row.original;
       return (
         <CellActions
@@ -112,6 +138,20 @@ export const columns: ColumnDef<Employee>[] = [
           designation={designation}
           role={role}
           company={company}
+          DOB={DOB}
+          DOJ={DOJ}
+          address={address}
+          city={city}
+          country={country}
+          contactNumber={contactNumber}
+          cnic={cnic}
+          gender={gender}
+          officeTimingIn={officeTimingIn}
+          officeTimingOut={officeTimingOut}
+          roleCombo={roleCombo}
+          statusCombo={statusCombo}
+          salary={salary}
+          status={status}
         />
       );
     },

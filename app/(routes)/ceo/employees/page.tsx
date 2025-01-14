@@ -30,6 +30,7 @@ const ApplicantsPage = async () => {
     },
   });
   const status = await db.status.findMany();
+  const rolesCombo = await db.role.findMany({});
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -69,6 +70,20 @@ const ApplicantsPage = async () => {
       designation: employee.designation ?? "N/A",
       company: employee?.company?.name ?? "N/A",
       userImage: employee.userImage ?? "N/A",
+      roleCombo: rolesCombo,
+      statusCombo: status,
+      gender: employee.gender ?? "Select",
+      contactNumber: employee.contactNumber ?? "",
+      cnic: employee.cnic ?? "",
+      DOB: employee.DOB ?? new Date(),
+      DOJ: employee.DOJ ?? new Date(),
+      city: employee.city ?? "",
+      country: employee.country ?? "",
+      address: employee.address ?? "",
+      statusId: employee.status?.name ?? "",
+      salary: employee.salary ?? "",
+      officeTimingIn: employee.officeTimingIn ?? "",
+      officeTimingOut: employee.OfficeTimingOut ?? "",
     }))
     .sort((a, b) => {
       const statusOrder = ["Active", "Former", "Resigned", "Terminated"];
