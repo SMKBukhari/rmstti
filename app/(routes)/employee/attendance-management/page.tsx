@@ -28,16 +28,16 @@ const AttendancePage = async () => {
     include: {
       user: true,
       workStatus: true,
+      checkLog: true
     },
     orderBy: {
-      date: "desc",
+      createdAt: "desc",
     },
-    take: 30, // Limit to last 30 records
   });
 
   const formattedAttendanceRecord: attendanceRecordsColumns[] =
     attendanceRecords.map((attendanceRecord) => {
-      const formatLocalTime = (time: Date | null) => {
+      const formatLocalTime = (time: Date | null | undefined) => {
         if (!time) return "N/A";
         return time.toLocaleTimeString([], {
           hour: "2-digit",
@@ -54,8 +54,8 @@ const AttendancePage = async () => {
           month: "long",
           day: "numeric",
         }),
-        checkIn: formatLocalTime(attendanceRecord.checkInTime),
-        checkOut: formatLocalTime(attendanceRecord.checkOutTime),
+        checkIn: formatLocalTime(attendanceRecord.checkLog?.checkInTime),
+        checkOut: formatLocalTime(attendanceRecord.checkLog?.checkOutTime),
         workingHours: attendanceRecord.workingHours || "N/A",
       };
     });
@@ -73,7 +73,6 @@ const AttendancePage = async () => {
         <DataTable
           columns={columns}
           data={formattedAttendanceRecord}
-          searchKey='date'
         />
       </div>
     </div>

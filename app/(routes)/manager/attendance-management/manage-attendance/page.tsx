@@ -2,7 +2,6 @@ import CustomBreadCrumb from "@/components/CustomBreadCrumb";
 import { DataTable } from "@/components/ui/data-table";
 import { db } from "@/lib/db";
 import React from "react";
-import { format } from "date-fns";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { attendanceRecordsColumns, columns } from "./_components/columns";
@@ -38,34 +37,43 @@ const ApplicantsPage = async () => {
     include: {
       user: true,
       workStatus: true,
+      checkLog: true,
     },
     orderBy: {
-      date: "desc",
+      createdAt: "desc",
     },
   });
 
   const workStatus = await db.workStatus.findMany();
 
-  // Formatting the applicants data for the table
   const formattedAttendanceRecord: attendanceRecordsColumns[] =
-    attendanceRecords.map((attendanceRecord) => ({
-      user: user,
-      workStatus: workStatus,
-      id: attendanceRecord.id || "N/A",
-      fullName: attendanceRecord.user.fullName || "N/A",
-      status: attendanceRecord.workStatus?.name || "N/A",
-      userImage: attendanceRecord.user.userImage || "",
-      date: attendanceRecord.date
-        ? format(new Date(attendanceRecord.date), "EEEE, MMMM d, yyyy")
-        : "N/A",
-      checkIn: attendanceRecord.checkInTime
-        ? format(new Date(attendanceRecord.checkInTime), "hh:mm a")
-        : "N/A",
-      checkOut: attendanceRecord.checkOutTime
-        ? format(new Date(attendanceRecord.checkOutTime), "hh:mm a")
-        : "N/A",
-      workingHours: attendanceRecord.workingHours || "N/A",
-    }));
+    attendanceRecords.map((attendanceRecord) => {
+      const formatLocalTime = (time: Date | null | undefined) => {
+        if (!time) return "N/A";
+        return time.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      };
+
+      return {
+        user: user,
+        workStatus: workStatus,
+        id: attendanceRecord.id || "N/A",
+        fullName: attendanceRecord.user.fullName || "N/A",
+        status: attendanceRecord.workStatus?.name || "N/A",
+        userImage: attendanceRecord.user.userImage || "",
+        date: attendanceRecord.date.toLocaleDateString([], {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+        checkIn: formatLocalTime(attendanceRecord.checkLog?.checkInTime),
+        checkOut: formatLocalTime(attendanceRecord.checkLog?.checkOutTime),
+        workingHours: attendanceRecord.workingHours || "N/A",
+      };
+    });
 
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
@@ -85,7 +93,12 @@ const ApplicantsPage = async () => {
         <DataTable
           columns={columns}
           data={formattedAttendanceRecord}
-          searchKey='fullName'
+          filterableColumns={[
+            {
+              id: "fullName",
+              title: "Full Name",
+            },
+          ]}
         />
       </div>
     </div>

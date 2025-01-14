@@ -32,7 +32,7 @@ const AttendancePage = async () => {
       checkLog: true,
     },
     orderBy: {
-      date: "desc",
+      createdAt: "desc",
     },
   });
 

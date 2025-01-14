@@ -111,4 +111,3 @@ const AttendanceUpdate: React.FC<AttendanceUpdateProps> = ({ user }) => {
 };
 
 export default AttendanceUpdate;
-

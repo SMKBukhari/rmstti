@@ -61,7 +61,7 @@ export async function POST(
             email: email,
             fullName: fullName,
             // Add other required fields with default values
-            password: "defaultPassword", // You should generate a random password or handle this differently
+            password: "12345678", // You should generate a random password or handle this differently
             contactNumber: "N/A",
             gender: "Other", // Default value, update as needed
           },
