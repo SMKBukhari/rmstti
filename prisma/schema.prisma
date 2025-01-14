@@ -34,6 +34,7 @@ model UserProfile {
   resumeName              String?
   resumePublicId          String?
   DOJ                     DateTime?
+  cnic                    String?
   workstatusId            String?
   workstatus              WorkStatus?           @relation(fields: [workstatusId], references: [id])
   statusId                String?
