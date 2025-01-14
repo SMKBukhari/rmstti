@@ -43,7 +43,7 @@ const ApplicantsPage = async () => {
       checkLog: true,
     },
     orderBy: {
-      date: "desc",
+      createdAt: "desc",
     },
   });
 
@@ -66,7 +66,7 @@ const ApplicantsPage = async () => {
         : "Not Checked in",
       checkOut: attendanceRecord.checkLog?.checkOutTime
         ? format(new Date(attendanceRecord.checkLog?.checkOutTime), "hh:mm a")
-        : "Not Checked in",
+        : "Not Checked Out",
       workingHours: attendanceRecord.workingHours || "N/A",
       department: attendanceRecord.user.department?.name || "N/A",
       role: attendanceRecord.user.role?.name || "N/A",
