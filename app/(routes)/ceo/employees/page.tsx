@@ -31,6 +31,7 @@ const ApplicantsPage = async () => {
   });
   const status = await db.status.findMany();
   const rolesCombo = await db.role.findMany({});
+  const dapartmentCombo = await db.department.findMany({});
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -72,6 +73,7 @@ const ApplicantsPage = async () => {
       userImage: employee.userImage ?? "N/A",
       roleCombo: rolesCombo,
       statusCombo: status,
+      departmentCombo: dapartmentCombo,
       gender: employee.gender ?? "Select",
       contactNumber: employee.contactNumber ?? "",
       cnic: employee.cnic ?? "",

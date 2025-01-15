@@ -10,13 +10,14 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EditEmployeeSchema, WarningSchema } from "@/schemas";
-import { Role, Status, UserProfile } from "@prisma/client";
+import { Department, Role, Status, UserProfile } from "@prisma/client";
 import { CountryOptions, getCityOptions } from "@/lib/data";
 
 interface CellActionsProps {
   user: UserProfile | null;
   roleCombo: Role[] | null;
   statusCombo: Status[] | null;
+  departmentCombo: Department[] | null;
   id: string;
   fullName: string;
   email: string;
@@ -60,6 +61,7 @@ const CellActions = ({
   officeTimingOut,
   roleCombo,
   statusCombo,
+  departmentCombo,
 }: CellActionsProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isSecondDialogOpen, setSecondDialogOpen] = useState(false);
@@ -168,13 +170,14 @@ const CellActions = ({
     }
   };
 
-  const onEditing = async (data: z.infer<typeof EditEmployeeSchema>) => {
+  const onEditing = async (values: z.infer<typeof EditEmployeeSchema>) => {
     try {
       setIsEditing(true);
       await axios.post(`/api/user/${user?.userId}/editEmployee`, {
         id: id,
+        values,
       });
-      toast.success(`Employee ${data.fullName} updated successfully.`);
+      toast.success(`Employee ${values.fullName} updated successfully.`);
       setSecondDialogOpen(false);
       setIsEditing(false);
       router.refresh();
@@ -411,7 +414,12 @@ const CellActions = ({
           {
             name: "department",
             label: "Department",
-            type: "input",
+            type: "select",
+            comboboxOptions:
+              departmentCombo?.map((department) => ({
+                label: department.name,
+                value: department.name,
+              })) ?? [],
           },
           {
             name: "salary",

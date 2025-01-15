@@ -5,12 +5,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import CellActions from "./CellActions";
-import { Role, Status, UserProfile } from "@prisma/client";
+import { Department, Role, Status, UserProfile } from "@prisma/client";
 
 export type Employee = {
   user: UserProfile | null;
   roleCombo: Role[] | null;
   statusCombo: Status[] | null;
+  departmentCombo: Department[] | null;
   id: string;
   fullName: string;
   email: string;
@@ -127,6 +128,7 @@ export const columns: ColumnDef<Employee>[] = [
         statusCombo,
         salary,
         status,
+        departmentCombo,
       } = row.original;
       return (
         <CellActions
@@ -150,6 +152,7 @@ export const columns: ColumnDef<Employee>[] = [
           officeTimingOut={officeTimingOut}
           roleCombo={roleCombo}
           statusCombo={statusCombo}
+          departmentCombo={departmentCombo}
           salary={salary}
           status={status}
         />
