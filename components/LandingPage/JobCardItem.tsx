@@ -67,7 +67,7 @@ const JobCardItem = ({ job, isComplete, userProfile }: JobCardItemProps) => {
     const sessionToken = Cookies.get("sessionToken");
     const userId = Cookies.get("userId");
 
-    if (!userId) {
+    if (!userId || !sessionToken) {
       setIsLoading(false);
       router.push("/signIn");
     }
