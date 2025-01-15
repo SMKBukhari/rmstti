@@ -107,7 +107,7 @@ export function MagazineTimetable({ user }: MagazineTimetableProps) {
             {/* <Label htmlFor='file-upload' className='cursor-pointer'>
               Upload Timetable
             </Label> */}
-            <UploadTimeTablePage user={user} />
+            {/* <UploadTimeTablePage user={user} /> */}
             <Input
               id='file-upload'
               type='file'

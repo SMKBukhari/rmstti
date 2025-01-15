@@ -55,6 +55,8 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Error processing timetable:", error);
+
+    // Ensure that the error object passed to NextResponse.json() is valid.
     return NextResponse.json(
       { error: "Failed to process timetable" },
       { status: 500 }
