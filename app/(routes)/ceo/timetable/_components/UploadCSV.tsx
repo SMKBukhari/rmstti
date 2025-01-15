@@ -66,9 +66,10 @@ export default function UploadTimeTablePage({
           "Content-Type": "multipart/form-data",
         },
       });
+      router.refresh();
       toast.success("Attendance data uploaded successfully");
       setDialogOpen(false);
-      router.push("/ceo/attendance-management");
+      router.push("/ceo/timetable");
     } catch (error) {
       console.error("Upload error:", error);
       toast.error("Failed to upload attendance data");
