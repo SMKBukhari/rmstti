@@ -16,9 +16,26 @@ const TimeTablePage = async () => {
       userId: userId,
     },
   });
+
+  const timetable = await db.timeTable.findMany({
+    include: {
+      user: {
+        select: {
+          fullName: true,
+        },
+      },
+    },
+    orderBy: [{ date: "asc" }, { shiftStart: "asc" }],
+  });
+
+  const enrichedTimetable = timetable.map((entry) => ({
+    ...entry,
+    fullName: entry.user?.fullName || "Unknown", // Use the actual fullName or fallback to "Unknown"
+  }));
+
   return (
     <main className='flex min-h-screen flex-col items-center justify-between p-24'>
-      <MagazineTimetable user={user} />
+      <MagazineTimetable user={user} timetable={enrichedTimetable} />
     </main>
   );
 };

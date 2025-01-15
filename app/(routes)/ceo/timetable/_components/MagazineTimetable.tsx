@@ -20,33 +20,51 @@ import { Input } from "@/components/ui/input";
 // import { Label } from "@/components/ui/label";
 import { TimetableDisplay } from "./TimeTableDisplay";
 import UploadTimeTablePage from "./UploadCSV";
-import { UserProfile } from "@prisma/client";
+import { TimeTable, UserProfile } from "@prisma/client";
 
 interface MagazineTimetableProps {
   user: UserProfile | null;
+  timetable: TimeTable[] | null;
 }
 
-export function MagazineTimetable({ user }: MagazineTimetableProps) {
-  const [timetable, setTimetable] = useState<TimetableEntry[]>([]);
+export function MagazineTimetable({
+  user,
+  timetable: initialTimetable,
+}: MagazineTimetableProps) {
+  const [timetable, setTimetable] = useState<TimetableEntry[]>(
+    initialTimetable
+      ? initialTimetable.map((entry) => ({
+          ...entry,
+          fullName: "", // Provide a placeholder for fullName
+        }))
+      : [] // Handle the case when initialTimetable is null
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const fetchTimetable = async () => {
-    setLoading(true);
-    try {
-      const fetchedTimetable = await getTimetable();
-      setTimetable(fetchedTimetable);
-    } catch (err) {
-      console.error('Error fetching timetable:', err);
-      setError('Failed to fetch timetable. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const fetchTimetable = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const fetchedTimetable = await getTimetable();
+  //     setTimetable(fetchedTimetable);
+  //   } catch (err) {
+  //     console.error('Error fetching timetable:', err);
+  //     setError('Failed to fetch timetable. Please try again later.');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
-    fetchTimetable();
-  }, []);
+    if (initialTimetable) {
+      setTimetable(
+        initialTimetable.map((entry) => ({
+          ...entry,
+          fullName: "Unknown", // Ensure fullName is added when updating state
+        }))
+      );
+    }
+  }, [initialTimetable]);
 
   const handleGenerateTimetable = async () => {
     setLoading(true);
@@ -78,7 +96,7 @@ export function MagazineTimetable({ user }: MagazineTimetableProps) {
     setError("");
     try {
       await uploadTimetableFile(formData);
-      await fetchTimetable();
+      // await fetchTimetable();
     } catch (err) {
       setError(
         err instanceof Error
