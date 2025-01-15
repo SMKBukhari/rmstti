@@ -98,9 +98,9 @@ export function MagazineTimetable() {
             {loading ? "Generating..." : "Generate Timetable"}
           </Button>
           <div className='flex items-center space-x-2'>
-            <Label htmlFor='file-upload' className='cursor-pointer'>
+{/*             <Label htmlFor='file-upload' className='cursor-pointer'>
               Upload Timetable
-            </Label>
+            </Label> */}
             <Input
               id='file-upload'
               type='file'
