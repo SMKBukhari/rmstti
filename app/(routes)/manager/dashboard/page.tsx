@@ -6,6 +6,7 @@ import TotalEmployee from "./_components/Cards/TotalEmployee";
 import TotalApplicant from "./_components/Cards/TotalApplicants";
 import { format } from "date-fns";
 import EmployeeBannerWarning from "./_components/userBannerWarning";
+import LeaveRequests from "./_components/Cards/LeaveRequests";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -52,13 +53,14 @@ const page = async () => {
     include: {
       role: true,
       department: true,
+      status: true,
     },
   });
 
   // Filter the users to get the employees and applicants
   const employees = users.filter(
     (emp) =>
-      user.isHired === true && emp.department?.name === user.department?.name
+      user.isHired === true && emp.status?.name === "Active" && emp.department?.name === user.department?.name
   );
   const applicants = users.filter(
     (user) =>
@@ -89,6 +91,47 @@ const page = async () => {
       },
     },
   });
+
+  const leaveRequests = await db.leaveRequest.findMany({
+    where: {
+      status: {
+        in: ["Pending", "PendingHigherApproval"],
+      },
+      user: {
+        department: {
+          name: user.department?.name,
+        }
+      }
+    },
+  });
+
+  const currentMonthStart = new Date();
+  currentMonthStart.setDate(1);
+
+  const currentMonthLeaveRequests = await db.leaveRequest.findMany({
+    where: {
+      createdAt: {
+        gte: currentMonthStart,
+      },
+    },
+  });
+
+  const previousMonthLeaveRequests = await db.leaveRequest.findMany({
+    where: {
+      createdAt: {
+        gte: previousMonthStart,
+        lte: previousMonthEnd,
+      },
+    },
+  });
+
+  const currentLeaveCount = currentMonthLeaveRequests.length;
+  const previousLeaveCount = previousMonthLeaveRequests.length;
+
+  // Calculate percentage change
+  const percentageChangeLeaves = previousLeaveCount
+    ? ((currentLeaveCount - previousLeaveCount) / previousLeaveCount) * 100
+    : 0;
 
   // Calculate the percentage change in the number of employees
   const currentCountEmployees = employees.length;
@@ -135,6 +178,10 @@ const page = async () => {
         <TotalApplicant
           totalEmployees={currentCountApplicants}
           percentageChange={percentageChangeApplicants}
+        />
+        <LeaveRequests
+          totalRequests={leaveRequests.length}
+          percentageChange={percentageChangeLeaves}
         />
       </div>
     </>

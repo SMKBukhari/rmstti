@@ -14,6 +14,7 @@ import {
   LiaSkype,
   LiaTwitter,
 } from "react-icons/lia";
+import { FaMoneyBillWave } from "react-icons/fa";
 
 interface UserAboutSectionProps {
   user:
@@ -122,6 +123,12 @@ const UserAboutSection = ({ user, teamMembers }: UserAboutSectionProps) => {
             <div className='flex gap-2'>
               <LiaBehance className='w-5 h-5 text-muted-foreground' />
               <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`Behance: ${user.behance}`}</h3>
+            </div>
+          )}
+          {user?.salary && (
+            <div className='flex gap-2'>
+              <FaMoneyBillWave className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5'>{`Salary: ${user.salary} PKR/month`}</h3>
             </div>
           )}
         </div>

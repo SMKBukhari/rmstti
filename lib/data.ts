@@ -376,7 +376,7 @@ export const ceoRoutes = [
   {
     icon: ChartNoAxesCombined,
     label: "Overview",
-    href: "/ceo/dashboard/overview",
+    href: "/ceo/overview",
   },
   {
     icon: BadgeMinus,
