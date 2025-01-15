@@ -173,9 +173,24 @@ const CellActions = ({
   const onEditing = async (values: z.infer<typeof EditEmployeeSchema>) => {
     try {
       setIsEditing(true);
-      await axios.post(`/api/user/${user?.userId}/editEmployee`, {
+      await axios.patch(`/api/user/${user?.userId}/editEmployee`, {
         id: id,
-        values,
+        fullName: values.fullName,
+        gender: values.gender,
+        contactNumber: values.contactNumber,
+        cnic: values.cnic,
+        DOB: values.DOB,
+        DOJ: values.DOJ,
+        city: values.city,
+        country: values.country,
+        address: values.address,
+        designation: values.designation,
+        status: values.status,
+        role: values.role,
+        department: values.department,
+        salary: values.salary,
+        officeTimingIn: values.officeTimingIn,
+        officeTimingOut: values.officeTimingOut,
       });
       toast.success(`Employee ${values.fullName} updated successfully.`);
       setSecondDialogOpen(false);

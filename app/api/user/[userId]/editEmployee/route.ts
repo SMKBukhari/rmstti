@@ -7,7 +7,25 @@ export const PATCH = async (
   { params }: { params: { userId: string } }
 ) => {
   try {
-    const { id, values } = await req.json();
+    const {
+      id,
+      fullName,
+      gender,
+      contactNumber,
+      cnic,
+      DOB,
+      DOJ,
+      city,
+      country,
+      address,
+      designation,
+      status,
+      role,
+      department,
+      salary,
+      officeTimingIn,
+      officeTimingOut,
+    } = await req.json();
 
     const { userId } = await params;
 
@@ -20,7 +38,36 @@ export const PATCH = async (
 
     const updateUser = await db.userProfile.update({
       where: { userId: id },
-      data: { ...values },
+      data: {
+        fullName,
+        gender,
+        address,
+        city,
+        country,
+        contactNumber,
+        cnic,
+        DOB,
+        DOJ,
+        designation,
+        status: {
+          connect: {
+            name: status,
+          },
+        },
+        role: {
+          connect: {
+            name: role,
+          },
+        },
+        department: {
+          connect: {
+            name: department,
+          },
+        },
+        salary,
+        officeTimingIn,
+        OfficeTimingOut: officeTimingOut,
+      },
     });
 
     const adminExcepThisUser = await db.userProfile.findMany({
