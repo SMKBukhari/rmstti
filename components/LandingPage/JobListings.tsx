@@ -26,7 +26,7 @@ const JobListings = ({ jobs }: JobListing) => {
             Explore our latest job opportunities and take the next step in your career.
           </p>
         </motion.div>
-        {jobs.lenth > 0 ? (
+        {jobs.length > 0 ? (
         <AnimatePresence>
           <motion.div
             {...fadeInOut}
