@@ -105,7 +105,7 @@ const JobCardItem = ({ job, isComplete, userProfile }: JobCardItemProps) => {
             <div className='w-12 h-12 min-w-12 min-h-12 border-white border rounded-md p-2 relative flex items-center justify-center overflow-hidden'>
               {/* {company?.logo && ( */}
               <Image
-                src={"/img/logo.png"}
+                src={"/img/logo_light.png"}
                 alt={"The Truth International"}
                 // width={40}
                 // height={40}
