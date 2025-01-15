@@ -146,23 +146,29 @@ export async function generateTimetable(
 }
 
 export async function getTimetable(): Promise<TimetableEntry[]> {
-  const timetable = await db.timeTable.findMany({
-    include: {
-      user: {
-        select: {
-          fullName: true,
+  try {
+    const timetable = await db.timeTable.findMany({
+      include: {
+        user: {
+          select: {
+            fullName: true,
+          },
         },
       },
-    },
-    orderBy: {
-      date: "asc",
-    },
-  });
+      orderBy: {
+        date: "asc",
+      },
+    });
 
-  return timetable.map((entry) => ({
-    ...entry,
-    fullName: entry.user.fullName,
-  }));
+    console.log("Fetched timetable:", timetable);
+    return timetable.map((entry) => ({
+      ...entry,
+      fullName: entry.user.fullName,
+    }));
+  } catch (error) {
+    console.error("Error fetching timetable:", error);
+    throw new Error("Failed to fetch timetable");
+  }
 }
 
 export async function uploadTimetableFile(formData: FormData) {
