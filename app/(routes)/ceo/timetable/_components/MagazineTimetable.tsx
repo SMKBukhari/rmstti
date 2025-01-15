@@ -31,22 +31,22 @@ export function MagazineTimetable({ user }: MagazineTimetableProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetchTimetable();
-  }, []);
-
   const fetchTimetable = async () => {
     setLoading(true);
     try {
       const fetchedTimetable = await getTimetable();
       setTimetable(fetchedTimetable);
     } catch (err) {
-      console.error(`Failed to fetch timetable: ${err}`);
-      setError("Failed to fetch timetable");
+      console.error('Error fetching timetable:', err);
+      setError('Failed to fetch timetable. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchTimetable();
+  }, []);
 
   const handleGenerateTimetable = async () => {
     setLoading(true);

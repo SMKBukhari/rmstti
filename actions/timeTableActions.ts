@@ -145,31 +145,59 @@ export async function generateTimetable(
   }
 }
 
+// export async function getTimetable(): Promise<TimetableEntry[]> {
+//   try {
+//     console.log('Starting getTimetable function to fetch all entries');
+//     const timetable = await db.timeTable.findMany({
+//       include: {
+//         user: {
+//           select: {
+//             fullName: true,
+//           },
+//         },
+//       },
+//       orderBy: [
+//         { date: 'asc' },
+//         { shiftStart: 'asc' }
+//       ],
+//     });
+
+//     console.log('Successfully fetched all timetable entries:', timetable.length);
+//     return timetable.map((entry) => ({
+//       ...entry,
+//       fullName: entry.user?.fullName ?? 'Unknown',
+//     }));
+//   } catch (error) {
+//     console.error('Detailed error in getTimetable:', {
+//       message: error instanceof Error ? error.message : 'Unknown error',
+//       stack: error instanceof Error ? error.stack : undefined,
+//     });
+//     throw new Error('Failed to fetch all timetable entries');
+//   }
+// }
+
 export async function getTimetable(): Promise<TimetableEntry[]> {
   try {
-    const timetable = await db.timeTable.findMany({
-      include: {
-        user: {
-          select: {
-            fullName: true,
-          },
-        },
-      },
-      orderBy: {
-        date: "asc",
+    const response = await fetch('/api/timetable', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
       },
     });
 
-    console.log("Fetched timetable:", timetable);
-    return timetable.map((entry) => ({
-      ...entry,
-      fullName: entry.user.fullName,
-    }));
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error("Error fetching timetable:", error);
-    throw new Error("Failed to fetch timetable");
+    console.error('Error fetching timetable:', error);
+    throw new Error('Failed to fetch timetable');
   }
 }
+
+
 
 export async function uploadTimetableFile(formData: FormData) {
   const file = formData.get("file") as File;
