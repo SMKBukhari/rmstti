@@ -17,10 +17,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+// import { Label } from "@/components/ui/label";
 import { TimetableDisplay } from "./TimeTableDisplay";
+import UploadTimeTablePage from "./UploadCSV";
+import { UserProfile } from "@prisma/client";
 
-export function MagazineTimetable() {
+interface MagazineTimetableProps {
+  user: UserProfile | null;
+}
+
+export function MagazineTimetable({ user }: MagazineTimetableProps) {
   const [timetable, setTimetable] = useState<TimetableEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -98,9 +104,10 @@ export function MagazineTimetable() {
             {loading ? "Generating..." : "Generate Timetable"}
           </Button>
           <div className='flex items-center space-x-2'>
-{/*             <Label htmlFor='file-upload' className='cursor-pointer'>
+            {/* <Label htmlFor='file-upload' className='cursor-pointer'>
               Upload Timetable
             </Label> */}
+            <UploadTimeTablePage user={user} />
             <Input
               id='file-upload'
               type='file'
