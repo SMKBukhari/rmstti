@@ -31,14 +31,15 @@ export function MagazineTimetable({
   user,
   timetable: initialTimetable,
 }: MagazineTimetableProps) {
-  const [timetable, setTimetable] = useState<TimetableEntry[]>(
-    initialTimetable
-      ? initialTimetable.map((entry) => ({
-          ...entry,
-          fullName: "", // Provide a placeholder for fullName
-        }))
-      : [] // Handle the case when initialTimetable is null
-  );
+  const [timetable, setTimetable] = useState<TimetableEntry[]>(() => {
+    if (initialTimetable) {
+      return initialTimetable.map((entry) => ({
+        ...entry,
+        fullName: "Unknown",
+      }));
+    }
+    return [];
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -57,12 +58,10 @@ export function MagazineTimetable({
 
   useEffect(() => {
     if (initialTimetable) {
-      setTimetable(
-        initialTimetable.map((entry) => ({
-          ...entry,
-          fullName: "Unknown", // Ensure fullName is added when updating state
-        }))
-      );
+      setTimetable(initialTimetable.map(entry => ({
+        ...entry,
+        fullName: "Unknown"
+      })));
     }
   }, [initialTimetable]);
 
