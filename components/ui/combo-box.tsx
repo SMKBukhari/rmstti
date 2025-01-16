@@ -61,7 +61,7 @@ const ComboBox = ({ options, value, onChange, heading }: ComboBoxProps) => {
               type='text'
               placeholder='Search Catogory'
               onChange={handleSearchTerm}
-              className='flex-1 w-full outline-none text-sm py-1'
+              className='flex-1 w-full outline-none text-sm py-1 px-2'
             />
           </div>
           <CommandList>

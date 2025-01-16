@@ -45,14 +45,14 @@ export const CountryOptions = Country.getAllCountries().map((country) => ({
 export const getCityOptions = (countryCode: string) => {
   const cities = City.getCitiesOfCountry(countryCode);
 
-  // Use a unique value that combines city name and country code or some unique identifier
   return cities
     ? cities.map((city) => ({
-        label: city.name,
-        value: `${city.name}-${city.stateCode || countryCode}`, // Append state code or country code for uniqueness
+        label: city.name, // Display name
+        value: `${city.name}-${city.stateCode || countryCode}`, // Unique identifier
       }))
     : [];
 };
+
 
 export const settingsTabs = [
   {

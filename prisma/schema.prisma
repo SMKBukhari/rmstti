@@ -11,12 +11,12 @@ datasource db {
 }
 
 model UserProfile {
-  userId                  String                @id @unique @default(cuid())
+  userId                  String                 @id @unique @default(cuid())
   fullName                String
-  email                   String                @unique
+  email                   String                 @unique
   password                String
   ConfirmPassword         String?
-  gender                  Gender                @default(Male)
+  gender                  Gender                 @default(Male)
   contactNumber           String?
   emergencyContactNumber  String?
   DOB                     DateTime?
@@ -26,7 +26,7 @@ model UserProfile {
   address                 String?
   userImage               String?
   departmentId            String?
-  department              Department?           @relation(fields: [departmentId], references: [id])
+  department              Department?            @relation(fields: [departmentId], references: [id])
   departmentOffered       String?
   designation             String?
   designationOffered      String?
@@ -38,11 +38,11 @@ model UserProfile {
   DOJ                     DateTime?
   cnic                    String?
   workstatusId            String?
-  workstatus              WorkStatus?           @relation(fields: [workstatusId], references: [id])
+  workstatus              WorkStatus?            @relation(fields: [workstatusId], references: [id])
   statusId                String?
-  status                  Status?               @relation(fields: [statusId], references: [id])
+  status                  Status?                @relation(fields: [statusId], references: [id])
   applicationStatusId     String?
-  applicationStatus       ApplicationStatus?    @relation(fields: [applicationStatusId], references: [id])
+  applicationStatus       ApplicationStatus?     @relation(fields: [applicationStatusId], references: [id])
   skype                   String?
   linkedIn                String?
   github                  String?
@@ -58,32 +58,72 @@ model UserProfile {
   resetTokenExpiry        DateTime?
   loginSessionToken       String?
   loginSessionExpiry      DateTime?
-  isVerified              Boolean?              @default(false)
-  isHired                 Boolean?              @default(false)
+  isVerified              Boolean?               @default(false)
+  isHired                 Boolean?               @default(false)
   salary                  String?
   salaryOffered           String?
   roleId                  String?
-  role                    Role?                 @relation(fields: [roleId], references: [id])
+  role                    Role?                  @relation(fields: [roleId], references: [id])
   roleOffered             String?
   notifications           Notifications[]
   skills                  Skills[]
   JobApplications         JobApplications[]
   currentJobApplicationId String?
-  totalYearlyLeaves       Int                   @default(36)
-  totalMonthlyLeaves      Int                   @default(3)
-  totalLeavesTaken        Int                   @default(0)
+  totalYearlyLeaves       Int                    @default(36)
+  totalMonthlyLeaves      Int                    @default(3)
+  totalLeavesTaken        Int                    @default(0)
   leaveRequests           LeaveRequest[]
-  createdAt               DateTime              @default(now())
+  createdAt               DateTime               @default(now())
   TimeTable               TimeTable[]
-  company                 company?              @relation(fields: [companyId], references: [id])
+  company                 company?               @relation(fields: [companyId], references: [id])
   companyId               String?
   officeTimingIn          String?
   OfficeTimingOut         String?
   Attendence              Attendence[]
   ResignationRequests     ResignationRequests[]
   Warnings                Warnings[]
-  updatedAt               DateTime              @default(now())
+  updatedAt               DateTime               @default(now())
   Requests                Requests[]
+  ProfieUpdateRequests    ProfieUpdateRequests[]
+}
+
+model ProfieUpdateRequests {
+  id                     String          @id @unique @default(cuid())
+  userId                 String
+  user                   UserProfile     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  aprroved               Boolean?        @default(false)
+  rejected               Boolean?        @default(false)
+  fullName               String
+  email                  String
+  password               String
+  ConfirmPassword        String?
+  gender                 Gender          @default(Male)
+  contactNumber          String?
+  emergencyContactNumber String?
+  DOB                    DateTime?
+  bloodGroup             String?
+  city                   String?
+  country                String?
+  address                String?
+  userImage              String?
+  jobExperience          JobExperience[]
+  education              Education[]
+  resumeUrl              String?
+  resumeName             String?
+  resumePublicId         String?
+  cnic                   String?
+  skype                  String?
+  linkedIn               String?
+  github                 String?
+  twitter                String?
+  facebook               String?
+  instagram              String?
+  behance                String?
+  zoomId                 String?
+  googleMeetId           String?
+  skills                 Skills[]
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @default(now())
 }
 
 model LeaveRequest {
@@ -224,47 +264,53 @@ model Department {
 }
 
 model JobExperience {
-  id               String      @id @unique @default(cuid())
-  userProfileId    String
-  userProfile      UserProfile @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
-  jobTitle         String
-  employmentType   String
-  companyName      String
-  location         String
-  startDate        DateTime?
-  currentlyWorking Boolean?
-  endDate          DateTime?
-  description      String?
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @default(now())
+  id                     String                @id @unique @default(cuid())
+  userProfileId          String
+  userProfile            UserProfile           @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
+  jobTitle               String
+  employmentType         String
+  companyName            String
+  location               String
+  startDate              DateTime?
+  currentlyWorking       Boolean?
+  endDate                DateTime?
+  description            String?
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @default(now())
+  ProfieUpdateRequests   ProfieUpdateRequests? @relation(fields: [profieUpdateRequestsId], references: [id])
+  profieUpdateRequestsId String?
 
   @@index([userProfileId], name: "idj_userProfileId")
 }
 
 model Education {
-  id                String      @id @unique @default(cuid())
-  userProfileId     String
-  userProfile       UserProfile @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
-  university        String
-  degree            String
-  fieldOfStudy      String
-  grade             String?
-  startDate         DateTime?
-  currentlyStudying Boolean?    @default(false)
-  endDate           DateTime?
-  description       String?
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @default(now())
+  id                     String                @id @unique @default(cuid())
+  userProfileId          String
+  userProfile            UserProfile           @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
+  university             String
+  degree                 String
+  fieldOfStudy           String
+  grade                  String?
+  startDate              DateTime?
+  currentlyStudying      Boolean?              @default(false)
+  endDate                DateTime?
+  description            String?
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @default(now())
+  ProfieUpdateRequests   ProfieUpdateRequests? @relation(fields: [profieUpdateRequestsId], references: [id])
+  profieUpdateRequestsId String?
 
   @@index([userProfileId], name: "ide_userProfileId")
 }
 
 model Skills {
-  id              String      @id @unique @default(cuid())
-  userProfileId   String
-  userProfile     UserProfile @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
-  name            String      @unique
-  experienceLevel String
+  id                     String                @id @unique @default(cuid())
+  userProfileId          String
+  userProfile            UserProfile           @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
+  name                   String                @unique
+  experienceLevel        String
+  ProfieUpdateRequests   ProfieUpdateRequests? @relation(fields: [profieUpdateRequestsId], references: [id])
+  profieUpdateRequestsId String?
 }
 
 model Notifications {

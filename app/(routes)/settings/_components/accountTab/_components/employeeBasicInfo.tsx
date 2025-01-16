@@ -24,11 +24,11 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-interface AccountTabUserInfoProps {
+interface AccountTabEmployeeInfoProps {
   user: UserProfile | null;
 }
 
-const UserBasicInfo = ({ user }: AccountTabUserInfoProps) => {
+const EmployeeBasicInfo = ({ user }: AccountTabEmployeeInfoProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [cities, setCities] = useState<{ label: string; value: string }[]>([]);
   const router = useRouter();
@@ -69,9 +69,13 @@ const UserBasicInfo = ({ user }: AccountTabUserInfoProps) => {
   const onSubmit = async (values: z.infer<typeof UserBasicInfor>) => {
     try {
       setIsLoading(true);
-      await axios.patch(`/api/user/${user?.userId}/updateUser`, values);
-      toast.success(`${user?.fullName} Your profile updated successfully."`);
+      await axios.post(`/api/employeeDataUpdateRequest`, {
+        userId: user?.userId,
+        values,
+      });
+      toast.success("Profile update request submitted successfully.");
       router.refresh();
+      router.push("/profile");
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         if (error.response && error.response.data) {
@@ -85,7 +89,7 @@ const UserBasicInfo = ({ user }: AccountTabUserInfoProps) => {
     }
   };
   return (
-    <Card className='flex w-full gap-4 lg:p-10 md:px-7 px-4'>
+    <Card className='flex w-full gap-4 lg:p-10 md:px-7 px-4 py-5'>
       <Form {...form}>
         <form
           className='space-y-8 w-full'
@@ -242,7 +246,7 @@ const UserBasicInfo = ({ user }: AccountTabUserInfoProps) => {
               control={form.control}
               name='address'
               render={({ field }) => (
-                <FormItem className="col-span-2">
+                <FormItem className='col-span-2'>
                   <FormLabel>
                     Address
                     <span className='text-red-500 ml-1'>*</span>
@@ -269,7 +273,7 @@ const UserBasicInfo = ({ user }: AccountTabUserInfoProps) => {
               {isLoading ? (
                 <Loader2 className='w-3 h-3 animate-spin' />
               ) : (
-                "Save Changes"
+                "Send Request for Update"
               )}
             </Button>
           </div>
@@ -279,4 +283,4 @@ const UserBasicInfo = ({ user }: AccountTabUserInfoProps) => {
   );
 };
 
-export default UserBasicInfo;
+export default EmployeeBasicInfo;

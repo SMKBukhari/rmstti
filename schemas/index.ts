@@ -14,6 +14,7 @@ export const UserBasicInfor = z.object({
   DOB: z.date(),
   city: z.string(),
   country: z.string(),
+  address: z.string().optional(),
 });
 
 export const UserSocialLinks = z.object({
