@@ -15,6 +15,9 @@ import {
   LiaTwitter,
 } from "react-icons/lia";
 import { FaMoneyBillWave } from "react-icons/fa";
+import { GiBookStorm } from "react-icons/gi";
+import { BiLogoZoom } from "react-icons/bi";
+import { SiGooglemeet } from "react-icons/si";
 
 interface UserAboutSectionProps {
   user:
@@ -57,6 +60,18 @@ const UserAboutSection = ({ user, teamMembers }: UserAboutSectionProps) => {
             <Crown className='w-5 h-5 text-muted-foreground' />
             <h3 className='text-muted-foreground text-base -mt-0.5'>{`Role: ${user?.role?.name}`}</h3>
           </div>
+          {user?.designation && (
+            <div className='flex gap-2'>
+              <GiBookStorm className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5'>{`Designation: ${user.designation}`}</h3>
+            </div>
+          )}
+          {user?.salary && (
+            <div className='flex gap-2'>
+              <FaMoneyBillWave className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5'>{`Salary: ${user.salary} PKR/month`}</h3>
+            </div>
+          )}
           <div className='flex gap-2'>
             <Flag className='w-5 h-5 text-muted-foreground' />
             <h3 className='text-muted-foreground text-base -mt-0.5'>{`Country: ${countryName}`}</h3>
@@ -87,6 +102,18 @@ const UserAboutSection = ({ user, teamMembers }: UserAboutSectionProps) => {
             <div className='flex gap-2'>
               <LiaSkype className='w-5 h-5 text-muted-foreground' />
               <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`Skype: ${user.skype}`}</h3>
+            </div>
+          )}
+          {user?.zoomId && (
+            <div className='flex gap-2'>
+              <BiLogoZoom className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`Zoom Id: ${user.zoomId}`}</h3>
+            </div>
+          )}
+          {user?.googleMeetId && (
+            <div className='flex gap-2'>
+              <SiGooglemeet className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`Google Meet Id: ${user.googleMeetId}`}</h3>
             </div>
           )}
           {user?.facebook && (
@@ -123,12 +150,6 @@ const UserAboutSection = ({ user, teamMembers }: UserAboutSectionProps) => {
             <div className='flex gap-2'>
               <LiaBehance className='w-5 h-5 text-muted-foreground' />
               <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`Behance: ${user.behance}`}</h3>
-            </div>
-          )}
-          {user?.salary && (
-            <div className='flex gap-2'>
-              <FaMoneyBillWave className='w-5 h-5 text-muted-foreground' />
-              <h3 className='text-muted-foreground text-base -mt-0.5'>{`Salary: ${user.salary} PKR/month`}</h3>
             </div>
           )}
         </div>

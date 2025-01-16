@@ -20,6 +20,7 @@ import Box from "../Box";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTheme } from "next-themes";
 
 interface JobCardItemProps {
   job: Job;
@@ -55,6 +56,7 @@ const JobCardItem = ({ job, isComplete, userProfile }: JobCardItemProps) => {
     const experience = experienceData.find((exp) => exp.value === years);
     return experience ? experience.label : "NA";
   };
+  const { resolvedTheme } = useTheme();
   const [isloading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -102,10 +104,14 @@ const JobCardItem = ({ job, isComplete, userProfile }: JobCardItemProps) => {
 
           {/* Company Details */}
           <Box className='items-center justify-start gap-x-4'>
-            <div className='w-12 h-12 min-w-12 min-h-12 border-white border rounded-md p-2 relative flex items-center justify-center overflow-hidden'>
+            <div className='w-12 h-12 min-w-12 min-h-12 border-white border rounded-md p-2 px-10 relative flex items-center justify-center overflow-hidden'>
               {/* {company?.logo && ( */}
               <Image
-                src={"/img/logo_light.png"}
+                src={
+                  resolvedTheme === "dark"
+                    ? "/img/logo_dark.png"
+                    : `/img/logo_light.png`
+                }
                 alt={"The Truth International"}
                 // width={40}
                 // height={40}

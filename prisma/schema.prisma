@@ -17,8 +17,10 @@ model UserProfile {
   password                String
   ConfirmPassword         String?
   gender                  Gender                @default(Male)
-  contactNumber           String
+  contactNumber           String?
+  emergencyContactNumber  String?
   DOB                     DateTime?
+  bloodGroup              String?
   city                    String?
   country                 String?
   address                 String?
@@ -48,6 +50,8 @@ model UserProfile {
   facebook                String?
   instagram               String?
   behance                 String?
+  zoomId                  String?
+  googleMeetId            String?
   otpCode                 String?
   otpCodeExpiry           DateTime?
   resetToken              String?
@@ -79,6 +83,7 @@ model UserProfile {
   ResignationRequests     ResignationRequests[]
   Warnings                Warnings[]
   updatedAt               DateTime              @default(now())
+  Requests                Requests[]
 }
 
 model LeaveRequest {
@@ -354,6 +359,18 @@ model Attachments {
   job       Job?     @relation(fields: [jobId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+}
+
+model Requests {
+  id              String      @id @unique @default(cuid())
+  title           String
+  requestMessage  String
+  requestForWhich String?
+  other           String?
+  userId          String
+  user            UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @default(now())
 }
 
 enum Gender {

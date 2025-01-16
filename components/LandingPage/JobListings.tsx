@@ -17,29 +17,30 @@ const JobListings = ({ jobs }: JobListing) => {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12"
+          className='text-center mb-12'
         >
           <h2 className='text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl'>
             Featured Job Openings
           </h2>
           <p className='mt-3 max-w-2xl mx-auto text-xl text-gray-500 dark:text-gray-300 sm:mt-4'>
-            Explore our latest job opportunities and take the next step in your career.
+            Explore our latest job opportunities and take the next step in your
+            career.
           </p>
         </motion.div>
-        {jobs.length > 0 ? (
-        <AnimatePresence>
-          <motion.div
-            {...fadeInOut}
-            layout
-            className='grid gap-8 sm:grid-cols-1 grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-          >
-            {jobs?.map((job) => (
-              <JobCardItem key={job.id} job={job} />
-            ))}
-          </motion.div>
-        </AnimatePresence>
-        ):(
-          <p>Jobs not  available at this time</p>
+        {jobs && jobs.length > 0 ? (
+          <AnimatePresence>
+            <motion.div
+              {...fadeInOut}
+              layout
+              className='grid gap-8 sm:grid-cols-1 grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+            >
+              {jobs?.map((job) => (
+                <JobCardItem key={job.id} job={job} />
+              ))}
+            </motion.div>
+          </AnimatePresence>
+        ) : (
+          <p>Jobs not available at this time</p>
         )}
       </div>
     </section>
@@ -47,4 +48,3 @@ const JobListings = ({ jobs }: JobListing) => {
 };
 
 export default JobListings;
-

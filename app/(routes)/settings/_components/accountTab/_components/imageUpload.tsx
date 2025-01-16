@@ -65,7 +65,7 @@ const ImageUpload = ({ user }: AccountTabImageUploadProps) => {
       <div className='lg:w-52 lg:h-52 md:w-40 md:h-40 w-36 h-36 ml-5'>
         {uploadedImage || user?.userImage ? (
           <Avatar className='w-full h-full'>
-            <AvatarImage src={uploadedImage || user?.userImage || ""} />
+            <AvatarImage className="w-full h-full object-cover object-center" src={uploadedImage || user?.userImage || ""} />
             <AvatarFallback>{avatarFallback}</AvatarFallback>
           </Avatar>
         ) : (

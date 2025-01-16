@@ -15,7 +15,7 @@ const UserProfileSection = ({ user }: UserProfileSectionProps) => {
       <div className='md:w-16 md:h-16 sm:w-24 sm:h-24 w-16 h-16  ml-5 md:relative absolute md:-top-0 -top-3'>
         {user?.userImage ? (
           <Avatar className='w-full h-full'>
-            <AvatarImage src={user.userImage} />
+            <AvatarImage className="w-full h-full object-cover object-center" src={user.userImage} />
             <AvatarFallback>{avatarFallback}</AvatarFallback>
           </Avatar>
         ) : (

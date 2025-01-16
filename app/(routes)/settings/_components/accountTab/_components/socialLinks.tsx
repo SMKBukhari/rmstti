@@ -36,6 +36,8 @@ const SocialLinls = ({ user }: AccountTabSocialLinksProps) => {
     facebook: user?.facebook || "",
     instagram: user?.instagram || "",
     behance: user?.behance || "",
+    zoomId: user?.zoomId || "",
+    googleMeetId: user?.googleMeetId || "",
   });
 
   const form = useForm<z.infer<typeof UserSocialLinks>>({
@@ -195,6 +197,43 @@ const SocialLinls = ({ user }: AccountTabSocialLinksProps) => {
                       {...field}
                       disabled={isLoading}
                       placeholder='https://www.behance.com/johndoe'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='zoomId'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Zoom Id</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      disabled={isLoading}
+                      placeholder='https://www.zoom.com/johndoe'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
+            <FormField
+              control={form.control}
+              name='googleMeetId'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Google Meet Id</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      disabled={isLoading}
+                      placeholder='https://www.googlemeet.com/johndoe'
                     />
                   </FormControl>
                   <FormMessage />

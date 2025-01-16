@@ -24,6 +24,8 @@ export const UserSocialLinks = z.object({
   facebook: z.string().optional(),
   instagram: z.string().optional(),
   behance: z.string().optional(),
+  zoomId: z.string().optional(),
+  googleMeetId: z.string().optional(),
 });
 
 export const UserExperience = z.object({
