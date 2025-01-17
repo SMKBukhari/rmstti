@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -64,7 +65,7 @@ const BasicInfo = ({ company }: GeneralTabBaiscInfoProps) => {
     }
   };
   return (
-    <div className='flex w-full gap-4 lg:p-10 md:px-7 px-4'>
+    <Card className='flex w-full gap-4 lg:p-10 md:px-7 px-4'>
       <Form {...form}>
         <form
           className='space-y-8 w-full'
@@ -175,7 +176,7 @@ const BasicInfo = ({ company }: GeneralTabBaiscInfoProps) => {
           </div>
         </form>
       </Form>
-    </div>
+    </Card>
   );
 };
 

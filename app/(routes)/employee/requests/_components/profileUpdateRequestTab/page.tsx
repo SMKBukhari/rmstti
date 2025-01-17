@@ -59,7 +59,7 @@ const ProfileUpdateRequestTab = async () => {
   );
 
   return (
-    <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
+    <div className='flex-col items-center justify-center flex'>
       <div className='mt-6 w-full'>
         <DataTable
           columns={columns}

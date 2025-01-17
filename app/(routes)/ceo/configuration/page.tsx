@@ -33,6 +33,12 @@ const SettingsPage = async () => {
     },
   });
 
+  const categories = await db.requestCategory.findMany({
+    include: {
+      requests: true,
+    },
+  });
+
   const departmentsWithUsers = departments.map((department) => ({
     ...department,
     users: department.users || [],
@@ -64,6 +70,7 @@ const SettingsPage = async () => {
               departments={departmentsWithUsers}
               userSkills={userWithSkills}
               company={user || null}
+              category={categories}
             />
           </TabsContent>
         </div>

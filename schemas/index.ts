@@ -228,6 +228,10 @@ export const DepartmentsSchema = z.object({
   name: z.string(),
 });
 
+export const RequestCategorySchema = z.object({
+  name: z.string(),
+});
+
 export const AddNewEmployeeSchema = z.object({
   fullName: z.string(),
   email: z.string().email(),
@@ -283,4 +287,10 @@ export const EditEmployeeSchema = z.object({
   status: z.string().optional(),
   officeTimingIn: z.string().optional(),
   officeTimingOut: z.string().optional(),
+});
+
+export const RequestsSchema = z.object({
+  requestTo: z.string(),
+  category: z.string(),
+  requestMessage: z.string(),
 });
