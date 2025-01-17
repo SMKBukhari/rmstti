@@ -14,6 +14,7 @@ import UserSkillss from "./_components/userSkills";
 import UserResumeUpload from "./_components/userResumeUpload";
 import { Card } from "@/components/ui/card";
 import EmployeeBasicInfo from "./_components/employeeBasicInfo";
+import EmplolyeeSocialLinls from "./_components/employeesocialLinks";
 
 interface AccountTabPageProps {
   user: (UserProfile & { role: Role | null }) | null;
@@ -32,12 +33,6 @@ const AccountTabPage = ({
     <>
       <div className='w-full flex flex-col items-center justify-center gap-10 px-5 py-10 pt-13 bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-xl mt-5'>
         <ImageUpload user={user} />
-        {/* {user?.role?.name === "Employee" ||
-          (user?.role?.name === "Manager" ? (
-            <EmployeeBasicInfo user={user} />
-          ) : (
-            <UserBaiscInfo user={user} />
-          ))} */}
         {user?.role?.name === "Employee" ? (
           <EmployeeBasicInfo user={user} />
         ) : user?.role?.name === "Manager" ? (
@@ -53,7 +48,13 @@ const AccountTabPage = ({
         <h2 className='text-xl font-medium text-muted-foreground self-start'>
           Social Links
         </h2>
-        <SocialLinls user={user} />
+        {user?.role?.name === "Employee" ? (
+          <EmplolyeeSocialLinls user={user} />
+        ) : user?.role?.name === "Manager" ? (
+          <EmplolyeeSocialLinls user={user} />
+        ) : (
+          <SocialLinls user={user} />
+        )}
       </Card>
 
       <UserExperiences user={userExperiences} />

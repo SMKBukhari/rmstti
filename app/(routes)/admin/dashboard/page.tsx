@@ -7,7 +7,7 @@ import TotalApplicant from "./_components/Cards/TotalApplicants";
 import { format } from "date-fns";
 import EmployeeBannerWarning from "./_components/userBannerWarning";
 import LeaveRequests from "./_components/Cards/LeaveRequests";
-import { AttendanceDashboard } from "./_components/AttendanceChart";
+import { AttendanceChart } from "./_components/AttendanceChart";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -182,7 +182,7 @@ const page = async () => {
         />
       </div>
       <div className='mt-10'>
-        <AttendanceDashboard />
+        <AttendanceChart />
       </div>
     </>
   );

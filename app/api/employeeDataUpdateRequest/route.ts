@@ -5,26 +5,19 @@ import { NextResponse } from "next/server";
 export const POST = async (req: Request) => {
   try {
     const { userId, values } = await req.json();
-    console.log("Received request:", { userId, values });
 
     const user = await db.userProfile.findUnique({
       where: { userId: userId },
     });
 
     if (!user) {
-      console.log("User not found:", userId);
       return new NextResponse("User not found", { status: 404 });
     }
-
-    console.log("User found:", user);
 
     const adminExceptThisUser = await db.userProfile.findMany({
       where: {
         role: {
           name: "Admin",
-        },
-        NOT: {
-          userId: userId,
         },
       },
     });
@@ -36,9 +29,6 @@ export const POST = async (req: Request) => {
         },
       },
     });
-
-    console.log("Admins found:", adminExceptThisUser.length);
-    console.log("CEOs found:", ceo.length);
 
     const notifications = [
       {
@@ -68,37 +58,28 @@ export const POST = async (req: Request) => {
       })),
     ];
 
-    console.log("Notifications to be created:", notifications.length);
+    // Create an object with only the changed fields
+    const changedFields = Object.keys(values).reduce((acc, key) => {
+      if (values[key] !== user[key]) {
+        acc[key] = values[key];
+      }
+      return acc;
+    }, {});
 
-    // Create a new profile update request in the database
+    // Create a new profile update request in the database with only the changed fields
     const updateRequest = await db.profieUpdateRequests.create({
       data: {
         userId,
-        fullName: values.fullName,
-        email: user.email, // Assuming email is not updated
-        password: user.password, // Use the existing password from the user profile
-        ConfirmPassword: user.ConfirmPassword, // Include if applicable
-        gender: values.gender,
-        contactNumber: values.contactNumber,
-        DOB: values.DOB,
-        country: values.country,
-        city: values.city,
-        address: values.address,
-        aprroved: false,
-        rejected: false,
+        ...changedFields,
       },
     });
-
-    console.log("Update request created:", updateRequest);
 
     // Send notifications
     const createdNotifications = await db.notifications.createMany({
       data: notifications,
     });
 
-    console.log("Notifications created:", createdNotifications);
-
-    return NextResponse.json({ updateRequest });
+    return NextResponse.json({ updateRequest, createdNotifications });
   } catch (error) {
     console.error(`USER_UPDATE_PATCH: ${error}`);
     if (error instanceof Error) {

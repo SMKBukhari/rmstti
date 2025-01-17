@@ -10,6 +10,8 @@ import {
   CalendarPlus,
   ChartNoAxesCombined,
   FileUser,
+  FolderOpen,
+  FolderOpenDot,
   Group,
   Hand,
   LayoutDashboard,
@@ -74,6 +76,19 @@ export const configurationTabs = [
     value: "general",
   },
 ];
+
+export const requestsTabs = [
+  {
+    icon: Users,
+    label: "Profile Update Requests",
+    value: "profileUpdateRequests",
+  },
+  {
+    icon: FolderOpen,
+    label: "Requests",
+    value: "requests",
+  }
+]
 
 const notificationRoute = {
   icon: Bell, // Use the appropriate icon for notifications
@@ -193,6 +208,11 @@ export const adminRoutes = [
     ],
   },
   {
+    icon: FolderOpenDot,
+    label: "Requests",
+    href: "/admin/requests",
+  },
+  {
     icon: User,
     label: "Profile",
     href: "/profile",
@@ -235,6 +255,11 @@ export const employeeRoutes = [
     icon: BadgeMinus,
     label: "Resignation Requests",
     href: "/employee/resign",
+  },
+  {
+    icon: FolderOpenDot,
+    label: "Requests",
+    href: "/employee/requests",
   },
   {
     icon: User,
@@ -312,7 +337,12 @@ export const managerRoutes = [
   {
     icon: BadgeMinus,
     label: "Resignation Requests",
-    href: "/employee/resign",
+    href: "/manager/resign",
+  },
+  {
+    icon: FolderOpenDot,
+    label: "Requests",
+    href: "/manager/requests",
   },
   {
     icon: User,
@@ -382,6 +412,11 @@ export const ceoRoutes = [
     icon: BadgeMinus,
     label: "Resignation Requests",
     href: "/ceo/resign/manage-resignations",
+  },
+  {
+    icon: FolderOpenDot,
+    label: "Requests",
+    href: "/ceo/requests",
   },
   {
     icon: User,

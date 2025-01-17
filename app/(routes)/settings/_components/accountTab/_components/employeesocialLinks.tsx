@@ -1,7 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import ComboBox from "@/components/ui/combo-box";
 import {
   Form,
   FormControl,
@@ -11,54 +9,39 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { CountryOptions, GenderOptions, getCityOptions } from "@/lib/data";
-import { UserBasicInfor } from "@/schemas";
+import { UserSocialLinks } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserProfile } from "@prisma/client";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-interface AccountTabEmployeeInfoProps {
+interface AccountTabEmployeeSocialLinksProps {
   user: UserProfile | null;
 }
 
-const EmployeeBasicInfo = ({ user }: AccountTabEmployeeInfoProps) => {
+const EmplolyeeSocialLinls = ({ user }: AccountTabEmployeeSocialLinksProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [cities, setCities] = useState<{ label: string; value: string }[]>([]);
   const router = useRouter();
 
-  useEffect(() => {
-    if (user?.country) {
-      const cityOptions = getCityOptions(user.country);
-      setCities(cityOptions);
-    }
-  }, [user?.country]);
-
-  const initialValuesRef = useRef<z.infer<typeof UserBasicInfor>>({
-    fullName: user?.fullName || "",
-    gender:
-      (user?.gender as "Male" | "Female" | "Other" | "Select") || "Select",
-    contactNumber: user?.contactNumber || "",
-    DOB: user?.DOB || new Date(),
-    country: user?.country || "",
-    city: user?.city || "",
-    address: user?.address || "",
+  const initialValuesRef = useRef<z.infer<typeof UserSocialLinks>>({
+    skype: user?.skype || "",
+    linkedIn: user?.linkedIn || "",
+    github: user?.github || "",
+    twitter: user?.twitter || "",
+    facebook: user?.facebook || "",
+    instagram: user?.instagram || "",
+    behance: user?.behance || "",
+    zoomId: user?.zoomId || "",
+    googleMeetId: user?.googleMeetId || "",
   });
 
-  const handleCountryChange = (countryCode: string) => {
-    const cityOptions = getCityOptions(countryCode);
-    setCities(cityOptions);
-    form.setValue("city", "");
-  };
-
-  const form = useForm<z.infer<typeof UserBasicInfor>>({
-    resolver: zodResolver(UserBasicInfor),
+  const form = useForm<z.infer<typeof UserSocialLinks>>({
+    resolver: zodResolver(UserSocialLinks),
     defaultValues: initialValuesRef.current,
   });
 
@@ -66,7 +49,7 @@ const EmployeeBasicInfo = ({ user }: AccountTabEmployeeInfoProps) => {
     JSON.stringify(form.getValues()) !==
     JSON.stringify(initialValuesRef.current);
 
-  const onSubmit = async (values: z.infer<typeof UserBasicInfor>) => {
+  const onSubmit = async (values: z.infer<typeof UserSocialLinks>) => {
     try {
       setIsLoading(true);
       await axios.post(`/api/employeeDataUpdateRequest`, {
@@ -88,7 +71,7 @@ const EmployeeBasicInfo = ({ user }: AccountTabEmployeeInfoProps) => {
     }
   };
   return (
-    <Card className='flex w-full gap-4 lg:p-10 md:px-7 px-4 py-5'>
+    <div className='flex w-full gap-4 lg:p-10 md:px-7 px-4'>
       <Form {...form}>
         <form
           className='space-y-8 w-full'
@@ -97,18 +80,15 @@ const EmployeeBasicInfo = ({ user }: AccountTabEmployeeInfoProps) => {
           <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
             <FormField
               control={form.control}
-              name='fullName'
+              name='linkedIn'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Full Name
-                    <span className='text-red-500 ml-1'>*</span>
-                  </FormLabel>
+                  <FormLabel>LinkedIn</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       disabled={isLoading}
-                      placeholder='John Doe'
+                      placeholder='https://www.linkedin.com/in/johndoe'
                     />
                   </FormControl>
                   <FormMessage />
@@ -117,122 +97,15 @@ const EmployeeBasicInfo = ({ user }: AccountTabEmployeeInfoProps) => {
             />
             <FormField
               control={form.control}
-              name='gender'
+              name='facebook'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Gender
-                    <span className='text-red-500 ml-1'>*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <ComboBox
-                      options={GenderOptions}
-                      heading='Gender'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
-            <FormField
-              control={form.control}
-              name='contactNumber'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Contact Number
-                    <span className='text-red-500 ml-1'>*</span>
-                  </FormLabel>
+                  <FormLabel>Facebook</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       disabled={isLoading}
-                      placeholder='03251234567'
-                      type='number'
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='DOB'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    DOB
-                    <span className='text-red-500 ml-1'>*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <FormControl>
-                      <Input
-                        type='date'
-                        disabled={isLoading}
-                        placeholder="e.g '2021-01-01'"
-                        value={
-                          field.value
-                            ? new Date(field.value).toISOString().split("T")[0]
-                            : ""
-                        }
-                        onChange={(e) =>
-                          field.onChange(new Date(e.target.value))
-                        }
-                        onBlur={field.onBlur}
-                        ref={field.ref}
-                      />
-                    </FormControl>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
-            <FormField
-              control={form.control}
-              name='country'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Country
-                    <span className='text-red-500 ml-1'>*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <ComboBox
-                      options={CountryOptions}
-                      heading='Country'
-                      value={field.value} // Pass the current value
-                      onChange={(value) => {
-                        field.onChange(value); // Call the onChange function from the field
-                        handleCountryChange(value); // Call your custom handler
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='city'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    City
-                    <span className='text-red-500 ml-1'>*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <ComboBox
-                      options={cities}
-                      heading='City'
-                      value={field.value} // e.g., "Islamabad-PB"
-                      onChange={(value) => {
-                        form.setValue("city", value); // Save the unique identifier
-                      }}
+                      placeholder='https://www.facebook.com/johndoe'
                     />
                   </FormControl>
                   <FormMessage />
@@ -240,21 +113,36 @@ const EmployeeBasicInfo = ({ user }: AccountTabEmployeeInfoProps) => {
               )}
             />
           </div>
+
           <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
             <FormField
               control={form.control}
-              name='address'
+              name='instagram'
               render={({ field }) => (
-                <FormItem className='col-span-2'>
-                  <FormLabel>
-                    Address
-                    <span className='text-red-500 ml-1'>*</span>
-                  </FormLabel>
+                <FormItem>
+                  <FormLabel>Instagram</FormLabel>
                   <FormControl>
-                    <Textarea
+                    <Input
                       {...field}
                       disabled={isLoading}
-                      placeholder="e.g 'House # 123, Street # 123, Sector # 123'"
+                      placeholder='https://www.instagram.com/johndoe'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='github'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Github</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      disabled={isLoading}
+                      placeholder='https://www.github.com/johndoe'
                     />
                   </FormControl>
                   <FormMessage />
@@ -262,6 +150,101 @@ const EmployeeBasicInfo = ({ user }: AccountTabEmployeeInfoProps) => {
               )}
             />
           </div>
+
+          <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
+            <FormField
+              control={form.control}
+              name='twitter'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Twitter</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      disabled={isLoading}
+                      placeholder='https://www.twitter.com/johndoe'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='skype'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Skype</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      disabled={isLoading}
+                      placeholder='https://www.skype.com/johndoe'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
+            <FormField
+              control={form.control}
+              name='behance'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Behnace</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      disabled={isLoading}
+                      placeholder='https://www.behance.com/johndoe'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='zoomId'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Zoom Id</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      disabled={isLoading}
+                      placeholder='https://www.zoom.com/johndoe'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
+            <FormField
+              control={form.control}
+              name='googleMeetId'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Google Meet Id</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      disabled={isLoading}
+                      placeholder='https://www.googlemeet.com/johndoe'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
           <div className='flex w-full'>
             <Button
               variant={"primary"}
@@ -278,8 +261,8 @@ const EmployeeBasicInfo = ({ user }: AccountTabEmployeeInfoProps) => {
           </div>
         </form>
       </Form>
-    </Card>
+    </div>
   );
 };
 
-export default EmployeeBasicInfo;
+export default EmplolyeeSocialLinls;

@@ -93,11 +93,11 @@ model ProfieUpdateRequests {
   user                   UserProfile     @relation(fields: [userId], references: [userId], onDelete: Cascade)
   aprroved               Boolean?        @default(false)
   rejected               Boolean?        @default(false)
-  fullName               String
-  email                  String
-  password               String
+  fullName               String?
+  email                  String?
+  password               String?
   ConfirmPassword        String?
-  gender                 Gender          @default(Male)
+  gender                 String?
   contactNumber          String?
   emergencyContactNumber String?
   DOB                    DateTime?
