@@ -22,7 +22,7 @@ import { UserSkills } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Skills, UserProfile } from "@prisma/client";
 import axios from "axios";
-import { Loader2, Plus, X } from "lucide-react";
+import { Loader2, Plus, X } from 'lucide-react';
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -60,19 +60,26 @@ const UserSkillss = ({ user }: AccountTabUserSkillsProps) => {
   const { isSubmitting, isValid } = form.formState;
 
   const onSubmit = async (values: z.infer<typeof UserSkills>) => {
+    if (!values || !values.name || !values.experienceLevel) {
+      toast.error("Please fill out all fields before submitting.");
+      return;
+    }
+
     try {
       setIsLoading(true);
-      await axios.post(
-        `/api/user/${user?.userId}/userSkills`,
-        { skills: [values] }
-      );
-      toast.success(`New Skill added.`);
-      toggleEditing()
-      router.refresh();
+      const response = await axios.post(`/api/user/${user?.userId}/userSkills`, { skills: [values] });
+    
+      if (response.data.createdSkills && response.data.createdSkills.length > 0) {
+        toast.success("New Skill(s) added.");
+        toggleEditing();
+        router.refresh();
+      } else {
+        toast.info(response.data.message || "No new skills were added.");
+      }
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         if (error.response && error.response.data) {
-          toast.error(error.response.data);
+          toast.error(error.response.data.error || "An unexpected error occurred. Please try again.");
         } else {
           toast.error("An unexpected error occurred. Please try again.");
         }
@@ -81,6 +88,7 @@ const UserSkillss = ({ user }: AccountTabUserSkillsProps) => {
       setIsLoading(false);
     }
   };
+  
 
   const saveSkill = async (values: z.infer<typeof UserSkills>) => {
     try {
@@ -239,7 +247,7 @@ const UserSkillss = ({ user }: AccountTabUserSkillsProps) => {
               {isLoading ? (
                 <Button
                 variant={"primary"}
-                disabled={!isValid || isSubmitting}
+                disabled={!isValid || isLoading}
                 typeof='submit'
               >
                 <Loader2 className='h-5 w-5 text-primary animate-spin' />
@@ -247,7 +255,7 @@ const UserSkillss = ({ user }: AccountTabUserSkillsProps) => {
               ) : (
                 <Button
                   variant={"primary"}
-                  disabled={!isValid || isSubmitting}
+                  disabled={!isValid || isLoading}
                   typeof='submit'
                 >
                   Save
@@ -262,3 +270,4 @@ const UserSkillss = ({ user }: AccountTabUserSkillsProps) => {
 };
 
 export default UserSkillss;
+
