@@ -1,5 +1,13 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
+// import cloudinary from "cloudinary";
+
+// cloudinary.v2.config({
+//   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+//   api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+//   api_secret: process.env.CLOUDINARY_API_SECRET,
+//   secure: true,
+// });
 
 export const PATCH = async (
   req: Request,
@@ -71,6 +79,13 @@ export const DELETE = async (
 
     // Delete the Images from the Cloudinary sotrage
     // TODO: Add the Cloudinary storage import
+    // const result = await cloudinary.v2.api.delete_resources(
+    //   [`${job.imagePublicId}`],
+    //   {
+    //     type: "upload",
+    //     resource_type: "raw",
+    //   }
+    // );
 
     // Delete the attachments
     // TODO: Add the attachments import
