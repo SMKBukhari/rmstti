@@ -42,7 +42,6 @@ const ForgotPasswordPage = () => {
         } else {
           Cookies.remove("sessionToken");
           Cookies.remove("sessionExpiry");
-          router.push("/signIn");
         }
       }
     };
@@ -50,7 +49,7 @@ const ForgotPasswordPage = () => {
     checkUserSession();
   }, [router]);
   return (
-    <div>
+    <div className="w-full flex justify-center">
         <ForgotPasswordForm />
     </div>
   )

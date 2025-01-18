@@ -33,48 +33,36 @@ export const POST = async (req: Request) => {
       resetLink
     );
 
-    const response = await sendMail({
-      to: email,
-      subject: "Password Reset Link (The Truth International)",
-      body: emailBody,
-    });
-    
-    const sendNotification = await db.notifications.create({
-      data: {
-        userId: user.userId,
-        title: "Password Reset Link Sent",
-        message: "A password reset link has been sent to your email",
-        createdBy: "Account",
-        isRead: false,
-        type: "General",
-      },
-    });
+    try {
+      const response = await sendMail({
+        to: email,
+        subject: "Password Reset Link (The Truth International)",
+        body: emailBody,
+      });
 
-    // if (response?.messageId) {
-    //   await db.notifications.create({
-    //     data: {
-    //       userId: user.userId,
-    //       title: "Password Reset Link Sent",
-    //       message: "A password reset link has been sent to your email",
-    //       createdBy: "Account",
-    //       isRead: false,
-    //       type: "General",
-    //     },
-    //   });
-    //   return new NextResponse("Reset link sent successfully", { status: 200 });
-    // } else {
-    //   return new NextResponse("Failed to send reset link email", {
-    //     status: 500,
-    //   });
-    // }
+      const sendNotification = await db.notifications.create({
+        data: {
+          userId: user.userId,
+          title: "Password Reset Link Sent",
+          message: "A password reset link has been sent to your email",
+          createdBy: "Account",
+          isRead: false,
+          type: "General",
+        },
+      });
 
-    return NextResponse.json({
-      message: "Reset link sent successfully",
-      response,
-      sendNotification,
-    });
+      return NextResponse.json({
+        message: "Reset link sent successfully",
+        response,
+        sendNotification,
+      });
+    } catch (emailError) {
+      console.error(`EMAIL_SEND_ERROR: ${emailError}`);
+      return new NextResponse("Failed to send email. Please try again later.", { status: 500 });
+    }
   } catch (error) {
     console.error(`FORGOT_PASSWORD_ERROR: ${error}`);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 };
+

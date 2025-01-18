@@ -31,7 +31,7 @@ const ForgotPasswordForm = () => {
     },
   });
 
-   const onSubmit = async (values: z.infer<typeof ForgotPasswordSchema>) => {
+  const onSubmit = async (values: z.infer<typeof ForgotPasswordSchema>) => {
     try {
       setIsLoading(true);
       await axios.post("/api/user/forgotPassword", values);
@@ -39,16 +39,19 @@ const ForgotPasswordForm = () => {
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         toast.error(error?.response?.data || "An unexpected error occurred.");
+      } else {
+        toast.error("An unexpected error occurred.");
       }
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <CardWrapper
       headerText='Forgot Password'
-      headerLabel='Enter your credentials to continue'
-      backButtonLabel="Already have an account?"
+      headerLabel='Enter your email to continue'
+      backButtonLabel="I know my Password?"
       backButtonHref='/signIn'
       isbackButton
     >
