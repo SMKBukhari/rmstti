@@ -225,7 +225,7 @@ model JobApplications {
   user                   UserProfile        @relation(fields: [userId], references: [userId], onDelete: Cascade)
   applicationStatusId    String?
   applicationStatus      ApplicationStatus? @relation(fields: [applicationStatusId], references: [id])
-  coverLetter            String?
+  coverLetter            String?            @db.LongText
   department             String?
   resumeUrl              String?
   resumeName             String?
