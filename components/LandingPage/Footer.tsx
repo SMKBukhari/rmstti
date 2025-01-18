@@ -35,8 +35,11 @@ const Footer = () => {
           </div>
           <div>
             <h3 className='text-lg font-semibold mb-4'>Contact Us</h3>
-            <p className='text-gray-400'>Email: info@hrmportal.com</p>
-            <p className='text-gray-400'>Phone: +1 (123) 456-7890</p>
+            <p className='text-gray-400'>Email: info@tti.org.pk</p>
+            <p className='text-gray-400'>Phone: 051-2820180
+            <br />
+              051-2820181
+            </p>
           </div>
           <div>
             <h3 className='text-lg font-semibold mb-4'>Follow Us</h3>
