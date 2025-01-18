@@ -57,7 +57,7 @@ const JobPublishActions = ({
   const onDelete = async () => {
     try {
       setIsLoading(true);
-      await axios.delete(`/api/jobs/${jobId}`);
+      await axios.delete(`/api/user/${user?.userId}/createNewJob/${jobId}`);
 
       router.refresh();
       return router.push("/admin/jobs");

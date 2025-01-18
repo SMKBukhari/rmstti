@@ -57,10 +57,10 @@ const JobPublishActions = ({
   const onDelete = async () => {
     try {
       setIsLoading(true);
-      await axios.delete(`/api/jobs/${jobId}`);
+      await axios.delete(`/api/user/${user?.userId}/createNewJob/${jobId}`);
 
       router.refresh();
-      return router.push("/admin/jobs");
+      return router.push("/ceo/jobs");
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         if (error.response && error.response.data) {

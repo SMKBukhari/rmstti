@@ -6,7 +6,11 @@ import { db } from "@/lib/db";
 
 export default async function Home() {
   
-  const jobs = await db.job.findMany();
+  const jobs = await db.job.findMany({
+    where: {
+      isPusblished: true,
+    }
+  });
 
   return (
     <div className='flex flex-col min-h-screen'>

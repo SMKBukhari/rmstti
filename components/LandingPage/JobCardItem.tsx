@@ -166,7 +166,7 @@ const JobCardItem = ({ job, isComplete, userProfile }: JobCardItemProps) => {
           {job.shortDescription && (
             <CardDescription className='text-xs'>
               {truncate(job.shortDescription, {
-                length: 180,
+                length: 300,
                 omission: "...",
               })}
             </CardDescription>
