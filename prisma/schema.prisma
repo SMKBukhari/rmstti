@@ -370,10 +370,11 @@ model CheckLog {
   id           String       @id @unique @default(cuid())
   checkInTime  DateTime
   checkOutTime DateTime?
+  workingHours String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @default(now())
   Attendence   Attendence[]
-}
+} 
 
 model Job {
   id                String            @id @unique @default(cuid())

@@ -28,7 +28,6 @@ export async function POST(
 
     // If action is "checkIn"
     if (action === "checkIn") {
-      // If attendance already exists and has no check-out, log the check-in
       if (attendance) {
         const checkLog = attendance.checkLog; // Access the single CheckLog object
 
@@ -97,31 +96,44 @@ export async function POST(
     // If action is "checkOut"
     if (action === "checkOut") {
       if (attendance) {
-        const checkLog = attendance.checkLog; // Access the single CheckLog object
+        // Find the most recent check-in log with no check-out (active check-in)
+        const activeCheckLog = await db.checkLog.findFirst({
+          where: {
+            Attendence: {
+              some: {
+                userId: userId,
+                date: currentDate,
+              }
+            },
+            checkOutTime: null, // Active check-in (no check-out time)
+          },
+          orderBy: { createdAt: 'desc' }, // Order by the most recent one
+        });
 
-        // If attendance exists and hasn't been checked out yet
-        if (checkLog?.checkOutTime === null) {
-          // If there is a check-in without a check-out, update it with check-out time
+        if (activeCheckLog) {
+          // If we have an active check-in, perform the check-out
+          const workingHours = calculateWorkingHours(activeCheckLog.checkInTime, utcTime);
           await db.checkLog.update({
             where: {
-              id: checkLog.id,
+              id: activeCheckLog.id,
             },
             data: {
               checkOutTime: utcTime,
+              workingHours: workingHours,
             },
           });
 
-          const checkInTime = checkLog.checkInTime;
-          const checkOutTime = utcTime;
+          // const checkInTime = activeCheckLog.checkInTime;
+          // const checkOutTime = utcTime;
 
-          // Get the difference in milliseconds
-          const timeDifference = checkOutTime.getTime() - checkInTime.getTime();
+          // // Get the difference in milliseconds
+          // const timeDifference = checkOutTime.getTime() - checkInTime.getTime();
 
-          // Convert the difference into hours and minutes
-          const hours = Math.floor(timeDifference / (1000 * 3600)); // in hours
-          const minutes = Math.floor(
-            (timeDifference % (1000 * 3600)) / (1000 * 60)
-          ); // in minutes
+          // // Convert the difference into hours and minutes
+          // const hours = Math.floor(timeDifference / (1000 * 3600)); // in hours
+          // const minutes = Math.floor(
+          //   (timeDifference % (1000 * 3600)) / (1000 * 60)
+          // ); // in minutes
 
           // Update the attendance record with the calculated working hours
           await db.attendence.update({
@@ -129,13 +141,15 @@ export async function POST(
               id: attendance.id,
             },
             data: {
-              workingHours: `${hours} hours ${minutes} minutes`,
+              workingHours: workingHours,
             },
           });
 
+          
+
           return NextResponse.json({ message: "Check-out successful." });
         } else {
-          // If there's no open check-in log, return an error
+          // If there's no active check-in log, return an error
           return NextResponse.json(
             { message: "No active check-in found for check-out." },
             { status: 400 }
@@ -160,3 +174,13 @@ export async function POST(
     );
   }
 }
+
+function calculateWorkingHours(checkInTime: Date, checkOutTime: Date): string {
+  const timeDifference = checkOutTime.getTime() - checkInTime.getTime();
+  const hours = Math.floor(timeDifference / (1000 * 3600)); // in hours
+  const minutes = Math.floor(
+    (timeDifference % (1000 * 3600)) / (1000 * 60)
+  ); // in minutes
+  return `${hours} hours ${minutes} minutes`;
+}
+

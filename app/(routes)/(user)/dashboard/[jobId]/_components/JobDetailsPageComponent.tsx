@@ -19,10 +19,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import UserBannerWarning from "../../_components/userBannerWarning";
 
 interface JobDetailsPageComponentProps {
   job: Job & { attachments: Attachments[] };
   jobId: string;
+  completedFields: number;
+  totalFields: number;
+  isComplete?: boolean;
   userProfile: (UserProfile & { JobApplications: JobApplications[] }) | null;
 }
 
@@ -37,6 +41,9 @@ const experienceData = [
 const JobDetailsPageComponent = ({
   job,
   jobId,
+  completedFields,
+  totalFields,
+  isComplete,
   userProfile,
 }: JobDetailsPageComponentProps) => {
   const router = useRouter();
@@ -99,10 +106,15 @@ const JobDetailsPageComponent = ({
         />
       )}
 
-      <Box className='mt-4'>
-        <CustomBreadCrumb
-          breadCrumbPage={job?.title || ""}
+      {!isComplete && (
+        <UserBannerWarning
+          completedFields={completedFields}
+          totalFields={totalFields}
         />
+      )}
+
+      <Box className='mt-4'>
+        <CustomBreadCrumb breadCrumbPage={job?.title || ""} />
       </Box>
 
       {/* Job Cover Image */}
@@ -154,6 +166,7 @@ const JobDetailsPageComponent = ({
                     variant='primary'
                     type='submit'
                     onClick={() => setOpen(true)}
+                    disabled={!isComplete}
                   >
                     Apply Now
                   </Button>
@@ -194,14 +207,16 @@ const JobDetailsPageComponent = ({
           </div>
           <div className='flex md:flex-col w-full md:justify-start justify-between flex-row items-center md:items-start gap-3'>
             <h2 className='text-md font-medium text-neutral-400'>
-              Employee Type
+              Employment Type
             </h2>
             <h3 className='text-sm font-medium'>{job.shiftTiming}</h3>
           </div>
           <div className='flex md:flex-col w-full md:justify-start justify-between flex-row items-center md:items-start gap-3'>
-            <h2 className='text-md font-medium text-neutral-400'>
-              Offer Salary
-            </h2>
+            {job.salary && (
+              <h2 className='text-md font-medium text-neutral-400'>
+                Offer Salary
+              </h2>
+            )}
             <h3 className='text-sm font-medium'>{job.salary}</h3>
           </div>
         </div>

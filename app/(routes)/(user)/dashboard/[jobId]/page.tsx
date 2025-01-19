@@ -18,7 +18,7 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
   });
 
   if (!job) {
-    redirect("/search");
+    redirect("/dashboard");
   }
 
   const profile = await db.userProfile.findUnique({
@@ -27,8 +27,25 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
     },
     include: {
       JobApplications: true,
+      jobExperience: true,
+      education: true,
     },
   });
+
+  const requiredFieldsForApply = [
+    profile?.fullName,
+    profile?.email,
+    profile?.contactNumber,
+    profile?.city,
+    profile?.country,
+    profile?.jobExperience,
+    profile?.education.length,
+    profile?.resumeUrl,
+  ];
+
+  const totalFields = requiredFieldsForApply.length;
+  const completedFields = requiredFieldsForApply.filter(Boolean).length;
+  const isComplete = requiredFieldsForApply.every(Boolean);
 
   return (
     <div className='flex-col p-4 md:p-8'>
@@ -36,6 +53,9 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
         job={job}
         jobId={job.id}
         userProfile={profile}
+        completedFields={completedFields}
+        totalFields={totalFields}
+        isComplete={isComplete}
       />
     </div>
   );

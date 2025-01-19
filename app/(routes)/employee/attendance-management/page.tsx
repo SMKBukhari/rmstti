@@ -38,7 +38,7 @@ const AttendancePage = async () => {
   const formattedAttendanceRecord: attendanceRecordsColumns[] =
     attendanceRecords.map((attendanceRecord) => {
       const formatLocalTime = (time: Date | null | undefined) => {
-        if (!time) return "N/A";
+        if (!time) return "Not Checked Out Yet";
         return time.toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -56,7 +56,7 @@ const AttendancePage = async () => {
         }),
         checkIn: formatLocalTime(attendanceRecord.checkLog?.checkInTime),
         checkOut: formatLocalTime(attendanceRecord.checkLog?.checkOutTime),
-        workingHours: attendanceRecord.workingHours || "N/A",
+        workingHours: attendanceRecord.checkLog?.workingHours || "Not Checked Out Yet",
       };
     });
 
