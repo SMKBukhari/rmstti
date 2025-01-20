@@ -78,7 +78,7 @@ export default function AvatarGroup({
                   height: size,
                 }}
               >
-                <AvatarImage src={user.image} alt={`${user.name}'s avatar`} />
+                <AvatarImage className="w-full object-cover object-center" src={user.image} alt={`${user.name}'s avatar`} />
                 <AvatarFallback className='text-xs font-medium'>
                   {user.name
                     .split(" ")

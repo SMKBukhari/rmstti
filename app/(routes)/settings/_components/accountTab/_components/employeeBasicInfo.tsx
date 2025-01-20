@@ -12,7 +12,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CountryOptions, GenderOptions, getCityOptions } from "@/lib/data";
+import {
+  BloodGroupOptions,
+  CountryOptions,
+  GenderOptions,
+  getCityOptions,
+} from "@/lib/data";
 import { UserBasicInfor } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserProfile } from "@prisma/client";
@@ -45,6 +50,8 @@ const EmployeeBasicInfo = ({ user }: AccountTabEmployeeInfoProps) => {
     gender:
       (user?.gender as "Male" | "Female" | "Other" | "Select") || "Select",
     contactNumber: user?.contactNumber || "",
+    emergencyContactNumber: user?.emergencyContactNumber || "",
+    bloodGroup: user?.bloodGroup || "",
     DOB: user?.DOB || new Date(),
     country: user?.country || "",
     city: user?.city || "",
@@ -152,6 +159,49 @@ const EmployeeBasicInfo = ({ user }: AccountTabEmployeeInfoProps) => {
                       disabled={isLoading}
                       placeholder='03251234567'
                       type='number'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='emergencyContactNumber'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Emergency Contact Number
+                    <span className='text-red-500 ml-1'>*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      disabled={isLoading}
+                      placeholder='03251234567'
+                      type='number'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className='grid md:grid-cols-2 grid-cols-1 gap-10 w-full'>
+            <FormField
+              control={form.control}
+              name='bloodGroup'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Blood Group
+                    <span className='text-red-500 ml-1'>*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <ComboBox
+                      options={BloodGroupOptions}
+                      heading='Blood Group'
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />

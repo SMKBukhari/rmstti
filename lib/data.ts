@@ -32,6 +32,17 @@ export const GenderOptions = [
   { label: "Other", value: "Other" },
 ];
 
+export const BloodGroupOptions = [
+  { label: "A+", value: "A+" },
+  { label: "A-", value: "A-" },
+  { label: "B+", value: "B+" },
+  { label: "B-", value: "B-" },
+  { label: "AB+", value: "AB+" },
+  { label: "AB-", value: "AB-" },
+  { label: "O+", value: "O+" },
+  { label: "O-", value: "O-" },
+];
+
 export const ExperienceLevels = [
   { label: "Beginner", value: "Beginner" },
   { label: "Intermediate", value: "Intermediate" },

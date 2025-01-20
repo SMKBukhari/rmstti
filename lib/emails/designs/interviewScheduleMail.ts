@@ -87,6 +87,7 @@ export const InterviewScheduledMail = `
       <strong>Date:</strong> {{interviewDate}}<br />
       <strong>Time:</strong> {{interviewTime}}<br />
       <strong>Location:</strong> The Truth International, Office 205-D, 2nd Floor, Evacuee Trust Complex, - Agha Khan Road, F-5/1, Islamabad, Pakistan.
+      <strong>Phone No:</strong> +92 51 2820180 / +92 51 2820181
     </p>
     <p>
       Please ensure that you are available at the specified date and time. If you have any conflicts or require further information, do not hesitate to contact us.

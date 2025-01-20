@@ -31,6 +31,7 @@ const ManageRequestsTabs = async () => {
       ? format(new Date(request.createdAt), "MMMM do, yyyy")
       : "N/A",
     requestMessage: request.requestMessage ?? "N/A",
+    requestTo: request.requestTo ?? "N/A",
     status: request.status,
   }));
 

@@ -11,9 +11,11 @@ export const UserBasicInfor = z.object({
   fullName: z.string(),
   gender: z.enum(["Male", "Female", "Other", "Select"]),
   contactNumber: z.string().length(11),
+  emergencyContactNumber: z.string().length(11).optional(),
   DOB: z.date(),
   city: z.string(),
   country: z.string(),
+  bloodGroup: z.string().optional(),
   address: z.string().optional(),
 });
 

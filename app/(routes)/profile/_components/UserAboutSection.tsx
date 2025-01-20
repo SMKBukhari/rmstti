@@ -2,8 +2,16 @@ import EmployeeQRCode from "@/components/EmployeeQRCode";
 import AvatarGroup from "@/components/ui/avatar-group";
 import { Card } from "@/components/ui/card";
 import { Role, Status, UserProfile } from "@prisma/client";
-import { Country } from "country-state-city";
-import { Check, Crown, Flag, Mail, Phone, User } from "lucide-react";
+// import { Country } from "country-state-city";
+import {
+  Check,
+  Crown,
+  HeartPulse,
+  Mail,
+  MapPin,
+  Phone,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import {
   LiaBehance,
@@ -27,9 +35,9 @@ interface UserAboutSectionProps {
 }
 
 const UserAboutSection = ({ user, teamMembers }: UserAboutSectionProps) => {
-  const countryName = user?.country
-    ? Country.getCountryByCode(user.country)?.name || user.country
-    : "Not Specified";
+  // const countryName = user?.country
+  //   ? Country.getCountryByCode(user.country)?.name || user.country
+  //   : "Not Specified";
 
   const teamMembersAvatar =
     teamMembers?.map((member) => ({
@@ -73,8 +81,12 @@ const UserAboutSection = ({ user, teamMembers }: UserAboutSectionProps) => {
             </div>
           )}
           <div className='flex gap-2'>
-            <Flag className='w-5 h-5 text-muted-foreground' />
-            <h3 className='text-muted-foreground text-base -mt-0.5'>{`Country: ${countryName}`}</h3>
+            <MapPin className='w-5 h-5 text-muted-foreground' />
+            <h3 className='text-muted-foreground text-base -mt-0.5'>{`Address: ${user?.address}`}</h3>
+          </div>
+          <div className='flex gap-2'>
+            <HeartPulse className='w-5 h-5 text-muted-foreground' />
+            <h3 className='text-muted-foreground text-base -mt-0.5'>{`Blood Group: ${user?.bloodGroup}`}</h3>
           </div>
         </div>
         <div className='flex flex-col gap-4'>
@@ -88,6 +100,17 @@ const UserAboutSection = ({ user, teamMembers }: UserAboutSectionProps) => {
                 {`Mobile No: `}
                 <Link href={`tel:${user.contactNumber}`}>
                   {user.contactNumber}
+                </Link>
+              </h3>
+            </div>
+          )}
+          {user?.emergencyContactNumber && (
+            <div className='flex gap-2'>
+              <Phone className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5'>
+                {`Emergency Contact No: `}
+                <Link href={`tel:${user.emergencyContactNumber}`}>
+                  {user.emergencyContactNumber}
                 </Link>
               </h3>
             </div>
