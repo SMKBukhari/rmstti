@@ -86,7 +86,7 @@ export const InterviewScheduledMail = `
       <strong>Interview Details:</strong><br />
       <strong>Date:</strong> {{interviewDate}}<br />
       <strong>Time:</strong> {{interviewTime}}<br />
-      <strong>Location:</strong> 2nd Floor, Evacuee Trust Complex, - Aga Khan Road, F-5/1, Islamabad, Pakistan.
+      <strong>Location:</strong> The Truth International, Office 205-D, 2nd Floor, Evacuee Trust Complex, - Agha Khan Road, F-5/1, Islamabad, Pakistan.
     </p>
     <p>
       Please ensure that you are available at the specified date and time. If you have any conflicts or require further information, do not hesitate to contact us.
@@ -101,7 +101,7 @@ export const InterviewScheduledMail = `
       <p>
         For more information about The Truth International (TTI), visit
         <strong>
-            <a href="https://thetruthinternational.com">thetruthinternational.com</a>
+            <a href="https://tti.org.pk">tti.org.pk</a>
         </strong>
       </p>
     </div>

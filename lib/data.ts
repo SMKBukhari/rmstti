@@ -55,7 +55,6 @@ export const getCityOptions = (countryCode: string) => {
     : [];
 };
 
-
 export const settingsTabs = [
   {
     icon: Users,
@@ -85,10 +84,28 @@ export const requestsTabs = [
   },
   {
     icon: FolderOpen,
-    label: "Requests",
-    value: "requests",
-  }
-]
+    label: "Manage Requests",
+    value: "manageRequests",
+  },
+  {
+    icon: FolderOpenDot,
+    label: "Raise Requests",
+    value: "raiseRequests",
+  },
+];
+
+export const requestTabsForCEO = [
+  {
+    icon: Users,
+    label: "Profile Update Requests",
+    value: "profileUpdateRequests",
+  },
+  {
+    icon: FolderOpen,
+    label: "Manage Requests",
+    value: "manageRequests",
+  },
+];
 
 const notificationRoute = {
   icon: Bell, // Use the appropriate icon for notifications

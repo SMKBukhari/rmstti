@@ -3,8 +3,8 @@ import RaiseRequest from "./_components/RaiseRequest";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { DataTable } from "@/components/ui/data-table";
-import { columns, LeaveRequestsColumns } from "./_components/columns";
 import { format } from "date-fns";
+import { columns, RequestsColumns } from "./_components/columns";
 
 const RequestsTabs = async () => {
   const cookieStore = cookies();
@@ -16,32 +16,27 @@ const RequestsTabs = async () => {
     },
   });
 
-  const leaveRequests = await db.leaveRequest.findMany({
+  const requests = await db.requests.findMany({
     where: {
       userId: user?.userId,
     },
     include: {
       user: true,
-      leaveType: true,
+      RequestCategory: true,
     },
   });
 
   // Formatting the applicants data for the table
-  const formattedLeaveRequests: LeaveRequestsColumns[] = leaveRequests.map(
-    (leaveRequest) => ({
-      user: user,
-      id: leaveRequest.id,
-      leaveType: leaveRequest.leaveType.name ?? "N/A",
-      startDate: leaveRequest.startDate
-        ? format(new Date(leaveRequest.startDate), "MMMM do, yyyy")
-        : "N/A",
-      endDate: leaveRequest.endDate
-        ? format(new Date(leaveRequest.endDate), "MMMM do, yyyy")
-        : "N/A",
-      reason: leaveRequest.reason ?? "N/A",
-      status: leaveRequest.status,
-    })
-  );
+  const formattedRequests: RequestsColumns[] = requests.map((request) => ({
+    user: user,
+    id: request.id,
+    requestCategory: request.RequestCategory?.name ?? "N/A",
+    date: request.createdAt
+      ? format(new Date(request.createdAt), "MMMM do, yyyy")
+      : "N/A",
+    requestMessage: request.requestMessage ?? "N/A",
+    status: request.status,
+  }));
 
   const requestsCategories = await db.requestCategory.findMany();
 
@@ -72,12 +67,12 @@ const RequestsTabs = async () => {
       <div className='mt-6 w-full'>
         <DataTable
           columns={columns}
-          data={formattedLeaveRequests}
+          data={formattedRequests}
           filterableColumns={[
             {
-              id: "status",
-              title: "Status",
-              options: ["Pending", "Approved", "Rejected"],
+              id: "requestCategory",
+              title: "Request Category",
+              options: requestsCategories.map((category) => category.name),
             },
           ]}
         />

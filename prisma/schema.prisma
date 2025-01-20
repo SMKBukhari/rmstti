@@ -374,7 +374,7 @@ model CheckLog {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @default(now())
   Attendence   Attendence[]
-} 
+}
 
 model Job {
   id                String            @id @unique @default(cuid())
@@ -414,6 +414,7 @@ model Requests {
   user              UserProfile      @relation(fields: [userId], references: [userId], onDelete: Cascade)
   requestTo         String?
   requestMessage    String           @db.LongText
+  status            String           @default("Pending")
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @default(now())
   requestCategoryId String?

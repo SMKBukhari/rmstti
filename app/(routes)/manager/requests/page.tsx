@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import ProfileUpdateRequestTab from "./_components/profileUpdateRequestTab/page";
 import RequestsTabs from "./_components/requestsTab/page";
+import ManageRequestsTabs from "./_components/mangeRequestsTab/page";
 
 const SettingsPage = async () => {
   const cookieStore = cookies();
@@ -41,17 +42,13 @@ const SettingsPage = async () => {
         </TabsList>
         <div className='mt-8'>
           <TabsContent value='profileUpdateRequests'>
-            <ProfileUpdateRequestTab
-            //   user={user}
-            //   userExperiences={userWithJobExperiences}
-            //   userEducation={userWithEducations}
-            //   userSkills={userWithSkills}
-            />
+            <ProfileUpdateRequestTab />
           </TabsContent>
-          <TabsContent value='requests'>
-            <RequestsTabs
-            // user={user}
-            />
+          <TabsContent value='raiseRequests'>
+            <RequestsTabs />
+          </TabsContent>
+          <TabsContent value='manageRequests'>
+            <ManageRequestsTabs />
           </TabsContent>
         </div>
       </Tabs>

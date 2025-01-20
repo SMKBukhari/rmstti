@@ -1,12 +1,11 @@
 import React from "react";
-import RaiseRequest from "./_components/RaiseRequest";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { DataTable } from "@/components/ui/data-table";
 import { format } from "date-fns";
 import { columns, RequestsColumns } from "./_components/columns";
 
-const RequestsTabs = async () => {
+const ManageRequestsTabs = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
 
@@ -17,9 +16,6 @@ const RequestsTabs = async () => {
   });
 
   const requests = await db.requests.findMany({
-    where: {
-      userId: user?.userId,
-    },
     include: {
       user: true,
       RequestCategory: true,
@@ -40,29 +36,8 @@ const RequestsTabs = async () => {
 
   const requestsCategories = await db.requestCategory.findMany();
 
-  const requestTo = await db.userProfile.findMany({
-    where: {
-      role: {
-        name: {
-          notIn: ["CEO", "User", "Applicant", "Interviewee"],
-        },
-      },
-      NOT: {
-        userId: user?.userId,
-      },
-    },
-    include: {
-      role: true,
-    },
-  });
-
   return (
     <div className='flex-col items-center justify-center flex'>
-      <RaiseRequest
-        requestTo={requestTo}
-        requestCatogries={requestsCategories}
-        user={user}
-      />
 
       <div className='mt-6 w-full'>
         <DataTable
@@ -81,4 +56,4 @@ const RequestsTabs = async () => {
   );
 };
 
-export default RequestsTabs;
+export default ManageRequestsTabs;

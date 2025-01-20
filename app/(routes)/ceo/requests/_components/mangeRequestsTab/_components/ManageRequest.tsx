@@ -13,17 +13,17 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-interface RaiseRequestProps {
+interface ManageRequestProps {
   user: UserProfile | null;
   requestCatogries: RequestCategory[] | null;
   requestTo: (UserProfile & { role: Role | null })[] | null;
 }
 
-const RaiseRequest = ({
+const ManageRequest = ({
   user,
   requestCatogries,
   requestTo,
-}: RaiseRequestProps) => {
+}: ManageRequestProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -125,4 +125,4 @@ const RaiseRequest = ({
   );
 };
 
-export default RaiseRequest;
+export default ManageRequest;
