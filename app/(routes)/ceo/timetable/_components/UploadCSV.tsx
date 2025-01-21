@@ -48,7 +48,7 @@ export default function UploadTimeTablePage({
     }
   };
 
-  const handleSubmit = async (data: FileUploadFormData) => {
+  const handleSubmit = async () => {
     if (!file) {
       toast.error("Please select a file to upload");
       return;
@@ -59,34 +59,35 @@ export default function UploadTimeTablePage({
     formData.append("file", file);
 
     try {
-      const response = await fetch(
-        `/api/user/${user?.userId}/uploadTimeTable`,
+      const response = await axios.post(
+        `/api/timetable/upload-timeTable`,
+        formData,
         {
-          method: "POST",
-          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      if (result.success) {
+      if (response.data.success) {
         router.refresh();
+        router.push("/ceo/timetable");
         toast.success("Attendance data uploaded successfully");
         setDialogOpen(false);
-        router.push("/ceo/timetable");
       } else {
-        throw new Error(result.error || "Failed to upload attendance data");
+        throw new Error(
+          response.data.error || "Failed to upload attendance data"
+        );
       }
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to upload attendance data"
-      );
+      if (axios.isAxiosError(error)) {
+        toast.error(
+          `Upload failed: ${error.response?.data?.error || error.message}`
+        );
+      } else {
+        toast.error("Failed to upload attendance data");
+      }
     } finally {
       setIsUploading(false);
     }

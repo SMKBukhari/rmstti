@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { TimetableDisplay } from "./TimeTableDisplay";
 import UploadTimeTablePage from "./UploadCSV";
 import { TimeTable, UserProfile } from "@prisma/client";
+import axios from "axios";
 
 interface MagazineTimetableProps {
   user: UserProfile | null;
@@ -71,31 +72,20 @@ export function MagazineTimetable({
     setLoading(true);
     setError("");
     try {
-      const response = await fetch("/api/timetable/generate-timetable", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ startDate: new Date() }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (data.success) {
-        setTimetable(data.timetable);
+      const response = await axios.post('/api/generate-timetable', { startDate: new Date() });
+      
+      if (response.data.success) {
+        setTimetable(response.data.timetable);
       } else {
-        throw new Error(data.error || "Failed to generate timetable");
+        throw new Error(response.data.error || 'Failed to generate timetable');
       }
     } catch (err) {
-      console.error("Error generating timetable:", err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "An error occurred while generating the timetable"
-      );
+      console.error('Error generating timetable:', err);
+      if (axios.isAxiosError(err)) {
+        setError(`Error: ${err.response?.status} - ${err.response?.data?.error || err.message}`);
+      } else {
+        setError("An error occurred while generating the timetable");
+      }
     } finally {
       setLoading(false);
     }
