@@ -66,7 +66,7 @@ export const POST = async (
       ...ceo.map((ceo) => ({
         userId: ceo.userId,
         title: notifcationTitle,
-        message: `Applicant ${applicant.fullName} has been rejected by ${user.userId}.`,
+        message: `Applicant ${applicant.fullName} has been rejected by ${user.fullName}.`,
         createdBy: NotificationCreator.Admin, // Notification from the system.
         senderImage: user.userImage,
         link: `/ceo/interviewees`,
@@ -75,7 +75,7 @@ export const POST = async (
       ...adminExcepThisUser.map((admin) => ({
         userId: admin.userId,
         title: "Interview Scheduled",
-        message: `Applicant ${applicant.fullName} has been rejected by ${user.userId}.`,
+        message: `Applicant ${applicant.fullName} has been rejected by ${user.fullName}.`,
         createdBy: NotificationCreator.Admin, // Notification from the system.
         senderImage: user.userImage,
         link: `/admin/interviewees`,
