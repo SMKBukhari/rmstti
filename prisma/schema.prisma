@@ -235,20 +235,26 @@ model JobApplications {
   appliedDate            DateTime?          @default(now())
   interviewDate          DateTime?
   isInterviewed          Boolean?           @default(false)
-  appearance             String?
-  communication          String?
-  reasoning              String?
+  experience             String?
+  skills                 String?
   education              String?
   jobKnowledge           String?
-  workExperience         String?
   generalKnowledge       String?
-  iq                     String?
-  pose                   String?
-  personality            String?
-  salaryExpectation      String?
+  culturalFit            String?
+  adaptability           String?
+  motivation             String?
+  problemSolving         String?
+  communication          String?
+  teamWork               String?
+  leaderShipPotential    String?
+  professionalism        String?
+  criticalThinking       String?
+  appearance             String?
+  maturity               String?
   strengths              String?
   weaknesses             String?
   remarks                String?
+  salaryExpectation      String?
   interviewerName        String?
   interviewerDesignation String?
   createdAt              DateTime           @default(now())

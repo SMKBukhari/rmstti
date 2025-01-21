@@ -22,6 +22,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ScoreGauge } from "./ScoreGauge";
+import { InterviewMarkingOptions } from "@/lib/data";
 
 interface UserAboutSectionProps {
   user: (UserProfile & { role: Role | null }) | null;
@@ -77,16 +78,22 @@ const UserAboutSection = ({
     resolver: zodResolver(InterviewRatingFormSchema),
     defaultValues: {
       candidateName: applicant?.fullName,
-      personality: "0",
-      appearance: "0",
-      communication: "0",
-      reasoning: "0",
-      education: "0",
-      jobKnowledge: "0",
-      workExperience: "0",
-      generalKnowledge: "0",
-      iq: "0",
-      pose: "0",
+      experience: "N/A",
+      skills: "N/A",
+      education: "N/A",
+      jobKnowledge: "N/A",
+      generalKnowledge: "N/A",
+      culturalFit: "N/A",
+      adaptability: "N/A",
+      motivation: "N/A",
+      problemSolving: "N/A",
+      communication: "N/A",
+      teamWork: "N/A",
+      leaderShipPotential: "N/A",
+      professionalism: "N/A",
+      criticalThinking: "N/A",
+      appearance: "N/A",
+      maturity: "N/A",
       salaryExpectations: "",
       strengths: "",
       weaknesses: "",
@@ -108,26 +115,35 @@ const UserAboutSection = ({
     },
   });
 
+  const criteria = {
+    experience: currentJobApplication?.experience,
+    skills: currentJobApplication?.skills,
+    education: currentJobApplication?.education,
+    jobKnowledge: currentJobApplication?.jobKnowledge,
+    generalKnowledge: currentJobApplication?.generalKnowledge,
+    culturalFit: currentJobApplication?.culturalFit,
+    adaptability: currentJobApplication?.adaptability,
+    motivation: currentJobApplication?.motivation,
+    problemSolving: currentJobApplication?.problemSolving,
+    communication: currentJobApplication?.communication,
+    teamWork: currentJobApplication?.teamWork,
+    leaderShipPotential: currentJobApplication?.leaderShipPotential,
+    professionalism: currentJobApplication?.professionalism,
+    criticalThinking: currentJobApplication?.criticalThinking,
+    appearance: currentJobApplication?.appearance,
+    maturity: currentJobApplication?.maturity,
+  }
+
   const calculateScore = () => {
-    if (!currentJobApplication) return 0;
+    if (!currentJobApplication) return 0
 
-    const obtainedPoints =
-      parseInt(currentJobApplication.appearance || "0") +
-      parseInt(currentJobApplication.communication || "0") +
-      parseInt(currentJobApplication.reasoning || "0") +
-      parseInt(currentJobApplication.education || "0") +
-      parseInt(currentJobApplication.jobKnowledge || "0") +
-      parseInt(currentJobApplication.workExperience || "0") +
-      parseInt(currentJobApplication.generalKnowledge || "0") +
-      parseInt(currentJobApplication.iq || "0") +
-      parseInt(currentJobApplication.pose || "0") +
-      parseInt(currentJobApplication.personality || "0");
+    const validCriteria = Object.values(criteria).filter((value) => value !== "N/A")
 
-    return obtainedPoints;
-  };
+    return validCriteria.reduce((total, value) => total + Number.parseInt(value || "0"), 0)
+  }
 
-  const totalPoints = 40;
-  const score = calculateScore();
+  const score = calculateScore()
+  const totalPoints = Object.values(criteria).filter((value) => value !== "N/A").length * 5
 
   const onJobOfferSubmit = async (data: z.infer<typeof JobOfferSchema>) => {
     try {
@@ -397,124 +413,132 @@ const UserAboutSection = ({
             disabled: true,
           },
           {
-            name: "appearance",
-            label: "Appearance/Mannerism",
+            name: "experience",
+            label: "Experience",
             type: "select",
-            comboboxOptions: [
-              { label: "Poor (0)", value: "0" },
-              { label: "Average (1)", value: "1" },
-              { label: "Good (2)", value: "2" },
-              { label: "V. Good (3)", value: "3" },
-              { label: "Excellent (4)", value: "4" },
-            ],
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
           },
           {
-            name: "communication",
-            label: "Communication/Presentation skills",
+            name: "skills",
+            label: "Skills",
             type: "select",
-            comboboxOptions: [
-              { label: "Poor (0)", value: "0" },
-              { label: "Average (1)", value: "1" },
-              { label: "Good (2)", value: "2" },
-              { label: "V. Good (3)", value: "3" },
-              { label: "Excellent (4)", value: "4" },
-            ],
-          },
-          {
-            name: "reasoning",
-            label: "Reasoning and Judgment",
-            type: "select",
-            comboboxOptions: [
-              { label: "Poor (0)", value: "0" },
-              { label: "Average (1)", value: "1" },
-              { label: "Good (2)", value: "2" },
-              { label: "V. Good (3)", value: "3" },
-              { label: "Excellent (4)", value: "4" },
-            ],
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
           },
           {
             name: "education",
             label: "Education",
             type: "select",
-            comboboxOptions: [
-              { label: "Poor (0)", value: "0" },
-              { label: "Average (1)", value: "1" },
-              { label: "Good (2)", value: "2" },
-              { label: "V. Good (3)", value: "3" },
-              { label: "Excellent (4)", value: "4" },
-            ],
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
           },
           {
             name: "jobKnowledge",
-            label: "Job/Subject Knowledge",
+            label: "Job Knowledge",
             type: "select",
-            comboboxOptions: [
-              { label: "Poor (0)", value: "0" },
-              { label: "Average (1)", value: "1" },
-              { label: "Good (2)", value: "2" },
-              { label: "V. Good (3)", value: "3" },
-              { label: "Excellent (4)", value: "4" },
-            ],
-          },
-          {
-            name: "workExperience",
-            label: "Work Experience",
-            type: "select",
-            comboboxOptions: [
-              { label: "Poor (0)", value: "0" },
-              { label: "Average (1)", value: "1" },
-              { label: "Good (2)", value: "2" },
-              { label: "V. Good (3)", value: "3" },
-              { label: "Excellent (4)", value: "4" },
-            ],
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
           },
           {
             name: "generalKnowledge",
-            label: "General Knowledge",
+            label: "General Knowledge/IQ",
             type: "select",
-            comboboxOptions: [
-              { label: "Poor (0)", value: "0" },
-              { label: "Average (1)", value: "1" },
-              { label: "Good (2)", value: "2" },
-              { label: "V. Good (3)", value: "3" },
-              { label: "Excellent (4)", value: "4" },
-            ],
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
           },
           {
-            name: "iq",
-            label: "I.Q.",
+            name: "culturalFit",
+            label: "Cultural Fit",
             type: "select",
-            comboboxOptions: [
-              { label: "Poor (0)", value: "0" },
-              { label: "Average (1)", value: "1" },
-              { label: "Good (2)", value: "2" },
-              { label: "V. Good (3)", value: "3" },
-              { label: "Excellent (4)", value: "4" },
-            ],
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
           },
           {
-            name: "pose",
-            label: "Pose & Maturity",
+            name: "adaptability",
+            label: "Adaptability",
             type: "select",
-            comboboxOptions: [
-              { label: "Poor (0)", value: "0" },
-              { label: "Average (1)", value: "1" },
-              { label: "Good (2)", value: "2" },
-              { label: "V. Good (3)", value: "3" },
-              { label: "Excellent (4)", value: "4" },
-            ],
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
           },
           {
-            name: "personality",
-            label: "Personality, Attitudes and Social adjustment",
+            name: "motivation",
+            label: "Motivation",
             type: "select",
-            comboboxOptions: [
-              { label: "Poor (0)", value: "0" },
-              { label: "Average (1)", value: "1" },
-              { label: "Good (2)", value: "2" },
-              { label: "V. Good (3)", value: "3" },
-              { label: "Excellent (4)", value: "4" },
-            ],
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "problemSolving",
+            label: "Problem Solving",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "communication",
+            label: "Communication",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "teamWork",
+            label: "Team Work",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "leaderShipPotential",
+            label: "Leadership Potential",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "professionalism",
+            label: "Professionalism",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "criticalThinking",
+            label: "Critical Thinking",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "appearance",
+            label: "Appearance",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "maturity",
+            label: "Maturity",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
           },
           {
             name: "salaryExpectations",

@@ -18,16 +18,22 @@ export type ApplicantsColumns = {
   userImage: string;
   department: string;
   isInterviewed: boolean;
-  appearance: string;
-  communication: string;
-  reasoning: string;
+  experience: string;
+  skills: string;
   education: string;
   jobKnowledge: string;
-  workExperience: string;
   generalKnowledge: string;
-  iq: string;
-  pose: string;
-  personality: string;
+  culturalFit: string;
+  adaptability: string;
+  motivation: string;
+  problemSolving: string;
+  communication: string;
+  teamWork: string;
+  leaderShipPotential: string;
+  professionalism: string;
+  criticalThinking: string;
+  appearance: string;
+  maturity: string;
 };
 
 export const columns: ColumnDef<ApplicantsColumns>[] = [
@@ -39,7 +45,7 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
       return (
         <Avatar className='w-10 h-10'>
           <AvatarImage
-            className='w-full h-full object-cover object-center'
+            className='object-cover object-center w-full h-full'
             src={userImage}
             alt={fullName}
           />
@@ -94,30 +100,52 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
         fullName,
         email,
         isInterviewed,
-        appearance,
-        communication,
-        reasoning,
+        experience,
+        skills,
         education,
         jobKnowledge,
-        workExperience,
         generalKnowledge,
-        iq,
-        pose,
-        personality,
+        culturalFit,
+        adaptability,
+        motivation,
+        problemSolving,
+        communication,
+        teamWork,
+        leaderShipPotential,
+        professionalism,
+        criticalThinking,
+        appearance,
+        maturity,
       } = row.original;
       if (isInterviewed) {
-        const obtainedPoints =
-          parseInt(appearance || "0") +
-          parseInt(communication || "0") +
-          parseInt(reasoning || "0") +
-          parseInt(education || "0") +
-          parseInt(jobKnowledge || "0") +
-          parseInt(workExperience || "0") +
-          parseInt(generalKnowledge || "0") +
-          parseInt(iq || "0") +
-          parseInt(pose || "0") +
-          parseInt(personality || "0");
-        const totalPoints = 40;
+        const criteria = {
+          experience,
+          skills,
+          education,
+          jobKnowledge,
+          generalKnowledge,
+          culturalFit,
+          adaptability,
+          motivation,
+          problemSolving,
+          communication,
+          teamWork,
+          leaderShipPotential,
+          professionalism,
+          criticalThinking,
+          appearance,
+          maturity,
+        };
+
+        const validCriteria = Object.values(criteria).filter(
+          (value) => value !== "N/A"
+        );
+
+        const obtainedPoints = validCriteria.reduce(
+          (total, value) => total + parseInt(value || "0"),
+          0
+        );
+        const totalPoints = validCriteria.length * 5; // Assuming each criterion is out of 5 points
         const percentage = (obtainedPoints / totalPoints) * 100;
 
         return (
@@ -131,7 +159,7 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
             }
               `}
           >
-            {obtainedPoints}
+            {obtainedPoints}/{totalPoints}
           </div>
         );
       }

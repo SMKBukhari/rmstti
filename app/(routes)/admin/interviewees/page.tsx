@@ -52,32 +52,38 @@ const IntervieweePage = async () => {
 
   // Formatting the applicants data for the table
   const formattedApplicants: ApplicantsColumns[] = interviewees.map(
-    (interviewee) => ({
-      user: user,
-      id: interviewee?.user?.userId ?? "N/A",
-      fullName: interviewee.user?.fullName ?? "N/A",
-      email: interviewee.user?.email ?? "N/A",
-      contact: interviewee.user?.contactNumber ?? "N/A",
-      interviewDate: interviewee.interviewDate
-        ? format(new Date(interviewee.interviewDate), "MMMM do, yyyy")
-        : "N/A",
-      resume: interviewee.user?.resumeUrl ?? "N/A",
-      resumeName: interviewee.user?.resumeName ?? "N/A",
-      userImage: interviewee.user?.userImage ?? "N/A",
-      department: interviewee.department ?? "N/A",
-      isInterviewed: interviewee.isInterviewed ?? false,
-      appearance: interviewee.appearance ?? "N/A",
-      communication: interviewee.communication ?? "N/A",
-      reasoning: interviewee.reasoning ?? "N/A",
-      education: interviewee.education ?? "N/A",
-      jobKnowledge: interviewee.jobKnowledge ?? "N/A",
-      workExperience: interviewee.workExperience ?? "N/A",
-      generalKnowledge: interviewee.generalKnowledge ?? "N/A",
-      iq: interviewee.iq ?? "N/A",
-      pose: interviewee.pose ?? "N/A",
-      personality: interviewee.personality ?? "N/A",
-    })
-  );
+      (interviewee) => ({
+        user: user,
+        id: interviewee?.user?.userId ?? "N/A",
+        fullName: interviewee.user?.fullName ?? "N/A",
+        email: interviewee.user?.email ?? "N/A",
+        contact: interviewee.user?.contactNumber ?? "N/A",
+        interviewDate: interviewee.interviewDate
+          ? format(new Date(interviewee.interviewDate), "MMMM do, yyyy")
+          : "N/A",
+        resume: interviewee.user?.resumeUrl ?? "N/A",
+        resumeName: interviewee.user?.resumeName ?? "N/A",
+        userImage: interviewee.user?.userImage ?? "N/A",
+        department: interviewee.department ?? "N/A",
+        isInterviewed: interviewee.isInterviewed ?? false,
+        experience: interviewee.experience ?? "N/A",
+        skills: interviewee.skills ?? "N/A",
+        education: interviewee.education ?? "N/A",
+        jobKnowledge: interviewee.jobKnowledge ?? "N/A",
+        generalKnowledge: interviewee.generalKnowledge ?? "N/A",
+        culturalFit: interviewee.culturalFit ?? "N/A",
+        adaptability: interviewee.adaptability ?? "N/A",
+        motivation: interviewee.motivation ?? "N/A",
+        problemSolving: interviewee.problemSolving ?? "N/A",
+        communication: interviewee.communication ?? "N/A",
+        teamWork: interviewee.teamWork ?? "N/A",
+        leaderShipPotential: interviewee.leaderShipPotential ?? "N/A",
+        professionalism: interviewee.professionalism ?? "N/A",
+        criticalThinking: interviewee.criticalThinking ?? "N/A",
+        appearance: interviewee.appearance ?? "N/A",
+        maturity: interviewee.maturity ?? "N/A",
+      })
+    );
 
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>

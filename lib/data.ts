@@ -50,6 +50,15 @@ export const ExperienceLevels = [
   { label: "Expert", value: "Expert" },
 ];
 
+export const InterviewMarkingOptions = [
+  { label: "N/A", value: "N/A" },
+  { label: "Poor (1)", value: "1" },
+  { label: "Average (2)", value: "2" },
+  { label: "Good (3)", value: "3" },
+  { label: "V. Good (4)", value: "4" },
+  { label: "Excellent (5)", value: "5" },
+];
+
 export const CountryOptions = Country.getAllCountries().map((country) => ({
   label: country.name,
   value: country.isoCode,
@@ -104,7 +113,6 @@ export const requestsTabs = [
     value: "profileUpdateRequests",
   },
 ];
-
 
 export const requestTabsForCEO = [
   {
