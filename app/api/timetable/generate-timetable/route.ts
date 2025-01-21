@@ -8,7 +8,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, timetable })
   } catch (error) {
     console.error("Error generating timetable:", error)
-    return NextResponse.json({ success: false, error: "Failed to generate timetable" }, { status: 500 })
+    return NextResponse.json(
+      { success: false, error: "Failed to generate timetable" },
+      { status: 500 }
+    )
   }
 }
 
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200 });
+}
