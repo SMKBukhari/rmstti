@@ -66,6 +66,7 @@
     "react-icons": "^5.4.0",
     "react-quill": "^2.0.0",
     "react-quill-new": "^3.3.3",
+    "react-to-pdf": "^1.0.1",
     "recharts": "^2.15.0",
     "sonner": "^1.7.1",
     "streamifier": "^0.1.1",
