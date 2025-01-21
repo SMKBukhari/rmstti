@@ -35,12 +35,9 @@ const CellActions = ({ user, id, fullName, email }: CellActionsProps) => {
   const onSubmit = async (data: z.infer<typeof ScheduleInterviewSchema>) => {
     try {
       setIsLoading(true);
-      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-      const localDate = new Date(data.interviewDateTime)
       await axios.post(`/api/user/${user?.userId}/scheduleAnInterview`, {
         applicantId: id,
-        interviewDateTime: localDate.toISOString(),
-        userTimezone,
+        interviewDateTime: data.interviewDateTime,
       });
       toast.success(`Interview scheduled successfully for ${fullName}.`);
       setDialogOpen(false);

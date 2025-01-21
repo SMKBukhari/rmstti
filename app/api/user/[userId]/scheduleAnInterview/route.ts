@@ -1,36 +1,40 @@
-import { db } from "@/lib/db"
-import { compileInterviewScheduledMail, sendMail } from "@/lib/emails/mail"
-import { NotificationCreator, NotificationType } from "@prisma/client"
-import { NextResponse } from "next/server"
+import { db } from "@/lib/db";
+import { compileInterviewScheduledMail, sendMail } from "@/lib/emails/mail";
+import { NotificationCreator, NotificationType } from "@prisma/client";
+import { format } from "date-fns";
+import { NextResponse } from "next/server";
 
-export const POST = async (req: Request, { params }: { params: { userId: string } }) => {
+export const POST = async (
+  req: Request,
+  { params }: { params: { userId: string } }
+) => {
   try {
-    const { userId } = params
-    const { interviewDateTime, applicantId, userTimezone } = await req.json()
+    const { userId } = params;
+    const { interviewDateTime, applicantId } = await req.json();
 
-    const userDate = new Date(interviewDateTime)
-
+    // Get the user profile
     const user = await db.userProfile.findFirst({
       where: { userId: userId },
-    })
+    });
 
     if (!user) {
-      return new NextResponse("User not found", { status: 404 })
+      return new NextResponse("User not found", { status: 404 });
     }
 
     const applicant = await db.userProfile.findFirst({
       where: {
         userId: applicantId,
       },
-    })
+    });
 
     if (!applicant) {
-      return new NextResponse("Applicant not found", { status: 404 })
+      return new NextResponse("Applicant not found", { status: 404 });
     }
 
+    // Find the "Interviewed" status ID
     const applicationStatus = await db.applicationStatus.findFirst({
       where: { name: "Interviewed" },
-    })
+    });
 
     const adminExcepThisUser = await db.userProfile.findMany({
       where: {
@@ -41,7 +45,7 @@ export const POST = async (req: Request, { params }: { params: { userId: string 
           not: user.userId,
         },
       },
-    })
+    });
 
     const ceo = await db.userProfile.findMany({
       where: {
@@ -49,40 +53,29 @@ export const POST = async (req: Request, { params }: { params: { userId: string 
           name: "CEO",
         },
       },
-    })
-
-    const formatDate = (date: Date, timezone: string) => {
-      return date.toLocaleString("en-US", {
-        timeZone: timezone,
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    }
-
-    const formatTime = (date: Date, timezone: string) => {
-      return date.toLocaleString("en-US", {
-        timeZone: timezone,
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      })
-    }
+    });
 
     const notifications = [
       {
         userId: applicant.userId,
         title: "Interview Scheduled",
-        message: `Your interview has been scheduled on ${formatDate(userDate, userTimezone)} at ${formatTime(userDate, userTimezone)}. Please be prepared.`,
-        createdBy: NotificationCreator.Account,
+        message: `Your interview has been scheduled on ${format(
+          new Date(interviewDateTime),
+          "eeee, MMMM do yyyy, h:mm a"
+        )}. Please be prepared.`,
+        createdBy: NotificationCreator.Account, // Notification from the system.
         type: NotificationType.General,
       },
       ...ceo.map((ceo) => ({
         userId: ceo.userId,
         title: "Interview Scheduled",
-        message: `An interview has been scheduled for ${applicant.fullName} on ${formatDate(userDate, userTimezone)} at ${formatTime(userDate, userTimezone)} by ${user.userId}.`,
-        createdBy: NotificationCreator.Admin,
+        message: `An interview has been scheduled for ${
+          applicant.fullName
+        } on ${format(
+          new Date(interviewDateTime),
+          "eeee, MMMM do yyyy, h:mm a"
+        )} by ${user.userId}.`,
+        createdBy: NotificationCreator.Admin, // Notification from the system.
         senderImage: user.userImage,
         link: `/ceo/interviewees`,
         type: NotificationType.General,
@@ -90,22 +83,27 @@ export const POST = async (req: Request, { params }: { params: { userId: string 
       ...adminExcepThisUser.map((admin) => ({
         userId: admin.userId,
         title: "Interview Scheduled",
-        message: `An interview has been scheduled for ${applicant.fullName} on ${formatDate(userDate, userTimezone)} at ${formatTime(userDate, userTimezone)} by ${user.userId}.`,
-        createdBy: NotificationCreator.Admin,
+        message: `An interview has been scheduled for ${
+          applicant.fullName
+        } on ${format(
+          new Date(interviewDateTime),
+          "eeee, MMMM do yyyy, h:mm a"
+        )} by ${user.userId}.`,
+        createdBy: NotificationCreator.Admin, // Notification from the system.
         senderImage: user.userImage,
         link: `/admin/interviewees`,
         type: NotificationType.General,
       })),
-    ]
+    ];
 
     const jobApplication = await db.jobApplications.findFirst({
       where: {
         userId: applicant.userId,
       },
-    })
+    });
 
     if (!jobApplication) {
-      return new NextResponse("Job Application not found", { status: 404 })
+      return new NextResponse("Job Application not found", { status: 404 });
     }
 
     const updatedJobApplication = await db.jobApplications.update({
@@ -113,18 +111,18 @@ export const POST = async (req: Request, { params }: { params: { userId: string 
         id: jobApplication.id,
       },
       data: {
-        interviewDate: userDate,
+        interviewDate: interviewDateTime,
         applicationStatus: {
           connect: {
             id: applicationStatus?.id,
           },
         },
       },
-    })
+    });
 
     await db.notifications.createMany({
       data: notifications,
-    })
+    });
 
     await db.userProfile.update({
       where: {
@@ -143,31 +141,41 @@ export const POST = async (req: Request, { params }: { params: { userId: string 
           },
         },
       },
-    })
+    });
 
-    const interviewDate = formatDate(userDate, userTimezone)
-    const interviewTime = formatTime(userDate, userTimezone)
+    const interviewDate = format(
+      new Date(interviewDateTime),
+      "eeee, MMMM do yyyy"
+    );
+    const interviewTime = format(new Date(interviewDateTime), "h:mm a");
 
     const emailBody = await compileInterviewScheduledMail(
       applicant.fullName,
       interviewDate,
-      interviewTime,
-      userTimezone,
-    )
+      interviewTime
+    );
     const response = await sendMail({
       to: applicant.email,
       subject: "Interview Scheduled (The Truth International)",
       body: emailBody,
-    })
+    });
+
+    // if (!response?.messageId) {
+    //   return NextResponse.json({
+    //     message: "Notifications updated successfully.",
+    //     updatedJobApplication,
+    //   });
+    // } else {
+    //   return new NextResponse("Failed to send email", { status: 500 });
+    // }
 
     return NextResponse.json({
       message: "Interview scheduled successfully.",
       updatedJobApplication,
       response,
-    })
+    });
   } catch (error) {
-    console.error(`SUBMIT_RESUME_POST: ${error}`)
-    return new NextResponse("Internal Server Error", { status: 500 })
+    console.error(`SUBMIT_RESUME_POST: ${error}`);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
-}
-
+};
