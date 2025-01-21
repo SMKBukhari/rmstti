@@ -132,7 +132,8 @@ export const compileApplicationReceivedMail = async (fullName: string) => {
 export const compileInterviewScheduledMail = async (
   fullName: string,
   interviewDate: string,
-  interviewTime: string
+  interviewTime: string,
+  userTimezone: string,
 ) => {
   const template = handlebars.compile(InterviewScheduledMail);
 
@@ -140,6 +141,7 @@ export const compileInterviewScheduledMail = async (
     fullName: fullName,
     interviewDate: interviewDate,
     interviewTime: interviewTime,
+    userTimezone: userTimezone,
   });
 
   return htmlBody;
