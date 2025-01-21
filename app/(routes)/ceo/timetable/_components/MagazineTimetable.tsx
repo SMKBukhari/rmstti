@@ -65,22 +65,52 @@ export function MagazineTimetable({
     }
   }, [initialTimetable]);
 
+  // const handleGenerateTimetable = async () => {
+  //   setLoading(true);
+  //   setError("");
+  //   try {
+  //     const generatedTimetable = await generateTimetable(new Date());
+  //     setTimetable(generatedTimetable);
+  //   } catch (err) {
+  //     setError(
+  //       err instanceof Error
+  //         ? err.message
+  //         : "An error occurred while generating the timetable"
+  //     );
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleGenerateTimetable = async () => {
-    setLoading(true);
-    setError("");
+    setLoading(true)
+    setError("")
     try {
-      const generatedTimetable = await generateTimetable(new Date());
-      setTimetable(generatedTimetable);
+      const response = await fetch("/api/timetable/generate-timetable", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ startDate: new Date() }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      if (data.success) {
+        setTimetable(data.timetable)
+      } else {
+        throw new Error(data.error || "Failed to generate timetable")
+      }
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "An error occurred while generating the timetable"
-      );
+      console.error("Error generating timetable:", err)
+      setError(err instanceof Error ? err.message : "An error occurred while generating the timetable")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>

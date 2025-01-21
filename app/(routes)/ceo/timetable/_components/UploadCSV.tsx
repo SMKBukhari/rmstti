@@ -54,25 +54,39 @@ export default function UploadTimeTablePage({
       return;
     }
 
-    console.log("Uploading file:", file);
-    console.log("Form data:", data);
     setIsUploading(true);
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      await axios.post(`/api/user/${user?.userId}/uploadTimeTable`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      router.refresh();
-      toast.success("Attendance data uploaded successfully");
-      setDialogOpen(false);
-      router.push("/ceo/timetable");
+      const response = await fetch(
+        `/api/user/${user?.userId}/uploadTimeTable`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        router.refresh();
+        toast.success("Attendance data uploaded successfully");
+        setDialogOpen(false);
+        router.push("/ceo/timetable");
+      } else {
+        throw new Error(result.error || "Failed to upload attendance data");
+      }
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error("Failed to upload attendance data");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to upload attendance data"
+      );
     } finally {
       setIsUploading(false);
     }
