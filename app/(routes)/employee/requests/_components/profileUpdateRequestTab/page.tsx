@@ -15,6 +15,9 @@ const ProfileUpdateRequestTab = async () => {
   });
 
   const profileUpdateRequests = await db.profieUpdateRequests.findMany({
+    where: {
+      userId: userId,
+    },
     include: {
       user: true,
     },
