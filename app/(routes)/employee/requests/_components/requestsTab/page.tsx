@@ -35,6 +35,7 @@ const RequestsTabs = async () => {
       ? format(new Date(request.createdAt), "MMMM do, yyyy")
       : "N/A",
     requestMessage: request.requestMessage ?? "N/A",
+    requestTo: request.requestTo,
     status: request.status,
   }));
 
@@ -49,6 +50,9 @@ const RequestsTabs = async () => {
       },
       NOT: {
         userId: user?.userId,
+      },
+      status: {
+        name: "Active",
       },
     },
     include: {

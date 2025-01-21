@@ -93,11 +93,11 @@ export const columns: ColumnDef<ProfileUpdateRequestsColumns>[] = [
       );
     },
   },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const { user, id, status } = row.original;
-      return <CellActions user={user} id={id} status={status} />;
-    },
-  },
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => {
+  //     const { user, id, status } = row.original;
+  //     return <CellActions user={user} id={id} status={status} />;
+  //   },
+  // },
 ];

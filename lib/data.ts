@@ -89,9 +89,9 @@ export const configurationTabs = [
 
 export const requestsTabs = [
   {
-    icon: Users,
-    label: "Profile Update Requests",
-    value: "profileUpdateRequests",
+    icon: FolderOpenDot,
+    label: "Raise Requests",
+    value: "raiseRequests",
   },
   {
     icon: FolderOpen,
@@ -99,11 +99,12 @@ export const requestsTabs = [
     value: "manageRequests",
   },
   {
-    icon: FolderOpenDot,
-    label: "Raise Requests",
-    value: "raiseRequests",
+    icon: Users,
+    label: "Profile Update Requests",
+    value: "profileUpdateRequests",
   },
 ];
+
 
 export const requestTabsForCEO = [
   {

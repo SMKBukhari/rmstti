@@ -16,6 +16,11 @@ const ManageRequestsTabs = async () => {
   });
 
   const requests = await db.requests.findMany({
+    where: {
+      NOT: {
+        userId: user?.userId,
+      },
+    },
     include: {
       user: true,
       RequestCategory: true,
@@ -31,6 +36,7 @@ const ManageRequestsTabs = async () => {
       ? format(new Date(request.createdAt), "MMMM do, yyyy")
       : "N/A",
     requestMessage: request.requestMessage ?? "N/A",
+    requestFrom: request.user.fullName,
     status: request.status,
   }));
 
@@ -38,7 +44,6 @@ const ManageRequestsTabs = async () => {
 
   return (
     <div className='flex-col items-center justify-center flex'>
-
       <div className='mt-6 w-full'>
         <DataTable
           columns={columns}

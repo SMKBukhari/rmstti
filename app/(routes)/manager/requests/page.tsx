@@ -25,7 +25,7 @@ const SettingsPage = async () => {
 
   return (
     <div>
-      <Tabs defaultValue='profileUpdateRequests' className='w-full'>
+      <Tabs defaultValue='raiseRequests' className='w-full'>
         <TabsList className='bg-transparent gap-10'>
           {requestsTabs.map((tab) => (
             <TabsTrigger

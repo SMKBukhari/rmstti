@@ -50,6 +50,9 @@ const RequestsTabs = async () => {
       NOT: {
         userId: user?.userId,
       },
+      status: {
+        name: "Active",
+      }
     },
     include: {
       role: true,

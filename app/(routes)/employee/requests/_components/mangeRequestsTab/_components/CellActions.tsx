@@ -84,9 +84,9 @@ const CellActions = ({ user, id }: CellActionsProps) => {
 
   return (
     <div className='flex gap-3' onClick={handleButtonClick}>
-      <Button variant={"destructive"} onClick={() => setDialogOpen(true)}>
+      {/* <Button variant={"destructive"} onClick={() => setDialogOpen(true)}>
         Delete
-      </Button>
+      </Button> */}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

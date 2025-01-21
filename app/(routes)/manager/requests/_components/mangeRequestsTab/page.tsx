@@ -13,9 +13,15 @@ const ManageRequestsTabs = async () => {
     where: {
       userId: userId,
     },
+    include: {
+      role: true,
+    }
   });
 
   const requests = await db.requests.findMany({
+    where: {
+      requestTo: `${user?.fullName} - ${user?.role?.name}`,
+    },
     include: {
       user: true,
       RequestCategory: true,
@@ -31,6 +37,7 @@ const ManageRequestsTabs = async () => {
       ? format(new Date(request.createdAt), "MMMM do, yyyy")
       : "N/A",
     requestMessage: request.requestMessage ?? "N/A",
+    requestFrom: request.user.fullName,
     status: request.status,
   }));
 

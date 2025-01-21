@@ -88,7 +88,7 @@ const CellActions = ({ user, id }: CellActionsProps) => {
         Delete
       </Button>
 
-      <DropdownMenu>
+      {/* <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button size={"icon"} variant={"ghost"}>
             <MoreHorizontal className='h-4 w-4' />
@@ -135,7 +135,7 @@ const CellActions = ({ user, id }: CellActionsProps) => {
             </Button>
           </DropdownMenuItem>
         </DropdownMenuContent>
-      </DropdownMenu>
+      </DropdownMenu> */}
 
       <DialogForm
         isOpen={isDialogOpen}

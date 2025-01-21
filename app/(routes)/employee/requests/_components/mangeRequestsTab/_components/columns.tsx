@@ -12,6 +12,7 @@ export type RequestsColumns = {
   date: string;
   requestCategory: string;
   requestMessage: string;
+  requestFrom: string;
   status: string;
 };
 
@@ -19,6 +20,10 @@ export const columns: ColumnDef<RequestsColumns>[] = [
   {
     accessorKey: "date",
     header: "Date",
+  },
+  {
+    accessorKey: "requestFrom",
+    header: "Request From",
   },
   {
     accessorKey: "requestCategory",
