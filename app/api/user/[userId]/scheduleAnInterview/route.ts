@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { compileInterviewScheduledMail, sendMail } from "@/lib/emails/mail";
 import { NotificationCreator, NotificationType } from "@prisma/client";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { NextResponse } from "next/server";
 
 export const POST = async (
@@ -11,6 +11,8 @@ export const POST = async (
   try {
     const { userId } = params;
     const { interviewDateTime, applicantId } = await req.json();
+
+    const parsedInterviewDateTime = parseISO(interviewDateTime);
 
     // Get the user profile
     const user = await db.userProfile.findFirst({
@@ -60,7 +62,7 @@ export const POST = async (
         userId: applicant.userId,
         title: "Interview Scheduled",
         message: `Your interview has been scheduled on ${format(
-          new Date(interviewDateTime),
+          parsedInterviewDateTime,
           "eeee, MMMM do yyyy, h:mm a"
         )}. Please be prepared.`,
         createdBy: NotificationCreator.Account, // Notification from the system.
@@ -72,7 +74,7 @@ export const POST = async (
         message: `An interview has been scheduled for ${
           applicant.fullName
         } on ${format(
-          new Date(interviewDateTime),
+          parsedInterviewDateTime,
           "eeee, MMMM do yyyy, h:mm a"
         )} by ${user.userId}.`,
         createdBy: NotificationCreator.Admin, // Notification from the system.
@@ -86,7 +88,7 @@ export const POST = async (
         message: `An interview has been scheduled for ${
           applicant.fullName
         } on ${format(
-          new Date(interviewDateTime),
+          parsedInterviewDateTime,
           "eeee, MMMM do yyyy, h:mm a"
         )} by ${user.userId}.`,
         createdBy: NotificationCreator.Admin, // Notification from the system.
@@ -111,7 +113,7 @@ export const POST = async (
         id: jobApplication.id,
       },
       data: {
-        interviewDate: interviewDateTime,
+        interviewDate: parsedInterviewDateTime,
         applicationStatus: {
           connect: {
             id: applicationStatus?.id,
@@ -143,11 +145,8 @@ export const POST = async (
       },
     });
 
-    const interviewDate = format(
-      new Date(interviewDateTime),
-      "eeee, MMMM do yyyy"
-    );
-    const interviewTime = format(new Date(interviewDateTime), "h:mm a");
+    const interviewDate = format(parsedInterviewDateTime, "eeee, MMMM do yyyy");
+    const interviewTime = format(parsedInterviewDateTime, "h:mm a");
 
     const emailBody = await compileInterviewScheduledMail(
       applicant.fullName,

@@ -35,9 +35,10 @@ const CellActions = ({ user, id, fullName, email }: CellActionsProps) => {
   const onSubmit = async (data: z.infer<typeof ScheduleInterviewSchema>) => {
     try {
       setIsLoading(true);
+      const isoDateTime = data.interviewDateTime.toISOString() // Convert to ISO string
       await axios.post(`/api/user/${user?.userId}/scheduleAnInterview`, {
         applicantId: id,
-        interviewDateTime: data.interviewDateTime,
+        interviewDateTime: isoDateTime,
       });
       toast.success(`Interview scheduled successfully for ${fullName}.`);
       setDialogOpen(false);
