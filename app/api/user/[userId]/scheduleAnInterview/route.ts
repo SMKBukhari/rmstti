@@ -8,8 +8,7 @@ export const POST = async (req: Request, { params }: { params: { userId: string 
     const { userId } = params
     const { interviewDateTime, applicantId, userTimezone } = await req.json()
 
-    const utcDate = new Date(interviewDateTime)
-    const userDate = new Date(utcDate.toLocaleString("en-US", { timeZone: userTimezone }))
+    const userDate = new Date(interviewDateTime)
 
     const user = await db.userProfile.findFirst({
       where: { userId: userId },
@@ -52,41 +51,37 @@ export const POST = async (req: Request, { params }: { params: { userId: string 
       },
     })
 
-    const formatDate = (date: Date) => {
-      const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-      const months = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ]
-      return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()} ${date.getFullYear()}`
+    const formatDate = (date: Date, timezone: string) => {
+      return date.toLocaleString("en-US", {
+        timeZone: timezone,
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
     }
 
-    const formatTime = (date: Date) => {
-      return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })
+    const formatTime = (date: Date, timezone: string) => {
+      return date.toLocaleString("en-US", {
+        timeZone: timezone,
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      })
     }
 
     const notifications = [
       {
         userId: applicant.userId,
         title: "Interview Scheduled",
-        message: `Your interview has been scheduled on ${formatDate(userDate)} at ${formatTime(userDate)}. Please be prepared.`,
+        message: `Your interview has been scheduled on ${formatDate(userDate, userTimezone)} at ${formatTime(userDate, userTimezone)}. Please be prepared.`,
         createdBy: NotificationCreator.Account,
         type: NotificationType.General,
       },
       ...ceo.map((ceo) => ({
         userId: ceo.userId,
         title: "Interview Scheduled",
-        message: `An interview has been scheduled for ${applicant.fullName} on ${formatDate(userDate)} at ${formatTime(userDate)} by ${user.userId}.`,
+        message: `An interview has been scheduled for ${applicant.fullName} on ${formatDate(userDate, userTimezone)} at ${formatTime(userDate, userTimezone)} by ${user.userId}.`,
         createdBy: NotificationCreator.Admin,
         senderImage: user.userImage,
         link: `/ceo/interviewees`,
@@ -95,7 +90,7 @@ export const POST = async (req: Request, { params }: { params: { userId: string 
       ...adminExcepThisUser.map((admin) => ({
         userId: admin.userId,
         title: "Interview Scheduled",
-        message: `An interview has been scheduled for ${applicant.fullName} on ${formatDate(userDate)} at ${formatTime(userDate)} by ${user.userId}.`,
+        message: `An interview has been scheduled for ${applicant.fullName} on ${formatDate(userDate, userTimezone)} at ${formatTime(userDate, userTimezone)} by ${user.userId}.`,
         createdBy: NotificationCreator.Admin,
         senderImage: user.userImage,
         link: `/admin/interviewees`,
@@ -118,7 +113,7 @@ export const POST = async (req: Request, { params }: { params: { userId: string 
         id: jobApplication.id,
       },
       data: {
-        interviewDate: utcDate,
+        interviewDate: userDate,
         applicationStatus: {
           connect: {
             id: applicationStatus?.id,
@@ -150,8 +145,8 @@ export const POST = async (req: Request, { params }: { params: { userId: string 
       },
     })
 
-    const interviewDate = formatDate(userDate)
-    const interviewTime = formatTime(userDate)
+    const interviewDate = formatDate(userDate, userTimezone)
+    const interviewTime = formatTime(userDate, userTimezone)
 
     const emailBody = await compileInterviewScheduledMail(
       applicant.fullName,
