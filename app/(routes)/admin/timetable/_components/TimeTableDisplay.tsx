@@ -2,10 +2,12 @@ import { format, startOfWeek, addDays } from 'date-fns'
 import { TimetableEntry } from '@/actions/timeTableActions'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { TimeTable } from '@prisma/client'
 
 interface TimetableDisplayProps {
-  timetable: TimetableEntry[]
+  timetable: (TimeTable & { fullName: string })[]
 }
+
 
 export function TimetableDisplay({ timetable }: TimetableDisplayProps) {
   const weekStart = startOfWeek(new Date(timetable[0].date), { weekStartsOn: 1 })
@@ -72,3 +74,42 @@ export function TimetableDisplay({ timetable }: TimetableDisplayProps) {
     </div>
   )
 }
+
+// import React from "react"
+// import type { TimeTable } from "@prisma/client"
+// import { format } from "date-fns"
+
+// interface TimetableDisplayProps {
+//   timetable: (TimeTable & { fullName: string })[]
+// }
+
+// export function TimetableDisplay({ timetable }: TimetableDisplayProps) {
+//   return (
+//     <div className="overflow-x-auto">
+//       <table className="min-w-full border-collapse">
+//         <thead className="">
+//           <tr>
+//             <th className="px-4 py-2 text-left border">Date</th>
+//             <th className="px-4 py-2 text-left border">Employee Name</th>
+//             <th className="px-4 py-2 text-left border">Shift Start</th>
+//             <th className="px-4 py-2 text-left border">Shift End</th>
+//             <th className="px-4 py-2 text-left border">Shift Type</th>
+//           </tr>
+//         </thead>
+//         <tbody>
+//           {timetable.map((entry) => (
+//             <tr key={entry.id} className="">
+//               <td className="border px-4 py-2">{format(new Date(entry.date), "yyyy-MM-dd")}</td>
+//               <td className="border px-4 py-2">{entry.fullName}</td>
+//               <td className="border px-4 py-2">{format(new Date(entry.shiftStart), "HH:mm")}</td>
+//               <td className="border px-4 py-2">{format(new Date(entry.shiftEnd), "HH:mm")}</td>
+//               <td className="border px-4 py-2">{entry.shiftType}</td>
+//             </tr>
+//           ))}
+//         </tbody>
+//       </table>
+//     </div>
+//   )
+// }
+
+

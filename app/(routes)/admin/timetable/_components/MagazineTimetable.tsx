@@ -1,12 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  generateTimetable,
-  getTimetable,
-  uploadTimetableFile,
-  TimetableEntry,
-} from "@/actions/timeTableActions";
+import { useState } from "react";
+import { uploadTimetableFile } from "@/actions/timeTableActions";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,43 +12,51 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+// import { Label } from "@/components/ui/label";
 import { TimetableDisplay } from "./TimeTableDisplay";
+import UploadTimeTablePage from "./UploadCSV";
+import { TimeTable, UserProfile } from "@prisma/client";
+import axios from "axios";
 
-export function MagazineTimetable() {
-  const [timetable, setTimetable] = useState<TimetableEntry[]>([]);
+interface MagazineTimetableProps {
+  user: UserProfile | null;
+  timetable: (TimeTable & { fullName: string })[] | null;
+}
+
+export function MagazineTimetable({
+  user,
+  timetable: initialTimetable,
+}: MagazineTimetableProps) {
+  const [timetable, setTimetable] = useState<
+    (TimeTable & { fullName: string })[]
+  >(() => initialTimetable || []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    fetchTimetable();
-  }, []);
-
-  const fetchTimetable = async () => {
-    setLoading(true);
-    try {
-      const fetchedTimetable = await getTimetable();
-      setTimetable(fetchedTimetable);
-    } catch (err) {
-      console.error(`Failed to fetch timetable: ${err}`);
-      setError("Failed to fetch timetable");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleGenerateTimetable = async () => {
     setLoading(true);
     setError("");
     try {
-      const generatedTimetable = await generateTimetable(new Date());
-      setTimetable(generatedTimetable);
+      const response = await axios.post("/api/timetable/generate-timetable", {
+        startDate: new Date(),
+      });
+
+      if (response.data.success) {
+        setTimetable(response.data.timetable);
+      } else {
+        throw new Error(response.data.error || "Failed to generate timetable");
+      }
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "An error occurred while generating the timetable"
-      );
+      console.error("Error generating timetable:", err);
+      if (axios.isAxiosError(err)) {
+        setError(
+          `Error: ${err.response?.status} - ${
+            err.response?.data?.error || err.message
+          }`
+        );
+      } else {
+        setError("An error occurred while generating the timetable");
+      }
     } finally {
       setLoading(false);
     }
@@ -71,18 +74,29 @@ export function MagazineTimetable() {
     setLoading(true);
     setError("");
     try {
-      await uploadTimetableFile(formData);
-      await fetchTimetable();
+      const response = await axios.post("/api/timetable/upload-timetable", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.data.success) {
+        setTimetable(response.data.timetable);
+      } else {
+        throw new Error(response.data.error || "Failed to upload timetable");
+      }
     } catch (err) {
+      console.error("Error uploading timetable:", err);
       setError(
         err instanceof Error
           ? err.message
-          : "An error occurred while uploading the file"
+          : "An error occurred while uploading the timetable"
       );
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <Card className='w-full max-w-4xl mx-auto'>
@@ -98,9 +112,10 @@ export function MagazineTimetable() {
             {loading ? "Generating..." : "Generate Timetable"}
           </Button>
           <div className='flex items-center space-x-2'>
-            <Label htmlFor='file-upload' className='cursor-pointer'>
+            {/* <Label htmlFor='file-upload' className='cursor-pointer'>
               Upload Timetable
-            </Label>
+            </Label> */}
+            {/* <UploadTimeTablePage user={user} /> */}
             <Input
               id='file-upload'
               type='file'

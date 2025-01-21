@@ -1,12 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  generateTimetable,
-  getTimetable,
-  uploadTimetableFile,
-  TimetableEntry,
-} from "@/actions/timeTableActions";
+import { useState } from "react";
+import { uploadTimetableFile } from "@/actions/timeTableActions";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -38,51 +33,27 @@ export function MagazineTimetable({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // const fetchTimetable = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const fetchedTimetable = await getTimetable();
-  //     setTimetable(fetchedTimetable);
-  //   } catch (err) {
-  //     console.error('Error fetching timetable:', err);
-  //     setError('Failed to fetch timetable. Please try again later.');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // const handleGenerateTimetable = async () => {
-  //   setLoading(true);
-  //   setError("");
-  //   try {
-  //     const generatedTimetable = await generateTimetable(new Date());
-  //     setTimetable(generatedTimetable);
-  //   } catch (err) {
-  //     setError(
-  //       err instanceof Error
-  //         ? err.message
-  //         : "An error occurred while generating the timetable"
-  //     );
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const handleGenerateTimetable = async () => {
     setLoading(true);
     setError("");
     try {
-      const response = await axios.post('/api/timetable/generate-timetable', { startDate: new Date() });
-      
+      const response = await axios.post("/api/timetable/generate-timetable", {
+        startDate: new Date(),
+      });
+
       if (response.data.success) {
         setTimetable(response.data.timetable);
       } else {
-        throw new Error(response.data.error || 'Failed to generate timetable');
+        throw new Error(response.data.error || "Failed to generate timetable");
       }
     } catch (err) {
-      console.error('Error generating timetable:', err);
+      console.error("Error generating timetable:", err);
       if (axios.isAxiosError(err)) {
-        setError(`Error: ${err.response?.status} - ${err.response?.data?.error || err.message}`);
+        setError(
+          `Error: ${err.response?.status} - ${
+            err.response?.data?.error || err.message
+          }`
+        );
       } else {
         setError("An error occurred while generating the timetable");
       }
@@ -103,18 +74,29 @@ export function MagazineTimetable({
     setLoading(true);
     setError("");
     try {
-      await uploadTimetableFile(formData);
-      // await fetchTimetable();
+      const response = await axios.post("/api/timetable/upload-timetable", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.data.success) {
+        setTimetable(response.data.timetable);
+      } else {
+        throw new Error(response.data.error || "Failed to upload timetable");
+      }
     } catch (err) {
+      console.error("Error uploading timetable:", err);
       setError(
         err instanceof Error
           ? err.message
-          : "An error occurred while uploading the file"
+          : "An error occurred while uploading the timetable"
       );
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <Card className='w-full max-w-4xl mx-auto'>
@@ -133,7 +115,7 @@ export function MagazineTimetable({
             {/* <Label htmlFor='file-upload' className='cursor-pointer'>
               Upload Timetable
             </Label> */}
-            <UploadTimeTablePage user={user} />
+            {/* <UploadTimeTablePage user={user} /> */}
             <Input
               id='file-upload'
               type='file'
