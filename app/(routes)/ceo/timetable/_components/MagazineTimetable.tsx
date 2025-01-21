@@ -50,17 +50,6 @@ export function MagazineTimetable({
   //   }
   // };
 
-  useEffect(() => {
-    if (initialTimetable) {
-      setTimetable(
-        initialTimetable.map((entry) => ({
-          ...entry,
-          fullName: "Unknown",
-        }))
-      );
-    }
-  }, [initialTimetable]);
-
   // const handleGenerateTimetable = async () => {
   //   setLoading(true);
   //   setError("");
