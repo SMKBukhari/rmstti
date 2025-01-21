@@ -72,7 +72,7 @@ export function MagazineTimetable({
     setLoading(true);
     setError("");
     try {
-      const response = await axios.post('/api/generate-timetable', { startDate: new Date() });
+      const response = await axios.post('/api/timetable/generate-timetable', { startDate: new Date() });
       
       if (response.data.success) {
         setTimetable(response.data.timetable);
