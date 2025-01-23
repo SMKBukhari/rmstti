@@ -17,6 +17,7 @@ import {
   LayoutDashboard,
   List,
   Lock,
+  Mailbox,
   NotebookText,
   NotepadTextDashed,
   Settings,
@@ -124,6 +125,19 @@ export const requestTabsForCEO = [
     icon: FolderOpen,
     label: "Manage Requests",
     value: "manageRequests",
+  },
+];
+
+export const complaintsTabs = [
+  {
+    icon: FolderOpenDot,
+    label: "Raise Complaints",
+    value: "raiseComplaints",
+  },
+  {
+    icon: FolderOpen,
+    label: "Manage Complaints",
+    value: "manageComplaints",
   },
 ];
 
@@ -250,6 +264,11 @@ export const adminRoutes = [
     href: "/admin/requests",
   },
   {
+    icon: Mailbox,
+    label: "Complaints",
+    href: "/admin/complaints",
+  },
+  {
     icon: User,
     label: "Profile",
     href: "/profile",
@@ -297,6 +316,11 @@ export const employeeRoutes = [
     icon: FolderOpenDot,
     label: "Requests",
     href: "/employee/requests",
+  },
+  {
+    icon: Mailbox,
+    label: "Complaints",
+    href: "/employee/complaints",
   },
   {
     icon: User,
@@ -382,6 +406,11 @@ export const managerRoutes = [
     href: "/manager/requests",
   },
   {
+    icon: Mailbox,
+    label: "Complaints",
+    href: "/manager/complaints",
+  },
+  {
     icon: User,
     label: "Profile",
     href: "/profile",
@@ -454,6 +483,11 @@ export const ceoRoutes = [
     icon: FolderOpenDot,
     label: "Requests",
     href: "/ceo/requests",
+  },
+  {
+    icon: Mailbox,
+    label: "Complaints",
+    href: "/ceo/complaints",
   },
   {
     icon: User,

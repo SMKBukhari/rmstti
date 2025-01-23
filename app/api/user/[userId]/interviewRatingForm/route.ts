@@ -9,7 +9,6 @@ export const POST = async (
     const { userId } = params;
     const {
       id,
-      interviewDate,
       experience,
       skills,
       education,
@@ -68,7 +67,6 @@ export const POST = async (
         id: jobApplication.id,
       },
       data: {
-        interviewDate,
         isInterviewed: true,
         experience,
         skills,

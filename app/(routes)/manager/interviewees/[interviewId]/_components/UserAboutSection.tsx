@@ -53,7 +53,7 @@ const UserAboutSection = ({
 
   useEffect(() => {
     if (applicant?.isHired) {
-      router.push("/admin/interviewees");
+      router.push("/manager/interviewees");
     }
   }, [applicant, router]);
 
@@ -78,27 +78,27 @@ const UserAboutSection = ({
     resolver: zodResolver(InterviewRatingFormSchema),
     defaultValues: {
       candidateName: applicant?.fullName,
-      experience: "N/A",
-      skills: "N/A",
-      education: "N/A",
-      jobKnowledge: "N/A",
-      generalKnowledge: "N/A",
-      culturalFit: "N/A",
-      adaptability: "N/A",
-      motivation: "N/A",
-      problemSolving: "N/A",
-      communication: "N/A",
-      teamWork: "N/A",
-      leaderShipPotential: "N/A",
-      professionalism: "N/A",
-      criticalThinking: "N/A",
-      appearance: "N/A",
-      maturity: "N/A",
-      salaryExpectations: "",
-      strengths: "",
-      weaknesses: "",
-      remarks: "",
-      interviewDate: new Date(),
+      experience: currentJobApplication?.experience || "N/A",
+      skills: currentJobApplication?.skills || "N/A",
+      education: currentJobApplication?.education || "N/A",
+      jobKnowledge: currentJobApplication?.jobKnowledge || "N/A",
+      generalKnowledge: currentJobApplication?.generalKnowledge || "N/A",
+      culturalFit: currentJobApplication?.culturalFit || "N/A",
+      adaptability: currentJobApplication?.adaptability || "N/A",
+      motivation: currentJobApplication?.motivation || "N/A",
+      problemSolving: currentJobApplication?.problemSolving || "N/A",
+      communication: currentJobApplication?.communication || "N/A",
+      teamWork: currentJobApplication?.teamWork || "N/A",
+      leaderShipPotential: currentJobApplication?.leaderShipPotential || "N/A",
+      professionalism: currentJobApplication?.professionalism || "N/A",
+      criticalThinking: currentJobApplication?.criticalThinking || "N/A",
+      appearance: currentJobApplication?.appearance || "N/A",
+      maturity: currentJobApplication?.maturity || "N/A",
+      salaryExpectations: currentJobApplication?.salaryExpectation || "",
+      strengths: currentJobApplication?.strengths || "",
+      weaknesses: currentJobApplication?.weaknesses || "",
+      remarks: currentJobApplication?.remarks || "",
+      interviewDate: currentJobApplication?.interviewDate || new Date(),
       positionApplied: currentJobApplication?.department || "IT Department",
       interviewerName: user?.fullName || "",
       interviewerDesignation: user?.role?.name || "",
@@ -132,18 +132,24 @@ const UserAboutSection = ({
     criticalThinking: currentJobApplication?.criticalThinking,
     appearance: currentJobApplication?.appearance,
     maturity: currentJobApplication?.maturity,
-  }
+  };
 
   const calculateScore = () => {
-    if (!currentJobApplication) return 0
+    if (!currentJobApplication) return 0;
 
-    const validCriteria = Object.values(criteria).filter((value) => value !== "N/A")
+    const validCriteria = Object.values(criteria).filter(
+      (value) => value !== "N/A"
+    );
 
-    return validCriteria.reduce((total, value) => total + Number.parseInt(value || "0"), 0)
-  }
+    return validCriteria.reduce(
+      (total, value) => total + Number.parseInt(value || "0"),
+      0
+    );
+  };
 
-  const score = calculateScore()
-  const totalPoints = Object.values(criteria).filter((value) => value !== "N/A").length * 5
+  const score = calculateScore();
+  const totalPoints =
+    Object.values(criteria).filter((value) => value !== "N/A").length * 5;
 
   const onJobOfferSubmit = async (data: z.infer<typeof JobOfferSchema>) => {
     try {
@@ -173,7 +179,7 @@ const UserAboutSection = ({
   const onSubmit = async (data: z.infer<typeof InterviewRatingFormSchema>) => {
     try {
       setIsLoading(true);
-      await axios.post(`/api/user/${user?.userId}/scheduleAnInterview`, {
+      await axios.post(`/api/user/${user?.userId}/interviewRatingForm`, {
         id: applicant?.userId,
         ...data,
       });

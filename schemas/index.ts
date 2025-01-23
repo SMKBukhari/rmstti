@@ -173,8 +173,8 @@ export const InterviewRatingFormSchema = z.object({
   candidateName: z.string().min(1, "Candidate name is required"),
   interviewDate: z.date(),
   positionApplied: z.string().min(1, "Position applied is required"),
-  experience: z.string().min(1, "Experience rating is required"),     
-  skills: z.string().min(1, "Skills rating is required"),          
+  experience: z.string().min(1, "Experience rating is required"),
+  skills: z.string().min(1, "Skills rating is required"),
   education: z.string().min(1, "Education rating is required"),
   jobKnowledge: z.string().min(1, "Job Knowledge rating is required"),
   generalKnowledge: z.string().min(1, "General Knowledge rating is required"),
@@ -184,7 +184,9 @@ export const InterviewRatingFormSchema = z.object({
   problemSolving: z.string().min(1, "Problem Solving rating is required"),
   communication: z.string().min(1, "Communication rating is required"),
   teamWork: z.string().min(1, "Team Work rating is required"),
-  leaderShipPotential: z.string().min(1, "Leadership Potential rating is required"),
+  leaderShipPotential: z
+    .string()
+    .min(1, "Leadership Potential rating is required"),
   professionalism: z.string().min(1, "Professionalism rating is required"),
   criticalThinking: z.string().min(1, "Critical Thinking rating is required"),
   appearance: z.string().min(1, "Appearance rating is required"),
@@ -294,4 +296,10 @@ export const RequestsSchema = z.object({
   requestTo: z.string(),
   category: z.string(),
   requestMessage: z.string(),
+});
+
+export const RaiseComplaintSchema = z.object({
+  complaintTitle: z.string(),
+  complaintTo: z.string(),
+  complaintMessage: z.string(),
 });
