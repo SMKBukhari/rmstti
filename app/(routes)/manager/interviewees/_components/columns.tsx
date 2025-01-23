@@ -15,6 +15,7 @@ export type ApplicantsColumns = {
   email: string;
   contact: string;
   interviewDate: string;
+  interviewTime: string;
   userImage: string;
   department: string;
   isInterviewed: boolean;
@@ -89,6 +90,10 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
         </Button>
       );
     },
+  },
+  {
+    accessorKey: "interviewTime",
+    header: "Interview Time",
   },
   {
     id: "actions",

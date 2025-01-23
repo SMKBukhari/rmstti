@@ -85,6 +85,7 @@ model UserProfile {
   updatedAt               DateTime               @default(now())
   Requests                Requests[]
   ProfieUpdateRequests    ProfieUpdateRequests[]
+  Complaints              Complaints[]
 }
 
 model ProfieUpdateRequests {
@@ -433,6 +434,19 @@ model RequestCategory {
   requests  Requests[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @default(now())
+}
+
+model Complaints {
+  id          String      @id @unique @default(cuid())
+  userId      String
+  user        UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  title       String
+  message     String      @db.LongText
+  isAnonymous Boolean?    @default(false)
+  complaintTo String?
+  status      String      @default("Pending")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now())
 }
 
 enum Gender {

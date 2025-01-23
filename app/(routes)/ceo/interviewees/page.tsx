@@ -61,6 +61,9 @@ const IntervieweePage = async () => {
       interviewDate: interviewee.interviewDate
         ? format(new Date(interviewee.interviewDate), "MMMM do, yyyy")
         : "N/A",
+      interviewTime: interviewee.interviewDate
+        ? format(new Date(interviewee.interviewDate), "h:mm a")
+        : "N/A",
       resume: interviewee.user?.resumeUrl ?? "N/A",
       resumeName: interviewee.user?.resumeName ?? "N/A",
       userImage: interviewee.user?.userImage ?? "N/A",
