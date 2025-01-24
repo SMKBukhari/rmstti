@@ -27,7 +27,7 @@ const JobListings = ({ jobs }: JobListing) => {
             career.
           </p>
         </motion.div>
-        {jobs && jobs.length > 0 ? (
+        {jobs ? (
           <AnimatePresence>
             <motion.div
               {...fadeInOut}
@@ -42,7 +42,7 @@ const JobListings = ({ jobs }: JobListing) => {
             </motion.div>
           </AnimatePresence>
         ) : (
-          <p>Jobs not available at this time</p>
+          <p className="flex items-center justify-center">Jobs not available at this time</p>
         )}
       </div>
     </section>
