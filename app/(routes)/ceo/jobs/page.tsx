@@ -50,7 +50,12 @@ const JobsPage = async () => {
         <DataTable
           columns={columns}
           data={formatedJobs}
-          searchKey='title'
+          filterableColumns={[
+            {
+              id: "title",
+              title: "Title",
+            },
+          ]}
           routePrefix='ceo/jobs'
         />
       </div>
