@@ -38,7 +38,11 @@ const page = async () => {
     },
   });
 
-  const jobs = await db.job.findMany();
+  const jobs = await db.job.findMany({
+    where: {
+      isPusblished: true,
+    }
+  });
   const departments = await db.department.findMany();
 
   if (user?.isVerified === false) {
