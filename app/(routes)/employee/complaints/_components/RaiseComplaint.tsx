@@ -27,21 +27,22 @@ const RaiseComplaint = ({ user, complaintTo }: RaiseComplaintProps) => {
   const form = useForm<z.infer<typeof RaiseComplaintSchema>>({
     resolver: zodResolver(RaiseComplaintSchema),
     defaultValues: {
-      complaintTitle: "",
+      title: "",
+      message: "",
       complaintTo: "",
-      complaintMessage: "",
+      isAnonymous: false,
     },
   });
 
   const onSubmit = async (data: z.infer<typeof RaiseComplaintSchema>) => {
     try {
       setIsLoading(true);
-      await axios.post(`/api/user/${user?.userId}/requests`, {
+      await axios.post(`/api/user/${user?.userId}/complaint`, {
         ...data,
       });
       console.log(data);
       toast.success(
-        `Your request for ${data.complaintTitle} sent successfully. Wait for the response.`
+        "Complaint raised successfully. You will be notified once it is resolved."
       );
       setDialogOpen(false);
       setIsLoading(false);
@@ -75,7 +76,7 @@ const RaiseComplaint = ({ user, complaintTo }: RaiseComplaintProps) => {
         fields={[
           {
             label: "Title",
-            name: "complaintTitle",
+            name: "title",
             type: "input",
           },
           {
@@ -90,8 +91,13 @@ const RaiseComplaint = ({ user, complaintTo }: RaiseComplaintProps) => {
               : [],
           },
           {
+            label: "Is Anonymous",
+            name: "isAnonymous",
+            type: "checkbox",
+          },
+          {
             label: "Complaint Message",
-            name: "complaintMessage",
+            name: "message",
             type: "richtextarea",
           },
         ]}

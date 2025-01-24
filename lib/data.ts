@@ -141,6 +141,14 @@ export const complaintsTabs = [
   },
 ];
 
+export const compaintsCEO = [
+  {
+    icon: FolderOpen,
+    label: "Manage Complaints",
+    value: "manageComplaints",
+  },
+];
+
 const notificationRoute = {
   icon: Bell, // Use the appropriate icon for notifications
   label: "Notifications",

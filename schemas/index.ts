@@ -299,7 +299,8 @@ export const RequestsSchema = z.object({
 });
 
 export const RaiseComplaintSchema = z.object({
-  complaintTitle: z.string(),
+  title: z.string(),
   complaintTo: z.string(),
-  complaintMessage: z.string(),
+  message: z.string(),
+  isAnonymous: z.boolean(),
 });

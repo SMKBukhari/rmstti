@@ -45,12 +45,12 @@ const UserPopover = ({ userProfile }: UserPopoverProps) => {
       <div className='flex gap-2 items-center'>
         {userProfile?.userImage ? (
           <Avatar>
-            <AvatarImage src={userProfile.userImage} />
+            <AvatarImage className="w-full object-cover object-center" src={userProfile.userImage} />
             <AvatarFallback>{avatarFallback}</AvatarFallback>
           </Avatar>
         ) : (
           <Avatar>
-            <AvatarImage src={userImage()} />
+            <AvatarImage className="w-full object-cover object-center" src={userImage()} />
             <AvatarFallback>{avatarFallback}</AvatarFallback>
           </Avatar>
         )}

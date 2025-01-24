@@ -36,6 +36,8 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { TimePicker12 } from "@/components/TimePicker12Hours";
 import Editor from "./Editor";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 interface Field<T extends FieldValues> {
   name: Path<T>;
@@ -49,6 +51,7 @@ interface Field<T extends FieldValues> {
     | "datetime"
     | "date"
     | "switchButton"
+    | "checkbox"
     | "file";
   comboboxOptions?: { label: string; value: string }[];
   heading?: string;
@@ -109,7 +112,9 @@ const DialogForm = <T extends FieldValues>({
                   name={field.name}
                   render={({ field: innerField }) => (
                     <FormItem>
-                      {field.label && <FormLabel>{field.label}</FormLabel>}
+                      {field.label && field.type !== "checkbox" && (
+                        <FormLabel>{field.label}</FormLabel>
+                      )}
                       <>
                         {/* Handling different field types separately */}
                         {field.type === "datetime" && (
@@ -236,6 +241,16 @@ const DialogForm = <T extends FieldValues>({
                               </span>
                             </div>
                           </FormControl>
+                        )}
+                        {field.type === "checkbox" && (
+                          <div className='flex items-center space-x-2'>
+                            <Checkbox
+                              checked={innerField.value}
+                              onCheckedChange={innerField.onChange}
+                              disabled={field.disabled || isSubmitting}
+                            />
+                            <Label>{field.label}</Label>
+                          </div>
                         )}
                         {field.type === "date" && (
                           <FormControl>

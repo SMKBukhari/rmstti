@@ -3,10 +3,10 @@ import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { DataTable } from "@/components/ui/data-table";
 import { format } from "date-fns";
-import { columns, RequestsColumns } from "./_components/columns";
+import { columns, ComplaintsColumns } from "./_components/columns";
 import RaiseComplaint from "./_components/RaiseComplaint";
 
-const RequestsTabs = async () => {
+const RaiseComplaintTab = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
 
@@ -26,7 +26,7 @@ const RequestsTabs = async () => {
   });
 
   // Formatting the applicants data for the table
-  const formattedRequests: RequestsColumns[] = requests.map((request) => ({
+  const formattedRequests: ComplaintsColumns[] = requests.map((request) => ({
     user: user,
     id: request.id,
     date: request.createdAt
@@ -71,17 +71,10 @@ const RequestsTabs = async () => {
         <DataTable
           columns={columns}
           data={formattedRequests}
-          filterableColumns={[
-            {
-              id: "requestCategory",
-              title: "Request Category",
-              options: requestsCategories.map((category) => category.name),
-            },
-          ]}
         />
       </div>
     </div>
   );
 };
 
-export default RequestsTabs;
+export default RaiseComplaintTab;
