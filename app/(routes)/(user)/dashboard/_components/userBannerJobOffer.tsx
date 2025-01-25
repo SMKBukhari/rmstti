@@ -39,6 +39,8 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
       designation: user?.designationOffered || "",
       salary: user?.salaryOffered || "",
       role: user?.roleOffered || "",
+      acceptPrivacyPolicy: false,
+      acceptTerms: false,
     },
   });
 
@@ -91,9 +93,9 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
               className='p-0 mx-0.5'
               onClick={openDialog}
             >
-              Submit
+              Confirm
             </Button>{" "}
-            your application to confirm your acceptance.
+            your acceptance.
           </>
         }
         variant='success'
@@ -108,6 +110,7 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
         onOpenChange={setIsDialogOpen}
         title='Accept Job Offer'
         description='Again recheck the details before submitting the application.'
+        isSteps
         fields={[
           {
             name: "joiningDate",
@@ -154,6 +157,61 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
         ]}
         onSubmit={onSubmit}
         form={form}
+        accordionContent={[
+          {
+            title: "Privacy Policy",
+            content: `
+              <h3>Privacy Policy</h3>
+              <p>This privacy policy sets out how our company uses and protects any information that you give us when you use this website.</p>
+              <ul>
+                <li>We are committed to ensuring that your privacy is protected.</li>
+                <li>We may collect the following information: name, contact information including email address, demographic information such as postcode, preferences and interests.</li>
+                <li>We require this information to understand your needs and provide you with a better service.</li>
+              </ul>
+            `,
+            fields: [
+              {
+                name: "acceptPrivacyPolicy",
+                type: "checkbox",
+                label: "I accept the privacy policy",
+              },
+            ],
+          },
+          {
+            title: "Job Offer Details",
+            content: `
+              <h3>Job Offer Details</h3>
+              <p>Please review the following details of your job offer:</p>
+              <ul>
+                <li>Position: ${user?.designationOffered}</li>
+                <li>Department: ${user?.departmentOffered}</li>
+                <li>Salary: ${user?.salaryOffered}/month</li>
+                <li>Start Date: To be determined</li>
+              </ul>
+              <p>If you have any questions about these details, please contact HR before accepting the offer.</p>
+            `,
+          },
+          {
+            title: "Terms and Conditions",
+            content: `
+              <h3>Terms and Conditions</h3>
+              <p>By accepting this job offer, you agree to the following terms and conditions:</p>
+              <ol>
+                <li>You will comply with all company policies and procedures.</li>
+                <li>You agree to maintain confidentiality regarding company information.</li>
+                <li>Your employment is subject to a probationary period as specified in your contract.</li>
+                <li>You agree to the working hours and responsibilities outlined in your job description.</li>
+              </ol>
+            `,
+            fields: [
+              {
+                name: "acceptTerms",
+                type: "checkbox",
+                label: "I accept the terms and conditions",
+              },
+            ],
+          },
+        ]}
       />
     </div>
   );

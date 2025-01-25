@@ -1,22 +1,22 @@
-import { db } from "@/lib/db";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import React from "react";
-import UserBannerSuccess from "./_components/userBannerSuccess";
-import UserBannerWarning from "./_components/userBannerWarning";
-import ApplicantBanner from "./_components/applicantBanner";
-import ApplicantInterviewBanner from "./_components/applicantInterviewDateBanner";
-import UserBannerWarningRejected from "./_components/userBannerWarningRejected";
-import UserBannerJobOffer from "./_components/userBannerJobOffer";
-import JobCardItem from "@/components/LandingPage/JobCardItem";
-import UserBannerInterviewSuccess from "./_components/userBannerInterviewSuccessFull";
+import { db } from "@/lib/db"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
+import React from "react"
+import UserBannerSuccess from "./_components/userBannerSuccess"
+import UserBannerWarning from "./_components/userBannerWarning"
+import ApplicantBanner from "./_components/applicantBanner"
+import ApplicantInterviewBanner from "./_components/applicantInterviewDateBanner"
+import UserBannerWarningRejected from "./_components/userBannerWarningRejected"
+import UserBannerJobOffer from "./_components/userBannerJobOffer"
+import JobCardItem from "@/components/LandingPage/JobCardItem"
+import UserBannerInterviewSuccess from "./_components/userBannerInterviewSuccessFull"
 
 const page = async () => {
-  const cookieStore = cookies();
-  const userId = (await cookieStore).get("userId")?.value;
+  const cookieStore = cookies()
+  const userId = (await cookieStore).get("userId")?.value
 
   if (!userId) {
-    redirect("/signIn");
+    redirect("/signIn")
   }
 
   const user = await db.userProfile.findUnique({
@@ -31,23 +31,23 @@ const page = async () => {
       role: true,
       JobApplications: true,
     },
-  });
+  })
 
   const jobApplications = await db.jobApplications.findMany({
     where: {
       id: user?.currentJobApplicationId || "",
     },
-  });
+  })
 
   const jobs = await db.job.findMany({
     where: {
       isPusblished: true,
     },
-  });
-  const departments = await db.department.findMany();
+  })
+  const departments = await db.department.findMany()
 
   if (user?.isVerified === false) {
-    redirect(`/verify/${userId}`);
+    redirect(`/verify/${userId}`)
   }
 
   const requiredFieldsForApply = [
@@ -59,23 +59,23 @@ const page = async () => {
     user?.jobExperience,
     user?.education.length,
     user?.resumeUrl,
-  ];
+  ]
 
-  const userRole = user?.role?.name === "User";
-  const applicantRole = user?.role?.name === "Applicant";
-  const intervieweeRole = user?.role?.name === "Interviewee";
+  const userRole = user?.role?.name === "User"
+  const applicantRole = user?.role?.name === "Applicant"
+  const intervieweeRole = user?.role?.name === "Interviewee"
 
-  const totalFields = requiredFieldsForApply.length;
-  const completedFields = requiredFieldsForApply.filter(Boolean).length;
-  const isComplete = requiredFieldsForApply.every(Boolean);
+  const totalFields = requiredFieldsForApply.length
+  const completedFields = requiredFieldsForApply.filter(Boolean).length
+  const isComplete = requiredFieldsForApply.every(Boolean)
 
-  const interviewDateTime = jobApplications[0]?.interviewDate;
+  const interviewDateTime = jobApplications[0]?.interviewDate
 
-  const isRejected = user?.applicationStatus?.name === "Rejected";
-  const isOffered = user?.applicationStatus?.name === "Offered";
-  const isHired = user?.applicationStatus?.name === "Hired";
+  const isRejected = user?.applicationStatus?.name === "Rejected"
+  const isOffered = user?.applicationStatus?.name === "Offered"
+  const isHired = user?.applicationStatus?.name === "Hired"
 
-  const isInterviewed = user?.JobApplications[0].isInterviewed === true;
+  const isInterviewed = user?.JobApplications[0]?.isInterviewed === true
 
   return (
     <div>
@@ -85,16 +85,9 @@ const page = async () => {
         !isHired &&
         !intervieweeRole &&
         (isComplete ? (
-          <UserBannerSuccess
-            label='Submit'
-            user={user}
-            department={departments}
-          />
+          <UserBannerSuccess label="Submit" user={user} department={departments} />
         ) : (
-          <UserBannerWarning
-            completedFields={completedFields}
-            totalFields={totalFields}
-          />
+          <UserBannerWarning completedFields={completedFields} totalFields={totalFields} />
         ))}
 
       {applicantRole && <ApplicantBanner />}
@@ -104,25 +97,17 @@ const page = async () => {
 
       {userRole && isRejected && <UserBannerWarningRejected />}
 
-      {isInterviewed && !isOffered && !isHired && (
-        <UserBannerInterviewSuccess />
-      )}
+      {isInterviewed && !isOffered && !isHired && <UserBannerInterviewSuccess />}
 
-      {intervieweeRole && isOffered && (
-        <UserBannerJobOffer label='Submit' user={user} />
-      )}
-      <div className='mt-10 grid gap-8 sm:grid-cols-1 grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
+      {intervieweeRole && isOffered && <UserBannerJobOffer label="Submit" user={user} />}
+      <div className="mt-10 grid gap-8 sm:grid-cols-1 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {jobs?.map((job) => (
-          <JobCardItem
-            key={job.id}
-            job={job}
-            isComplete={isComplete}
-            userProfile={user}
-          />
+          <JobCardItem key={job.id} job={job} isComplete={isComplete} userProfile={user} />
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default page;
+export default page
+

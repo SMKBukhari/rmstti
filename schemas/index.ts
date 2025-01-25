@@ -214,6 +214,8 @@ export const JobOfferAcceptanceSchema = z.object({
   designation: z.string(),
   department: z.string(),
   role: z.string(),
+  acceptPrivacyPolicy: z.boolean(),
+  acceptTerms: z.boolean(),
 });
 
 export const LeaveRequestSchema = z.object({

@@ -38,6 +38,12 @@ import { TimePicker12 } from "@/components/TimePicker12Hours";
 import Editor from "./Editor";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./ui/accordion";
 
 interface Field<T extends FieldValues> {
   name: Path<T>;
@@ -60,6 +66,12 @@ interface Field<T extends FieldValues> {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
+interface AccordionContentItem<T extends FieldValues> {
+  title: string;
+  content: string;
+  fields?: Field<T>[];
+}
+
 interface ButtonConfig {
   label: string;
   onClick?: () => void;
@@ -77,8 +89,10 @@ interface DialogFormProps<T extends FieldValues> {
   fields: Field<T>[];
   buttons: ButtonConfig[];
   onSubmit: (data: T) => void;
+  isSteps?: boolean;
   form: UseFormReturn<T>; // Pass the form instance
   isSubmitting?: boolean; // For form loading state
+  accordionContent?: AccordionContentItem<T>[];
 }
 
 const DialogForm = <T extends FieldValues>({
@@ -90,8 +104,40 @@ const DialogForm = <T extends FieldValues>({
   buttons,
   onSubmit,
   form,
+  isSteps,
   isSubmitting,
+  accordionContent,
 }: DialogFormProps<T>) => {
+  const renderField = (field: Field<T>) => {
+    const innerField = form.register(field.name);
+
+    switch (field.type) {
+      case "checkbox":
+        return (
+          <div className='flex items-center space-x-2'>
+            <Checkbox
+              id={field.name}
+              {...innerField}
+              onCheckedChange={(checked) => {
+                form.setValue(field.name, checked);
+              }}
+            />
+            <Label htmlFor={field.name}>{field.label}</Label>
+          </div>
+        );
+      case "input":
+        return (
+          <Input
+            {...innerField}
+            placeholder={field.placeholder}
+            disabled={field.disabled || isSubmitting}
+          />
+        );
+      // Add cases for other field types as needed
+      default:
+        return null;
+    }
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className='max-h-[90vh] overflow-auto'>
@@ -279,6 +325,42 @@ const DialogForm = <T extends FieldValues>({
                   )}
                 />
               ))}
+              {isSteps && accordionContent && (
+                <div className='text-muted-foreground'>
+                  <Accordion type='single' collapsible className='w-full'>
+                    {accordionContent.map((item, index) => (
+                      <AccordionItem key={index} value={`item-${index + 1}`}>
+                        <AccordionTrigger>{item.title}</AccordionTrigger>
+                        <AccordionContent>
+                          <div
+                            dangerouslySetInnerHTML={{ __html: item.content }}
+                          />
+                          {item.fields &&
+                            item.fields.map((field) => (
+                              <FormField
+                                key={field.name as string}
+                                control={form.control}
+                                name={field.name}
+                                render={({ field: innerField }) => (
+                                  <FormItem className="mt-5">
+                                    {field.label &&
+                                      field.type !== "checkbox" && (
+                                        <FormLabel>{field.label}</FormLabel>
+                                      )}
+                                    <FormControl>
+                                      {renderField(field)}
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            ))}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </div>
+              )}
             </div>
             <div className='flex w-full'>
               <DialogFooter className='w-full flex gap-3'>

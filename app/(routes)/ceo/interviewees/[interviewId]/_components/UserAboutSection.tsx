@@ -85,6 +85,16 @@ const UserAboutSection = ({ user, applicant, userJobApplications, department, ro
     },
   })
 
+  const jobOfferForm = useForm<z.infer<typeof JobOfferSchema>>({
+    resolver: zodResolver(JobOfferSchema),
+    defaultValues: {
+      designation: "",
+      department: currentJobApplication?.department ?? "IT Department",
+      role: "Employee",
+      salary: "",
+    },
+  })
+  
   useEffect(() => {
     if (currentJobApplication) {
       form.reset({
@@ -115,17 +125,16 @@ const UserAboutSection = ({ user, applicant, userJobApplications, department, ro
         interviewerDesignation: user?.role?.name ?? "",
       })
     }
-  }, [currentJobApplication, applicant, user, form])
+    if (currentJobApplication) {
+      jobOfferForm.reset({
+        designation: "",
+        department: currentJobApplication.department ?? "IT Department",
+        role: "Employee",
+        salary: "",
+      })
+    }
+  }, [currentJobApplication, applicant, user, form, jobOfferForm])
 
-  const jobOfferForm = useForm<z.infer<typeof JobOfferSchema>>({
-    resolver: zodResolver(JobOfferSchema),
-    defaultValues: {
-      designation: "",
-      department: currentJobApplication?.department ?? "IT Department",
-      role: "Employee",
-      salary: "",
-    },
-  })
 
   const criteria = {
     experience: currentJobApplication?.experience,

@@ -75,7 +75,7 @@ export const POST = async (
         message: `An interview has been scheduled for ${
           applicant.fullName
         } on ${format(localDate, "eeee, MMMM do yyyy, h:mm a")} by ${
-          user.userId
+          user.fullName
         }.`,
         createdBy: NotificationCreator.Admin, // Notification from the system.
         senderImage: user.userImage,
@@ -88,7 +88,7 @@ export const POST = async (
         message: `An interview has been scheduled for ${
           applicant.fullName
         } on ${format(localDate, "eeee, MMMM do yyyy, h:mm a")} by ${
-          user.userId
+          user.fullName
         }.`,
         createdBy: NotificationCreator.Admin, // Notification from the system.
         senderImage: user.userImage,

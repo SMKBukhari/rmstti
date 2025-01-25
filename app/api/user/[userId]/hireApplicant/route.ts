@@ -31,6 +31,8 @@ export const POST = async (
       return new NextResponse("Applicant not found", { status: 404 });
     }
 
+    
+
     const applicationStatus = await db.applicationStatus.findFirst({
       where: { name: "Hired" },
     });
