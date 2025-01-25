@@ -9,6 +9,7 @@ import ApplicantInterviewBanner from "./_components/applicantInterviewDateBanner
 import UserBannerWarningRejected from "./_components/userBannerWarningRejected";
 import UserBannerJobOffer from "./_components/userBannerJobOffer";
 import JobCardItem from "@/components/LandingPage/JobCardItem";
+import UserBannerInterviewSuccess from "./_components/userBannerInterviewSuccessFull";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -41,7 +42,7 @@ const page = async () => {
   const jobs = await db.job.findMany({
     where: {
       isPusblished: true,
-    }
+    },
   });
   const departments = await db.department.findMany();
 
@@ -74,6 +75,8 @@ const page = async () => {
   const isOffered = user?.applicationStatus?.name === "Offered";
   const isHired = user?.applicationStatus?.name === "Hired";
 
+  const isInterviewed = user?.JobApplications[0].isInterviewed === true;
+
   return (
     <div>
       {userRole &&
@@ -95,11 +98,15 @@ const page = async () => {
         ))}
 
       {applicantRole && <ApplicantBanner />}
-      {intervieweeRole && !isOffered && !isHired && (
+      {intervieweeRole && !isOffered && !isHired && !isInterviewed && (
         <ApplicantInterviewBanner interviewDateTime={interviewDateTime} />
       )}
 
       {userRole && isRejected && <UserBannerWarningRejected />}
+
+      {isInterviewed && !isOffered && !isHired && (
+        <UserBannerInterviewSuccess />
+      )}
 
       {intervieweeRole && isOffered && (
         <UserBannerJobOffer label='Submit' user={user} />

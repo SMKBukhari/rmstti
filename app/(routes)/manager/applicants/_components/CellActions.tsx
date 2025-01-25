@@ -19,7 +19,7 @@ interface CellActionsProps {
   email: string;
 }
 
-const CellActions = ({ user, id, fullName, email }: CellActionsProps) => {
+const CellActions = ({ user, id, fullName }: CellActionsProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -35,14 +35,26 @@ const CellActions = ({ user, id, fullName, email }: CellActionsProps) => {
   const onSubmit = async (data: z.infer<typeof ScheduleInterviewSchema>) => {
     try {
       setIsLoading(true);
+      // Convert the selected date to a Date object
+      const selectedDate = new Date(data.interviewDateTime);
+
+      // Get the local timezone offset in minutes
+      const timezoneOffset = selectedDate.getTimezoneOffset();
+
+      // Convert the date to ISO string (which will be in UTC)
+      const isoString = selectedDate.toISOString();
       await axios.post(`/api/user/${user?.userId}/scheduleAnInterview`, {
         applicantId: id,
-        interviewDateTime: data.interviewDateTime,
+        interviewDateTime: isoString,
+        timezoneOffset: timezoneOffset,
       });
+      console.log(
+        "Interview scheduled successfully" + fullName + "." + isoString
+      );
+      router.refresh();
       toast.success(`Interview scheduled successfully for ${fullName}.`);
       setDialogOpen(false);
       setIsLoading(false);
-      router.refresh();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         if (error.response && error.response.data) {
@@ -62,8 +74,9 @@ const CellActions = ({ user, id, fullName, email }: CellActionsProps) => {
       setIsRejection(true);
       await axios.post(`/api/user/${user?.userId}/rejectJobApplication`, {
         applicantId: id,
-        notifcationTitle: "Application Rejected", 
-        notificationMessage: "Your Application has been rejected. Please try again later.",
+        notifcationTitle: "Application Rejected",
+        notificationMessage:
+          "Your Application has been rejected. Please try again later.",
       });
       toast.success(`Applicant ${fullName} rejected successfully.`);
       router.refresh();
