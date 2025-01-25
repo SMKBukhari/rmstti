@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { compileInterviewScheduledMail, sendMail } from "@/lib/emails/mail";
 import { NotificationCreator, NotificationType } from "@prisma/client";
-import { format } from "date-fns";
+import { addMinutes, format } from "date-fns";
 import { NextResponse } from "next/server";
 
 export const POST = async (
@@ -10,7 +10,7 @@ export const POST = async (
 ) => {
   try {
     const { userId } = params;
-    const { interviewDateTime, applicantId } = await req.json();
+    const { interviewDateTime, applicantId, timezoneOffset } = await req.json();
 
     // Get the user profile
     const user = await db.userProfile.findFirst({
@@ -20,6 +20,9 @@ export const POST = async (
     if (!user) {
       return new NextResponse("User not found", { status: 404 });
     }
+
+    const utcDate = new Date(interviewDateTime);
+    const localDate = addMinutes(utcDate, -timezoneOffset);
 
     const applicant = await db.userProfile.findFirst({
       where: {
@@ -60,7 +63,7 @@ export const POST = async (
         userId: applicant.userId,
         title: "Interview Scheduled",
         message: `Your interview has been scheduled on ${format(
-          new Date(interviewDateTime),
+          localDate,
           "eeee, MMMM do yyyy, h:mm a"
         )}. Please be prepared.`,
         createdBy: NotificationCreator.Account, // Notification from the system.
@@ -71,10 +74,9 @@ export const POST = async (
         title: "Interview Scheduled",
         message: `An interview has been scheduled for ${
           applicant.fullName
-        } on ${format(
-          new Date(interviewDateTime),
-          "eeee, MMMM do yyyy, h:mm a"
-        )} by ${user.userId}.`,
+        } on ${format(localDate, "eeee, MMMM do yyyy, h:mm a")} by ${
+          user.userId
+        }.`,
         createdBy: NotificationCreator.Admin, // Notification from the system.
         senderImage: user.userImage,
         link: `/ceo/interviewees`,
@@ -85,10 +87,9 @@ export const POST = async (
         title: "Interview Scheduled",
         message: `An interview has been scheduled for ${
           applicant.fullName
-        } on ${format(
-          new Date(interviewDateTime),
-          "eeee, MMMM do yyyy, h:mm a"
-        )} by ${user.userId}.`,
+        } on ${format(localDate, "eeee, MMMM do yyyy, h:mm a")} by ${
+          user.userId
+        }.`,
         createdBy: NotificationCreator.Admin, // Notification from the system.
         senderImage: user.userImage,
         link: `/admin/interviewees`,
@@ -111,7 +112,7 @@ export const POST = async (
         id: jobApplication.id,
       },
       data: {
-        interviewDate: interviewDateTime,
+        interviewDate: localDate,
         applicationStatus: {
           connect: {
             id: applicationStatus?.id,
@@ -143,11 +144,10 @@ export const POST = async (
       },
     });
 
-    const interviewDate = format(
-      new Date(interviewDateTime),
-      "eeee, MMMM do yyyy"
-    );
-    const interviewTime = format(new Date(interviewDateTime), "h:mm a");
+    const interviewDate = format(localDate, "eeee, MMMM do yyyy");
+    const interviewTime = format(localDate, "h:mm a");
+
+    console.log("Interview Scheduled: ", interviewDate, interviewTime);
 
     const emailBody = await compileInterviewScheduledMail(
       applicant.fullName,

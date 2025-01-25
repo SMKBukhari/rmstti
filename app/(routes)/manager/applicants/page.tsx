@@ -34,6 +34,13 @@ const ApplicantsPage = async () => {
     },
     include: {
       user: true,
+      job: true,
+    },
+  });
+
+  const jobs = await db.job.findMany({
+    where: {
+      department: user?.department?.name,
     },
   });
 
@@ -50,6 +57,7 @@ const ApplicantsPage = async () => {
         : "N/A",
       department: applicant.department ?? "N/A",
       userImage: applicant.user?.userImage ?? "N/A",
+      appliedForJob: applicant.job?.title ?? "N/A",
     })
   );
 
@@ -68,6 +76,11 @@ const ApplicantsPage = async () => {
             {
               id: "fullName",
               title: "Full Name",
+            },
+            {
+              id: "appliedForJob",
+              title: "Applied For Job",
+              options: jobs.map((job) => job.title),
             },
           ]}
         />

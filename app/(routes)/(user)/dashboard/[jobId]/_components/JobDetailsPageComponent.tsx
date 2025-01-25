@@ -128,8 +128,8 @@ const JobDetailsPageComponent = ({
               className='object-cover w-full h-full rounded-lg'
             />
           ) : (
-            <div className='w-full h-full relative bg-emerald-100 flex items-center justify-center'>
-              <h2 className='text-3xl font-semibold tracking-wider text-emerald-500'>
+            <div className='w-full h-full relative bg-[#295b8186] flex items-center justify-center'>
+              <h2 className='text-3xl font-semibold tracking-wider text-white'>
                 {job.title}
               </h2>
             </div>
@@ -173,7 +173,6 @@ const JobDetailsPageComponent = ({
                 ) : (
                   <Button
                     variant='outline'
-                    className='hover:text-white hover:shadow-sm hover:bg-[#0AAB7C]/80 text-[#0AAB7C] border-[#0AAB7C]'
                     type='button'
                     disabled
                   >

@@ -30,8 +30,12 @@ const ApplicantsPage = async () => {
     },
     include: {
       user: true,
+      job: true,
     },
   });
+
+  const jobs = await db.job.findMany();
+  const departments = await db.department.findMany();
 
   // Formatting the applicants data for the table
   const formattedApplicants: ApplicantsColumns[] = applicants.map(
@@ -46,6 +50,7 @@ const ApplicantsPage = async () => {
         : "N/A",
       department: applicant.department ?? "N/A",
       userImage: applicant.user?.userImage ?? "N/A",
+      appliedForJob: applicant.job?.title ?? "N/A",
     })
   );
 
@@ -59,7 +64,22 @@ const ApplicantsPage = async () => {
         <DataTable
           columns={columns}
           data={formattedApplicants}
-          searchKey='fullName'
+          filterableColumns={[
+            {
+              id: "fullName",
+              title: "Full Name",
+            },
+            {
+              id: "department",
+              title: "Department",
+              options: departments.map((department) => department.name),
+            },
+            {
+              id: "appliedForJob",
+              title: "Applied For Job",
+              options: jobs.map((job) => job.title),
+            },
+          ]}
           routePrefix='ceo/applicants'
         />
       </div>

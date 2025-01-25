@@ -21,8 +21,6 @@ const ApplicantsPage = async () => {
     },
   });
 
-  const departments = await db.department.findMany();
-
   const applicationStatus = await db.applicationStatus.findFirst({
     where: { name: "Applied" },
   });
@@ -32,8 +30,12 @@ const ApplicantsPage = async () => {
     },
     include: {
       user: true,
+      job: true,
     },
   });
+
+  const jobs = await db.job.findMany();
+  const departments = await db.department.findMany();
 
   // Formatting the applicants data for the table
   const formattedApplicants: ApplicantsColumns[] = applicants.map(
@@ -48,6 +50,7 @@ const ApplicantsPage = async () => {
         : "N/A",
       department: applicant.department ?? "N/A",
       userImage: applicant.user?.userImage ?? "N/A",
+      appliedForJob: applicant.job?.title ?? "N/A",
     })
   );
 
@@ -71,6 +74,11 @@ const ApplicantsPage = async () => {
               id: "department",
               title: "Department",
               options: departments.map((dept) => dept.name).filter(Boolean),
+            },
+            {
+              id: "appliedForJob",
+              title: "Applied For Job",
+              options: jobs.map((job) => job.title),
             },
           ]}
         />

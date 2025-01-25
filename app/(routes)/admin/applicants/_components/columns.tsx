@@ -17,6 +17,7 @@ export type ApplicantsColumns = {
   appliedAt: string;
   userImage: string;
   department: string;
+  appliedForJob: string;
 };
 
 export const columns: ColumnDef<ApplicantsColumns>[] = [
@@ -58,6 +59,10 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
   {
     accessorKey: "department",
     header: "Application For",
+  },
+  {
+    accessorKey: "appliedForJob",
+    header: "Applied For Job",
   },
   {
     accessorKey: "appliedAt",
