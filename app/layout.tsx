@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react"
 
 import "@/app/api/cron/escalationCron"
 
@@ -34,6 +35,7 @@ export default function RootLayout({
         <Providers>
           <main>{children}</main>
           <Toaster />
+          <Analytics />
         </Providers>
       </body>
     </html>
