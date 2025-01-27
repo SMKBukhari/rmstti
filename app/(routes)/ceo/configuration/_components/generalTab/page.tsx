@@ -9,6 +9,7 @@ import {
 import CreateDepartments from "./_components/createdepartments";
 import CompanyBasicInfo from "./_components/basic";
 import CreateRequestsCategory from "./_components/createRequestsCategories";
+import UploadCompanyPolicy from "./_components/uploadCompanyPolicy";
 
 interface GeneralTabPageProps {
   user: UserProfile | null;
@@ -34,6 +35,7 @@ const GeneralTabPage = ({
           </h2>
           <CompanyBasicInfo company={company} />
         </div>
+        <UploadCompanyPolicy company={company} />
         <CreateDepartments user={userSkills} departments={departments} />
         <CreateRequestsCategory user={userSkills} category={category} />
       </div>

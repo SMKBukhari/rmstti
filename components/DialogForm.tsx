@@ -68,7 +68,7 @@ interface Field<T extends FieldValues> {
 
 interface AccordionContentItem<T extends FieldValues> {
   title: string;
-  content: string;
+  content: React.ReactNode;
   fields?: Field<T>[];
 }
 
@@ -332,9 +332,7 @@ const DialogForm = <T extends FieldValues>({
                       <AccordionItem key={index} value={`item-${index + 1}`}>
                         <AccordionTrigger>{item.title}</AccordionTrigger>
                         <AccordionContent>
-                          <div
-                            dangerouslySetInnerHTML={{ __html: item.content }}
-                          />
+                          {item.content} {/* Directly render the JSX */}
                           {item.fields &&
                             item.fields.map((field) => (
                               <FormField
@@ -342,7 +340,7 @@ const DialogForm = <T extends FieldValues>({
                                 control={form.control}
                                 name={field.name}
                                 render={({ field: innerField }) => (
-                                  <FormItem className="mt-5">
+                                  <FormItem className='mt-5'>
                                     {field.label &&
                                       field.type !== "checkbox" && (
                                         <FormLabel>{field.label}</FormLabel>

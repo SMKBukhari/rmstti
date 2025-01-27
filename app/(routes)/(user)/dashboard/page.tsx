@@ -30,6 +30,7 @@ const page = async () => {
       skills: true,
       role: true,
       JobApplications: true,
+      company: true,
     },
   })
 

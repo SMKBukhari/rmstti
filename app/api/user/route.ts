@@ -55,6 +55,8 @@ export const POST = async (req: Request) => {
       return new NextResponse("User Role not found", { status: 500 });
     }
 
+    const company = await db.company.findFirst({});
+
     const user = await db.userProfile.create({
       data: {
         fullName,
@@ -74,6 +76,11 @@ export const POST = async (req: Request) => {
             id: userRole.id,
           },
         },
+        company: {
+          connect: {
+            id: company?.id,
+          },
+        },
       },
     });
 
@@ -84,7 +91,7 @@ export const POST = async (req: Request) => {
       subject: "Email Verification (The Truth International)",
       body: emailBody,
     });
-    
+
     await db.notifications.create({
       data: {
         userId: user.userId,
@@ -118,7 +125,7 @@ export const POST = async (req: Request) => {
     //   });
     // }
 
-      return NextResponse.json({user, response}, { status: 201 });
+    return NextResponse.json({ user, response }, { status: 201 });
   } catch (error) {
     console.error(`SINGUP_ERROR: ${error}`);
     return new NextResponse("Internal Server Error", { status: 500 });

@@ -13,12 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { RequestCategorySchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  RequestCategory,
-  Requests,
-  Skills,
-  UserProfile,
-} from "@prisma/client";
+import { RequestCategory, Requests, Skills, UserProfile } from "@prisma/client";
 import axios from "axios";
 import { Loader2, Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -38,7 +33,7 @@ const CreateRequestsCategory = ({
 }: GeneralTabCreateRequestsCategoryProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-  const [editingCateogryId, setEditingDCateogryId] = useState<string | null>(
+  const [editingCateogryId, setEditingCateogryId] = useState<string | null>(
     null
   );
   const [editingName, setEditingName] = useState("");
@@ -80,12 +75,12 @@ const CreateRequestsCategory = ({
     }
   };
 
-  const updateDepartment = async (categoryId: string, newName: string) => {
+  const updateCategories = async (categoryId: string, newName: string) => {
     try {
       await axios.patch(`/api/user/${user?.userId}/categories/${categoryId}`, {
         name: newName,
       });
-      setEditingDCateogryId(null);
+      setEditingCateogryId(null);
       router.refresh();
       toast.success("Category updated successfully!");
     } catch (error) {
@@ -116,15 +111,15 @@ const CreateRequestsCategory = ({
   };
 
   const handleEditStart = (category: RequestCategory) => {
-    setEditingDCateogryId(category.id);
+    setEditingCateogryId(category.id);
     setEditingName(category.name);
   };
 
   const handleEditEnd = (categoryId: string) => {
     if (editingName.trim() !== "") {
-      updateDepartment(categoryId, editingName);
+      updateCategories(categoryId, editingName);
     }
-    setEditingDCateogryId(null);
+    setEditingCateogryId(null);
   };
 
   const handleKeyDown = (
@@ -202,7 +197,7 @@ const CreateRequestsCategory = ({
                 <div className='text-2xl font-bold mb-2'>
                   {item.requests.length}
                 </div>
-                <div className='text-sm text-muted-foreground'>Total Users</div>
+                <div className='text-sm text-muted-foreground'>Total Requests for this Category</div>
               </Card>
             ))}
           </div>
