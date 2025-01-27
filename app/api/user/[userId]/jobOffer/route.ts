@@ -9,7 +9,22 @@ export const POST = async (
 ) => {
   try {
     const { userId } = params;
-    const { id, designation, department, salary, role } = await req.json();
+    const {
+      id,
+      designation,
+      department,
+      salary,
+      role,
+      DOJ,
+      totalYearlyLeaves,
+      totalMonthlyLeaves,
+    } = await req.json();
+
+    if (!id || !designation || !department || !salary || !role || !DOJ) {
+      return new NextResponse("Please provide all the required fields", {
+        status: 400,
+      });
+    }
 
     // Get the user profile
     const user = await db.userProfile.findFirst({
@@ -123,6 +138,9 @@ export const POST = async (
         departmentOffered: department,
         designationOffered: designation,
         roleOffered: role,
+        DOJ: new Date(DOJ),
+        totalYearlyLeaves: totalYearlyLeaves,
+        totalMonthlyLeaves: totalMonthlyLeaves,
       },
     });
 

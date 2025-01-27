@@ -69,9 +69,9 @@ model UserProfile {
   skills                  Skills[]
   JobApplications         JobApplications[]
   currentJobApplicationId String?
-  totalYearlyLeaves       Int                    @default(36)
-  totalMonthlyLeaves      Int                    @default(3)
-  totalLeavesTaken        Int                    @default(0)
+  totalYearlyLeaves       String                 @default("36")
+  totalMonthlyLeaves      String                 @default("3")
+  totalLeavesTaken        String                 @default("0")
   leaveRequests           LeaveRequest[]
   createdAt               DateTime               @default(now())
   TimeTable               TimeTable[]

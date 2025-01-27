@@ -92,9 +92,12 @@ const UserAboutSection = ({ user, applicant, userJobApplications, department, ro
       department: currentJobApplication?.department ?? "IT Department",
       role: "Employee",
       salary: "",
+      DOJ: new Date().toISOString().split("T")[0], // Set to current date as string
+      totalYearlyLeaves: "",
+      totalMonthlyLeaves: "",
     },
   })
-  
+
   useEffect(() => {
     if (currentJobApplication) {
       form.reset({
@@ -127,14 +130,16 @@ const UserAboutSection = ({ user, applicant, userJobApplications, department, ro
     }
     if (currentJobApplication) {
       jobOfferForm.reset({
+        DOJ: new Date().toISOString().split("T")[0],
         designation: "",
         department: currentJobApplication.department ?? "IT Department",
         role: "Employee",
         salary: "",
+        totalYearlyLeaves: "",
+        totalMonthlyLeaves: "",
       })
     }
   }, [currentJobApplication, applicant, user, form, jobOfferForm])
-
 
   const criteria = {
     experience: currentJobApplication?.experience,
@@ -186,7 +191,6 @@ const UserAboutSection = ({ user, applicant, userJobApplications, department, ro
         }
       }
     } finally {
-      setSecondDialogOpen(false)
       setIsLoading(false)
     }
   }
@@ -200,7 +204,6 @@ const UserAboutSection = ({ user, applicant, userJobApplications, department, ro
       })
       console.log(data)
       toast.success(`Interview updated successfully for ${applicant?.fullName}.`)
-      setDialogOpen(false)
       setIsLoading(false)
       router.refresh()
       redirect("/admin/interviewees")
@@ -213,7 +216,6 @@ const UserAboutSection = ({ user, applicant, userJobApplications, department, ro
         }
       }
     } finally {
-      setDialogOpen(false)
       setIsLoading(false)
     }
   }
@@ -365,6 +367,23 @@ const UserAboutSection = ({ user, applicant, userJobApplications, department, ro
             type: "input",
             placeholder: "e.g '100000'",
           },
+          {
+            name: "DOJ",
+            label: "Date of Joining",
+            type: "date",
+          },
+          {
+            name: "totalYearlyLeaves",
+            label: "Total Yearly Leaves",
+            type: "input",
+            placeholder: "e.g '12'",
+          },
+          {
+            name: "totalMonthlyLeaves",
+            label: "Total Monthly Leaves",
+            type: "input",
+            placeholder: "e.g '1'",
+          },
         ]}
         buttons={[
           {
@@ -379,7 +398,10 @@ const UserAboutSection = ({ user, applicant, userJobApplications, department, ro
             onClick: () => setSecondDialogOpen(false),
           },
         ]}
-        onSubmit={onJobOfferSubmit}
+        onSubmit={(data) => {
+          onJobOfferSubmit(data)
+          setSecondDialogOpen(false)
+        }}
         form={jobOfferForm}
       />
 
@@ -532,9 +554,6 @@ const UserAboutSection = ({ user, applicant, userJobApplications, department, ro
             type: "submit",
             variant: "primary",
             isLoading: isLoading,
-            // onClick: () => {
-            //   onSubmit(form.getValues());
-            // },
           },
           {
             label: "Cancel",
@@ -542,7 +561,10 @@ const UserAboutSection = ({ user, applicant, userJobApplications, department, ro
             onClick: () => setDialogOpen(false),
           },
         ]}
-        onSubmit={onSubmit}
+        onSubmit={(data) => {
+          onSubmit(data)
+          setDialogOpen(false)
+        }}
         form={form}
       />
     </main>

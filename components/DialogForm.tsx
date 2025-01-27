@@ -51,6 +51,7 @@ interface Field<T extends FieldValues> {
   placeholder?: string;
   type:
     | "input"
+    | "number"
     | "textarea"
     | "richtextarea"
     | "select"
@@ -58,6 +59,7 @@ interface Field<T extends FieldValues> {
     | "date"
     | "switchButton"
     | "checkbox"
+    | "time"
     | "file";
   comboboxOptions?: { label: string; value: string }[];
   heading?: string;
@@ -231,6 +233,16 @@ const DialogForm = <T extends FieldValues>({
                             />
                           </FormControl>
                         )}
+                        {field.type === "number" && (
+                          <FormControl>
+                            <Input
+                              type='number'
+                              {...innerField}
+                              placeholder={field.placeholder}
+                              disabled={field.disabled || isSubmitting}
+                            />
+                          </FormControl>
+                        )}
                         {field.type === "file" && (
                           <FormControl>
                             <Input
@@ -316,6 +328,15 @@ const DialogForm = <T extends FieldValues>({
                               }
                               onBlur={innerField.onBlur}
                               ref={innerField.ref}
+                            />
+                          </FormControl>
+                        )}
+                        {field.type === "time" && (
+                          <FormControl>
+                            <Input
+                              type='time'
+                              disabled={field.disabled || isSubmitting}
+                              placeholder={field.placeholder}
                             />
                           </FormControl>
                         )}

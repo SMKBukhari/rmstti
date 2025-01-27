@@ -202,11 +202,14 @@ export const InterviewRatingFormSchema = z.object({
 });
 
 export const JobOfferSchema = z.object({
+  DOJ: z.date().or(z.string()).optional(),
+  totalYearlyLeaves: z.string().optional(),
+  totalMonthlyLeaves: z.string().optional(),
   designation: z.string(),
   department: z.string(),
   salary: z.string(),
   role: z.string(),
-});
+})
 
 export const JobOfferAcceptanceSchema = z.object({
   joiningDate: z.date(),
