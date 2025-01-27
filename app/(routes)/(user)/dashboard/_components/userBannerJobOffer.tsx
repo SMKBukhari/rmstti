@@ -34,7 +34,7 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
   const form = useForm<z.infer<typeof JobOfferAcceptanceSchema>>({
     resolver: zodResolver(JobOfferAcceptanceSchema),
     defaultValues: {
-      joiningDate: new Date(),
+      joiningDate: new Date(user?.DOJ || ""),
       department: user?.departmentOffered || "",
       designation: user?.designationOffered || "",
       salary: user?.salaryOffered || "",
@@ -43,6 +43,10 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
       acceptTerms: false,
     },
   });
+
+  const watch = form.watch();
+  const acceptPrivacyPolicy = watch.acceptPrivacyPolicy;
+  const acceptTerms = watch.acceptTerms;
 
   const onSubmit = async (values: z.infer<typeof JobOfferAcceptanceSchema>) => {
     try {
@@ -86,14 +90,19 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
             <span className='font-bold underline underline-offset-2'>
               {user?.salaryOffered}/month
             </span>
-            . Please review our offer and company policy.
+            . Please
+            <Button variant={"link"} className='p-0 ml-1 mr-0.5' onClick={openDialog}>
+              Review
+            </Button>{" "}
+            our offer and company policy.
           </>
         }
         variant='success'
+        button={{
+          label: label,
+          onClick: openDialog,
+        }}
       />
-      <Button variant='primary' onClick={openDialog} className='w-full'>
-        {label}
-      </Button>
       <DialogForm
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
@@ -102,8 +111,9 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
         isSteps
         fields={[
           {
+            label: "Joining Date",
             name: "joiningDate",
-            type: "datetime",
+            type: "date",
             disabled: true,
           },
           {
@@ -137,6 +147,7 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
             type: "submit",
             variant: "primary",
             isLoading: isLoading,
+            disabled: !acceptPrivacyPolicy || !acceptTerms,
           },
           {
             label: "Cancel",
@@ -211,44 +222,6 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
                 name: "acceptPrivacyPolicy",
                 type: "checkbox",
                 label: "I have read and accept the company policy",
-              },
-            ],
-          },
-          {
-            title: "Terms and Conditions",
-            content: (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>
-                  Terms and Conditions
-                </h3>
-                <p className='mb-2'>
-                  By accepting this job offer, you agree to the following terms
-                  and conditions:
-                </p>
-                <ol className='list-decimal pl-5 mb-4'>
-                  <li>
-                    You will comply with all company policies and procedures.
-                  </li>
-                  <li>
-                    You agree to maintain confidentiality regarding company
-                    information.
-                  </li>
-                  <li>
-                    Your employment is subject to a probationary period as
-                    specified in your contract.
-                  </li>
-                  <li>
-                    You agree to the working hours and responsibilities outlined
-                    in your job description.
-                  </li>
-                </ol>
-              </div>
-            ),
-            fields: [
-              {
-                name: "acceptTerms",
-                type: "checkbox",
-                label: "I accept the terms and conditions",
               },
             ],
           },
