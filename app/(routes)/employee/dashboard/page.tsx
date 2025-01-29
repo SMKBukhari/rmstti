@@ -3,9 +3,10 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import React from "react";
 import LeaveRequests from "./_components/Cards/LeaveRequests";
-import TotalLeaves from "./_components/Cards/TotalLeaves";
+// import TotalLeaves from "./_components/Cards/TotalLeaves";
 import { format } from "date-fns";
 import EmployeeBannerWarning from "./_components/userBannerWarning";
+import BalanceLeaves from "./_components/Cards/BalanceLeaves";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -23,6 +24,7 @@ const page = async () => {
       role: true,
       status: true,
       jobExperience: true,
+      leaveRequests: true,
       education: true,
       department: {
         include: {
@@ -86,7 +88,8 @@ const page = async () => {
             Rejected: rejectedRequests.length,
           }}
         />
-        <TotalLeaves userId={userId} />
+        {/* <TotalLeaves userId={userId} /> */}
+        <BalanceLeaves user={user} />
       </div>
     </>
   );

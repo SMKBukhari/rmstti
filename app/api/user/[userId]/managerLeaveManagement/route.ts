@@ -28,6 +28,9 @@ export const POST = async (
       return new NextResponse("User not found", { status: 404 });
     }
 
+    const totalYearlyLeaves = Number.parseInt(user.totalYearlyLeaves);
+    const totalMonthlyLeaves = Number.parseInt(user.totalMonthlyLeaves);
+
     const getLeaveType = await db.leaveType.findFirst({
       where: {
         name: leaveType,
@@ -57,10 +60,8 @@ export const POST = async (
         new Date(leaveRequest.startDate).getMonth() === currentMonth
     ).length;
 
-    const remainingLeavesThisYear =
-      user.totalYearlyLeaves - leavesTakenThisYear;
-    const remainingLeavesThisMonth =
-      user.totalMonthlyLeaves - leavesTakenThisMonth;
+    const remainingLeavesThisYear = totalYearlyLeaves - leavesTakenThisYear;
+    const remainingLeavesThisMonth = totalMonthlyLeaves - leavesTakenThisMonth;
 
     let requireHigherApproval = false;
 

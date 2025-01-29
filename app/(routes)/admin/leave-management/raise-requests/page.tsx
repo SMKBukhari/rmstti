@@ -54,14 +54,15 @@ const ApplicantsPage = async () => {
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
       <div className='flex items-center justify-between w-full'>
-        <CustomBreadCrumb breadCrumbPage='Raise Requests' breadCrumbItem={
-          [
+        <CustomBreadCrumb
+          breadCrumbPage='Raise Requests'
+          breadCrumbItem={[
             {
-              label: 'Leave Management',
-              link: '/manager/leave-management/raise-requests',
+              label: "Leave Management",
+              link: "/manager/leave-management/raise-requests",
             },
-          ]
-        } />
+          ]}
+        />
       </div>
 
       <RaiseRequest leaveType={leaveTypes} user={user} />
@@ -70,11 +71,18 @@ const ApplicantsPage = async () => {
         <DataTable
           columns={columns}
           data={formattedLeaveRequests}
-          searchKey='leaveType'
           filterableColumns={[
             {
-              id: "fullName",
-              title: "Name",
+              id: "leaveType",
+              title: "Leave Type",
+              options: leaveTypes
+                .map((leaveType) => leaveType.name)
+                .filter(Boolean),
+            },
+            {
+              id: "status",
+              title: "Status",
+              options: ["Pending", "Approved", "Rejected"],
             },
           ]}
         />

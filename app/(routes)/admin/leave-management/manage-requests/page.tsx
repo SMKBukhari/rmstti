@@ -67,7 +67,6 @@ const ApplicantsPage = async () => {
         <DataTable
           columns={columns}
           data={formattedLeaveRequests}
-          routePrefix='admin/leave-management/manage-requests'
           filterableColumns={[
             {
               id: "leaveType",
@@ -79,6 +78,11 @@ const ApplicantsPage = async () => {
             {
               id: "fullName",
               title: "Name",
+            },
+            {
+              id: "status",
+              title: "Status",
+              options: ["Pending", "Approved", "Rejected"],
             },
           ]}
         />

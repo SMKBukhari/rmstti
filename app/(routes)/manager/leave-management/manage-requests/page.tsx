@@ -57,6 +57,8 @@ const ApplicantsPage = async () => {
     })
   );
 
+  const leaveTypes = await db.leaveType.findMany();
+
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
       <div className='flex items-center justify-between w-full'>
@@ -75,8 +77,24 @@ const ApplicantsPage = async () => {
         <DataTable
           columns={columns}
           data={formattedLeaveRequests}
-          searchKey='leaveType'
-          routePrefix='manager/leave-management/raise-requests'
+          filterableColumns={[
+            {
+              id: "leaveType",
+              title: "Leave Type",
+              options: leaveTypes
+                .map((leaveType) => leaveType.name)
+                .filter(Boolean),
+            },
+            {
+              id: "status",
+              title: "Status",
+              options: ["Pending", "Approved", "Rejected"],
+            },
+            {
+              id: "fullName",
+              title: "Name",
+            },
+          ]}
         />
       </div>
     </div>

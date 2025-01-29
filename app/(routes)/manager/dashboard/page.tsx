@@ -7,6 +7,7 @@ import TotalApplicant from "./_components/Cards/TotalApplicants";
 import { format } from "date-fns";
 import EmployeeBannerWarning from "./_components/userBannerWarning";
 import LeaveRequests from "./_components/Cards/LeaveRequests";
+import BalanceLeaves from "./_components/Cards/BalanceLeaves";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -24,6 +25,7 @@ const page = async () => {
       role: true,
       status: true,
       jobExperience: true,
+      leaveRequests: true,
       education: true,
       department: {
         include: {
@@ -183,6 +185,7 @@ const page = async () => {
           totalRequests={leaveRequests.length}
           percentageChange={percentageChangeLeaves}
         />
+        <BalanceLeaves user={user} />
       </div>
     </>
   );

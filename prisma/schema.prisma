@@ -72,6 +72,7 @@ model UserProfile {
   totalYearlyLeaves       String                 @default("36")
   totalMonthlyLeaves      String                 @default("3")
   totalLeavesTaken        String                 @default("0")
+  totalLeavesBalance      String?
   leaveRequests           LeaveRequest[]
   createdAt               DateTime               @default(now())
   TimeTable               TimeTable[]

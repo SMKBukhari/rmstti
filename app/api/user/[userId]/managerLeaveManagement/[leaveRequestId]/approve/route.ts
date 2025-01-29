@@ -19,6 +19,10 @@ export const PATCH = async (
       },
     });
 
+    if (!leaveRequest) {
+      return new NextResponse("Leave Request not found", { status: 400 });
+    }
+
     const user = await db.userProfile.findFirst({
       where: {
         userId,
@@ -28,9 +32,31 @@ export const PATCH = async (
       },
     });
 
-    if (!leaveRequest) {
-      return new NextResponse("Leave Request not found", { status: 400 });
+    if (!user) {
+      return new NextResponse("User not found", { status: 400 });
     }
+
+    // Calculate the number of days requested
+    let daysRequested;
+    if (leaveRequest.leaveType.name.toLowerCase().includes("half leave")) {
+      // If it's a half-day leave
+      daysRequested = 0.5;
+    } else {
+      const startDate = new Date(leaveRequest.startDate);
+      const endDate = new Date(leaveRequest.endDate);
+
+      // Calculate the difference in days
+      const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+      daysRequested = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Add 1 to include both start and end dates
+    }
+
+    // Calculate new total leaves taken
+    const currentLeavesTaken = Number.parseFloat(user.totalLeavesTaken);
+    const newTotalLeavesTaken = currentLeavesTaken + daysRequested;
+
+    // Calculate new total leaves balance
+    const currentLeavesBalance = Number(leaveRequest.user.totalLeavesBalance);
+    const newTotalLeavesBalance = currentLeavesBalance - daysRequested;
 
     const admins = await db.userProfile.findMany({
       where: { role: { name: "Admin" } },
@@ -42,7 +68,7 @@ export const PATCH = async (
 
     const notifications = [
       {
-        userId,
+        userId: leaveRequest.userId,
         title: "Leave Request Approved",
         message: `Your leave request for ${leaveRequest.leaveType.name} from ${leaveRequest.startDate} to ${leaveRequest.endDate} has been approved.`,
         createdBy: NotificationCreator.Account,
@@ -52,18 +78,18 @@ export const PATCH = async (
       ...admins.map((admin) => ({
         userId: admin.userId,
         title: "Leave Request Approved",
-        message: `${user?.fullName} has approved a leave request for ${leaveRequest.leaveType.name} from ${leaveRequest.startDate} to ${leaveRequest.endDate}.`,
+        message: `${user.fullName} has approved a leave request for ${leaveRequest.leaveType.name} from ${leaveRequest.startDate} to ${leaveRequest.endDate}.`,
         createdBy: NotificationCreator.Employee,
-        senderImage: user?.userImage,
+        senderImage: user.userImage,
         link: `/admin/leave-management/manage-requests`,
         type: NotificationType.General,
       })),
       ...ceo.map((ceo) => ({
         userId: ceo.userId,
         title: "Leave Request Approved",
-        message: `${user?.fullName} has approved a leave request for ${leaveRequest.leaveType.name} from ${leaveRequest.startDate} to ${leaveRequest.endDate}.`,
+        message: `${user.fullName} has approved a leave request for ${leaveRequest.leaveType.name} from ${leaveRequest.startDate} to ${leaveRequest.endDate}.`,
         createdBy: NotificationCreator.Employee,
-        senderImage: user?.userImage,
+        senderImage: user.userImage,
         link: `/ceo/leave-management/manage-requests`,
         type: NotificationType.General,
       })),
@@ -79,6 +105,16 @@ export const PATCH = async (
       },
       include: {
         user: true,
+      },
+    });
+
+    await db.userProfile.update({
+      where: {
+        userId: leaveRequest.userId,
+      },
+      data: {
+        // totalLeavesTaken: newTotalLeavesTaken.toString(),
+        totalLeavesBalance: newTotalLeavesBalance.toString(),
       },
     });
 

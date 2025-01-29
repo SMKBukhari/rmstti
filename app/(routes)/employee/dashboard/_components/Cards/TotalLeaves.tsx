@@ -15,13 +15,20 @@ interface TotalLeavesProps {
   userId: string;
 }
 
-const TotalLeaves = ({
-  userId,
-}: TotalLeavesProps) => {
+interface LeavesState {
+  yearlyLeaves: number;
+  monthlyLeaves: number;
+  yearlyLeavesTaken: number;
+  monthlyLeavesTaken: number;
+  remainingYearlyLeaves: number;
+  remainingMonthlyLeaves: number;
+}
+
+const TotalLeaves = ({ userId }: TotalLeavesProps) => {
   const [selectedPeriod, setSelectedPeriod] = useState<"year" | "month">(
     "year"
   );
-  const [leaves, setLeaves] = useState({
+  const [leaves, setLeaves] = useState<LeavesState>({
     yearlyLeaves: 36,
     monthlyLeaves: 3,
     yearlyLeavesTaken: 0,
@@ -33,18 +40,22 @@ const TotalLeaves = ({
   useEffect(() => {
     const fetchLeaves = async () => {
       const updatedLeaves = await fetchAndUpdateLeaves(userId);
-      setLeaves(updatedLeaves);
+      setLeaves({
+        yearlyLeaves: Number(updatedLeaves.yearlyLeaves),
+        monthlyLeaves: Number(updatedLeaves.monthlyLeaves),
+        yearlyLeavesTaken: Number(updatedLeaves.yearlyLeavesTaken),
+        monthlyLeavesTaken: updatedLeaves.monthlyLeavesTaken,
+        remainingYearlyLeaves: updatedLeaves.remainingYearlyLeaves,
+        remainingMonthlyLeaves: updatedLeaves.remainingMonthlyLeaves,
+      });
     };
 
     fetchLeaves();
   }, [userId]);
 
-  const totalLeaves =
-    selectedPeriod === "year" ? leaves.yearlyLeaves : leaves.monthlyLeaves;
-  const remainingLeaves =
-    selectedPeriod === "year"
-      ? leaves.remainingYearlyLeaves
-      : leaves.remainingMonthlyLeaves;
+  const totalLeaves = selectedPeriod === "year" ? leaves.yearlyLeaves : leaves.monthlyLeaves
+  const remainingLeaves = selectedPeriod === "year" ? leaves.remainingYearlyLeaves : leaves.remainingMonthlyLeaves
+  const leavesTaken = selectedPeriod === "year" ? leaves.yearlyLeavesTaken : leaves.monthlyLeavesTaken
 
   return (
     <Card>
@@ -54,6 +65,7 @@ const TotalLeaves = ({
         </CardTitle>
         <Select
           onValueChange={(value: "year" | "month") => setSelectedPeriod(value)}
+          defaultValue={selectedPeriod}
         >
           <SelectTrigger className='w-full'>
             <SelectValue placeholder='Select period' />

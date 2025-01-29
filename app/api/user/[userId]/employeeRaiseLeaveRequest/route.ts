@@ -33,6 +33,9 @@ export const POST = async (
       return new NextResponse("User not found", { status: 404 });
     }
 
+    const totalYearlyLeaves = Number.parseInt(user.totalYearlyLeaves);
+    const totalMonthlyLeaves = Number.parseInt(user.totalMonthlyLeaves);
+
     const getLeaveType = await db.leaveType.findFirst({
       where: {
         name: leaveType,
@@ -88,8 +91,8 @@ export const POST = async (
 
       if (lastMonthLeaves === 0) {
         carriedOverLeaves = Math.min(
-          user.totalMonthlyLeaves,
-          36 - user.totalYearlyLeaves
+          totalMonthlyLeaves,
+          36 - totalYearlyLeaves
         );
       }
 
@@ -99,9 +102,9 @@ export const POST = async (
     const carriedOverLeaves = await calculateCarriedOverLeaves(userId);
 
     const remainingLeavesThisYear =
-      user.totalYearlyLeaves - leavesTakenThisYear + carriedOverLeaves;
+      totalYearlyLeaves - leavesTakenThisYear + carriedOverLeaves;
     const remainingLeavesThisMonth =
-      user.totalMonthlyLeaves - leavesTakenThisMonth + carriedOverLeaves;
+      totalMonthlyLeaves - leavesTakenThisMonth + carriedOverLeaves;
 
     console.log(remainingLeavesThisYear, remainingLeavesThisMonth);
 
@@ -220,13 +223,13 @@ export const POST = async (
       },
       data: {
         totalYearlyLeaves: Math.min(
-          user.totalYearlyLeaves + carriedOverLeaves,
+          totalYearlyLeaves + carriedOverLeaves,
           36
-        ),
+        ).toString(),
         totalMonthlyLeaves: Math.min(
-          user.totalMonthlyLeaves + carriedOverLeaves,
+          totalMonthlyLeaves + carriedOverLeaves,
           36
-        ),
+        ).toString(),
       },
     });
 

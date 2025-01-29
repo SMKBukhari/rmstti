@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react";
 
-import "@/app/api/cron/escalationCron"
+import "@/app/api/cron/escalationCron";
 
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
-import { StatusChecker } from "@/components/CheckStatus";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -31,7 +30,6 @@ export default function RootLayout({
         // className={`${roboto.className} antialiased bg-[#f1f1f1] dark:bg-[#1A1A1A] overflow-hidden`}
         className={`${roboto.className} antialiased`}
       >
-        <StatusChecker />
         <Providers>
           <main>{children}</main>
           <Toaster />
