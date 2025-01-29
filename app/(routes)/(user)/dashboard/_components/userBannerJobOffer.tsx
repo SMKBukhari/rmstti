@@ -46,7 +46,6 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
 
   const watch = form.watch();
   const acceptPrivacyPolicy = watch.acceptPrivacyPolicy;
-  const acceptTerms = watch.acceptTerms;
 
   const onSubmit = async (values: z.infer<typeof JobOfferAcceptanceSchema>) => {
     try {
@@ -147,7 +146,7 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
             type: "submit",
             variant: "primary",
             isLoading: isLoading,
-            disabled: !acceptPrivacyPolicy || !acceptTerms,
+            disabled: !acceptPrivacyPolicy,
           },
           {
             label: "Cancel",
