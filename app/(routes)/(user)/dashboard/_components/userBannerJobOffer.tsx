@@ -90,7 +90,11 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
               {user?.salaryOffered}/month
             </span>
             . Please
-            <Button variant={"link"} className='p-0 ml-1 mr-0.5' onClick={openDialog}>
+            <Button
+              variant={"link"}
+              className='p-0 ml-1 mr-0.5'
+              onClick={openDialog}
+            >
               Review
             </Button>{" "}
             our offer and company policy.
@@ -158,7 +162,7 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
         form={form}
         accordionContent={[
           {
-            title: "Company Policy",
+            title: "Company Policy & Offer Letter",
             content: (
               <div className='w-full flex flex-col gap-3'>
                 <div className='w-full'>
@@ -208,7 +212,34 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
                             }
                           }}
                         >
-                          Download
+                          View
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  {user?.offerLetterUrl && (
+                    <div className='w-full'>
+                      <div className='text-xs flex items-center gap-1 whitespace-nowrap py-2 px-3 rounded-md bg-neutral-200 dark:bg-neutral-900'>
+                        <File className='w-5 h-5 mr-2' />
+                        <p className='text-sm truncate flex-grow'>
+                          Offer Letter
+                        </p>
+                        <Button
+                          variant={"ghost"}
+                          size={"sm"}
+                          onClick={() => {
+                            if (user?.offerLetterUrl) {
+                              const link = document.createElement("a");
+                              link.href = user.offerLetterUrl;
+                              link.download = "offer_letter.pdf";
+                              link.target = "_blank";
+                              document.body.appendChild(link);
+                              link.click();
+                              document.body.removeChild(link);
+                            }
+                          }}
+                        >
+                          View
                         </Button>
                       </div>
                     </div>
@@ -220,7 +251,8 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
               {
                 name: "acceptPrivacyPolicy",
                 type: "checkbox",
-                label: "I have read and accept the company policy",
+                label:
+                  "I have read and accept the company policy, and I confirm that I will sign the offer letter on my first day.",
               },
             ],
           },

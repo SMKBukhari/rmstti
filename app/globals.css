@@ -127,4 +127,17 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+
+  #offer-letter {
+    @media screen {
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+    }
+    @media print {
+      position: static;
+      left: auto;
+      top: auto;
+    }
+  }
 }

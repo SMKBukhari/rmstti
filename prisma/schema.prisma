@@ -80,6 +80,9 @@ model UserProfile {
   companyId               String?
   officeTimingIn          String?
   OfficeTimingOut         String?
+  offerLetterUrl          String?
+  offerLetterName         String?
+  offerLetterPublicId     String?
   Attendence              Attendence[]
   ResignationRequests     ResignationRequests[]
   Warnings                Warnings[]
