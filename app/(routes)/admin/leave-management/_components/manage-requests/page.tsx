@@ -4,28 +4,24 @@ import { db } from "@/lib/db";
 import React from "react";
 import { format } from "date-fns";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { columns, LeaveRequestsColumns } from "./_components/columns";
-import RaiseRequest from "./_components/RaiseRequest";
 
-const ApplicantsPage = async () => {
+const ManageLeaveRequests = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
-
-  if (!userId) {
-    redirect("/signIn");
-  }
 
   const user = await db.userProfile.findUnique({
     where: {
       userId: userId,
     },
+    include: {
+      department: true,
+    },
   });
 
+  const leaveType = await db.leaveType.findMany();
+
   const leaveRequests = await db.leaveRequest.findMany({
-    where: {
-      userId: user?.userId,
-    },
     include: {
       user: true,
       leaveType: true,
@@ -37,6 +33,7 @@ const ApplicantsPage = async () => {
     (leaveRequest) => ({
       user: user,
       id: leaveRequest.id,
+      fullName: leaveRequest.user.fullName ?? "N/A",
       leaveType: leaveRequest.leaveType.name ?? "N/A",
       startDate: leaveRequest.startDate
         ? format(new Date(leaveRequest.startDate), "MMMM do, yyyy")
@@ -46,26 +43,25 @@ const ApplicantsPage = async () => {
         : "N/A",
       reason: leaveRequest.reason ?? "N/A",
       status: leaveRequest.status,
+      userImage: leaveRequest.user.userImage ?? "N/A",
+      approvedBy: leaveRequest.approvedBy ?? "N/A",
+      rejectedBy: leaveRequest.rejectedBy ?? "N/A",
     })
   );
-
-  const leaveTypes = await db.leaveType.findMany();
 
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
       <div className='flex items-center justify-between w-full'>
         <CustomBreadCrumb
-          breadCrumbPage='Raise Requests'
+          breadCrumbPage='Manage Employee Leave Requests'
           breadCrumbItem={[
             {
               label: "Leave Management",
-              link: "/manager/leave-management/raise-requests",
+              link: "/admin/leave-management/raise-requests",
             },
           ]}
         />
       </div>
-
-      <RaiseRequest leaveType={leaveTypes} user={user} />
 
       <div className='mt-6 w-full'>
         <DataTable
@@ -75,9 +71,13 @@ const ApplicantsPage = async () => {
             {
               id: "leaveType",
               title: "Leave Type",
-              options: leaveTypes
+              options: leaveType
                 .map((leaveType) => leaveType.name)
                 .filter(Boolean),
+            },
+            {
+              id: "fullName",
+              title: "Name",
             },
             {
               id: "status",
@@ -91,4 +91,4 @@ const ApplicantsPage = async () => {
   );
 };
 
-export default ApplicantsPage;
+export default ManageLeaveRequests;

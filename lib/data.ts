@@ -115,6 +115,19 @@ export const requestsTabs = [
   },
 ];
 
+export const leaveManagementTabs = [
+  {
+    icon: Hand,
+    label: "Raise Leave Requests",
+    value: "raiseRequests",
+  },
+  {
+    icon: NotepadTextDashed,
+    label: "Manage Requests",
+    value: "manageRequests",
+  },
+];
+
 export const requestTabsForCEO = [
   {
     icon: Users,
@@ -205,19 +218,7 @@ export const adminRoutes = [
   {
     icon: NotebookText,
     label: "Leave Management",
-    href: "/admin/leave-management/manage-requests",
-    subitems: [
-      {
-        icon: Hand,
-        label: "Raise Leave Requests",
-        href: "/admin/leave-management/raise-requests",
-      },
-      {
-        icon: NotepadTextDashed,
-        label: "Manage Employee Leave Requests",
-        href: "/admin/leave-management/manage-requests",
-      },
-    ],
+    href: "/admin/leave-management",
   },
   {
     icon: Calendar,
