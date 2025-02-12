@@ -54,60 +54,52 @@
 // }
 
 
-import { db } from "@/lib/db";
-import { NextResponse } from "next/server";
+import { db } from "@/lib/db"
+import { NextResponse } from "next/server"
 
-export async function GET(
-  request: Request,
-  { params }: { params: { userId: string } }
-) {
+export async function GET(request: Request, { params }: { params: { userId: string } }) {
   try {
-    const { userId } = params;
+    const { userId } = params
 
-    // Fetch the user's latest attendance record (check-in or check-out)
-    const latestAttendance = await db.attendence.findFirst({
+    // Find the most recent CheckLog for this user
+    const latestCheckLog = await db.checkLog.findFirst({
       where: {
-        userId: userId,
+        Attendence: {
+          some: {
+            userId: userId,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
       },
-      include: {
-        checkLog: true,  // Include check log information
-      },
-    });
+    })
 
-    if (!latestAttendance || !latestAttendance.checkLog) {
-      return NextResponse.json({ status: "checkedOut" });
+    if (!latestCheckLog) {
+      return NextResponse.json({ status: "checkedOut" })
     }
 
-    const checkLog = latestAttendance.checkLog;
+    // If there's a checkInTime but no checkOutTime, the user is checked in
+    if (latestCheckLog.checkInTime && !latestCheckLog.checkOutTime) {
+      // Check if the check-in is within the last 24 hours
+      const checkInTime = new Date(latestCheckLog.checkInTime)
+      const currentTime = new Date()
+      const timeDifference = currentTime.getTime() - checkInTime.getTime()
+      const hoursDifference = timeDifference / (1000 * 3600)
 
-    // If the user has checked in but not checked out
-    if (checkLog.checkInTime && !checkLog.checkOutTime) {
-      // Set the start of the day as the check-in time
-      const startOfDay = new Date(checkLog.checkInTime);
-
-      // Calculate the end of the 24-hour period from the check-in time
-      const endOfDay = new Date(startOfDay);
-      endOfDay.setHours(endOfDay.getHours() + 24);
-
-      // Get the current time
-      const currentTime = new Date();
-
-      // Check if the current time is within the 24-hour window
-      if (currentTime >= startOfDay && currentTime <= endOfDay) {
-        return NextResponse.json({ status: "checkedIn" });
+      if (hoursDifference <= 24) {
+        return NextResponse.json({ status: "checkedIn" })
       }
     }
 
-    // If no active check-in or the 24-hour window has passed
-    return NextResponse.json({ status: "checkedOut" });
+    // In all other cases, consider the user checked out
+    return NextResponse.json({ status: "checkedOut" })
   } catch (error) {
-    console.error("Error fetching attendance status:", error);
-    return NextResponse.json(
-      { message: "Failed to fetch attendance status" },
-      { status: 500 }
-    );
+    console.error("Error fetching attendance status:", error)
+    return NextResponse.json({ message: "Failed to fetch attendance status" }, { status: 500 })
   }
 }
+
+
+
+
