@@ -42,6 +42,7 @@ const ManageLeaveRequests = async () => {
         ? format(new Date(leaveRequest.endDate), "MMMM do, yyyy")
         : "N/A",
       reason: leaveRequest.reason ?? "N/A",
+      leaveBalance: leaveRequest.user.totalLeavesBalance ?? "N/A",
       status: leaveRequest.status,
       userImage: leaveRequest.user.userImage ?? "N/A",
       approvedBy: leaveRequest.approvedBy ?? "N/A",

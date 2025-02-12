@@ -14,6 +14,7 @@ export type LeaveRequestsColumns = {
   startDate: string;
   endDate: string;
   reason: string;
+  leaveBalance: string;
   status: string;
   approvedBy?: string;
   rejectedBy?: string;
@@ -61,6 +62,10 @@ export const columns: ColumnDef<LeaveRequestsColumns>[] = [
   {
     accessorKey: "reason",
     header: "Reason",
+  },
+  {
+    accessorKey: "leaveBalance",
+    header: "Leave Balance",
   },
   {
     accessorKey: "status",
