@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import AttendanceUpdate from "./_components/AttendanceUpdate";
 
-const AttendancePage = async () => {
+const MarkAttendance = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
 
@@ -76,4 +76,4 @@ const AttendancePage = async () => {
   );
 };
 
-export default AttendancePage;
+export default MarkAttendance;

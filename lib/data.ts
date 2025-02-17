@@ -128,6 +128,32 @@ export const leaveManagementTabs = [
   },
 ];
 
+export const attendanceManagementTabs = [
+  {
+    icon: CalendarPlus,
+    label: "Mark Attendance",
+    value: "markAttendance",
+  },
+  {
+    icon: CalendarFold,
+    label: "Manage Attendance",
+    value: "manageAttendance",
+  },
+];
+
+export const resignationManagementTabs = [
+  {
+    icon: Hand,
+    label: "Raise Resignation Requests",
+    value: "raiseRequests",
+  },
+  {
+    icon: NotepadTextDashed,
+    label: "Manage Resignation Requests",
+    value: "manageRequests",
+  },
+];
+
 export const requestTabsForCEO = [
   {
     icon: Users,
@@ -201,19 +227,7 @@ export const adminRoutes = [
   {
     icon: CalendarClock,
     label: "Attendance Management",
-    href: "/admin/attendance-management/manage-attendance",
-    subitems: [
-      {
-        icon: CalendarPlus,
-        label: "Mark Attendance",
-        href: "/admin/attendance-management/mark-attendance",
-      },
-      {
-        icon: CalendarFold,
-        label: "Manage Attendance",
-        href: "/admin/attendance-management/manage-attendance",
-      },
-    ],
+    href: "/admin/attendance-management",
   },
   {
     icon: NotebookText,
@@ -253,19 +267,7 @@ export const adminRoutes = [
   {
     icon: BadgeMinus,
     label: "Resignation Management",
-    href: "/admin/resign/manage-resignations",
-    subitems: [
-      {
-        icon: Hand,
-        label: "Raise Resignation Requests",
-        href: "/admin/resign/raise-request",
-      },
-      {
-        icon: NotepadTextDashed,
-        label: "Manage Resignation Requests",
-        href: "/admin/resign/manage-resignations",
-      },
-    ],
+    href: "/admin/resignationManagement",
   },
   {
     icon: FolderOpenDot,

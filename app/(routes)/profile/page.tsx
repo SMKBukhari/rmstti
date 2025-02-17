@@ -30,6 +30,7 @@ const ProfilePage = async () => {
           users: {
             include: {
               role: true,
+              status: true,
             },
           },
         },
@@ -49,10 +50,13 @@ const ProfilePage = async () => {
     ? { ...user, educations: user.education || [] }
     : null;
 
-  const teamMembers =
-    user?.role?.name !== "User"
-      ? user?.department?.users.filter((teamMember) => teamMember.userId)
-      : [];
+  const teamMembers = user?.department?.users.filter(
+    (teamMember) =>
+      teamMember.userId &&
+      teamMember.status?.name !== "Resigned" &&
+      teamMember.status?.name !== "Terminated" &&
+      teamMember.status?.name !== "Former"
+  );
 
   return (
     <div className='w-full'>

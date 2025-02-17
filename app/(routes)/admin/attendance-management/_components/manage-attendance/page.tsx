@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 import { AttendanceRecord, columns } from "./_components/columns";
 import UploadAttendancePage from "./_components/UploadCSV";
 
-const ApplicantsPage = async () => {
+const ManageAttendance = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
 
@@ -126,4 +126,4 @@ const ApplicantsPage = async () => {
   );
 };
 
-export default ApplicantsPage;
+export default ManageAttendance;

@@ -6,7 +6,7 @@ import { columns, ResignationRequestsColumns } from "./_components/columns";
 import { format } from "date-fns";
 import { cookies } from "next/headers";
 
-const ApplicantsPage = async () => {
+const ManageResignationPage = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
 
@@ -53,4 +53,4 @@ const ApplicantsPage = async () => {
   );
 };
 
-export default ApplicantsPage;
+export default ManageResignationPage;

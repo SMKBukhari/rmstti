@@ -7,6 +7,7 @@ import {
   Check,
   Crown,
   HeartPulse,
+  IdCard,
   Mail,
   MapPin,
   Phone,
@@ -22,7 +23,7 @@ import {
   LiaSkype,
   LiaTwitter,
 } from "react-icons/lia";
-import { FaMoneyBillWave } from "react-icons/fa";
+import { FaFemale, FaMale, FaMoneyBillWave, FaTransgenderAlt } from "react-icons/fa";
 import { GiBookStorm } from "react-icons/gi";
 import { BiLogoZoom } from "react-icons/bi";
 import { SiGooglemeet } from "react-icons/si";
@@ -59,6 +60,20 @@ const UserAboutSection = ({ user, teamMembers }: UserAboutSectionProps) => {
             <h3 className='text-muted-foreground text-base -mt-0.5'>{`Full Name: ${user?.fullName}`}</h3>
           </div>
           <div className='flex gap-2'>
+            {user?.gender === "Male" ? (
+              <FaMale className='w-5 h-5 text-muted-foreground' />
+            ) : user?.gender === "Female" ? (
+              <FaFemale className='w-5 h-5 text-muted-foreground' />
+            ) : (
+              <FaTransgenderAlt className='w-5 h-5 text-muted-foreground' />
+            )}
+            <h3 className='text-muted-foreground text-base -mt-0.5'>{`Gender: ${user?.gender}`}</h3>
+          </div>
+          <div className='flex gap-2'>
+            <IdCard className='w-5 h-5 text-muted-foreground' />
+            <h3 className='text-muted-foreground text-base -mt-0.5'>{`CNIC: ${user?.cnic}`}</h3>
+          </div>
+          <div className='flex gap-2'>
             <Check className='w-5 h-5 text-muted-foreground' />
             <h3 className='text-muted-foreground text-base -mt-0.5'>{`Status: ${
               user?.status?.name || "Not Appointed Yet"
@@ -82,7 +97,7 @@ const UserAboutSection = ({ user, teamMembers }: UserAboutSectionProps) => {
           )}
           <div className='flex gap-2'>
             <MapPin className='w-5 h-5 text-muted-foreground' />
-            <h3 className='text-muted-foreground text-base -mt-0.5'>{`Address: ${user?.address}`}</h3>
+            <h3 className='text-muted-foreground text-base -mt-0.5'>{`Address: ${user?.address === null ? "Not Entered" : user?.address}`}</h3>
           </div>
           <div className='flex gap-2'>
             <HeartPulse className='w-5 h-5 text-muted-foreground' />
