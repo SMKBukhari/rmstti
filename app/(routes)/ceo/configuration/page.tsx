@@ -44,6 +44,8 @@ const SettingsPage = async () => {
     users: department.users || [],
   }));
 
+  const publicHolidays = await db.publicHoliday.findMany();
+
   const userWithSkills = user ? { ...user, skills: user.skills || [] } : null;
 
   return (
@@ -71,6 +73,7 @@ const SettingsPage = async () => {
               userSkills={userWithSkills}
               company={user || null}
               category={categories}
+              publicHolidays={publicHolidays}
             />
           </TabsContent>
         </div>

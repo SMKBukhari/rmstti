@@ -27,7 +27,9 @@ interface UploadAttendancePageProps {
   user: UserProfile | null;
 }
 
-export default function UploadAttendancePage({user}: UploadAttendancePageProps) {
+export default function UploadAttendancePage({
+  user,
+}: UploadAttendancePageProps) {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -59,11 +61,15 @@ export default function UploadAttendancePage({user}: UploadAttendancePageProps) 
     formData.append("file", file);
 
     try {
-      await axios.post(`/api/user/${user?.userId}/attendance/upload`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await axios.post(
+        `/api/user/${user?.userId}/attendance/upload`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       toast.success("Attendance data uploaded successfully");
       setDialogOpen(false);
       router.push("/ceo/attendance-management");
@@ -77,7 +83,7 @@ export default function UploadAttendancePage({user}: UploadAttendancePageProps) 
 
   return (
     <>
-      <div className='flex w-full items-end justify-end'>
+      <div>
         <Button variant={"primary"} onClick={() => setDialogOpen(true)}>
           Upload Attendance
         </Button>

@@ -1,6 +1,7 @@
 import {
   company,
   Department,
+  PublicHoliday,
   RequestCategory,
   Requests,
   Skills,
@@ -10,6 +11,7 @@ import CreateDepartments from "./_components/createdepartments";
 import CompanyBasicInfo from "./_components/basic";
 import CreateRequestsCategory from "./_components/createRequestsCategories";
 import UploadCompanyPolicy from "./_components/uploadCompanyPolicy";
+import PublicHolidays from "./_components/publicHolidays";
 
 interface GeneralTabPageProps {
   user: UserProfile | null;
@@ -17,13 +19,16 @@ interface GeneralTabPageProps {
   departments: (Department & { users: UserProfile[] })[];
   category: (RequestCategory & { requests: Requests[] })[];
   company: (UserProfile & { company: company | null }) | null;
+  publicHolidays: PublicHoliday[] | [];
 }
 
 const GeneralTabPage = ({
+  user,
   userSkills,
   departments,
   company,
   category,
+  publicHolidays,
 }: GeneralTabPageProps) => {
   return (
     <>
@@ -38,6 +43,7 @@ const GeneralTabPage = ({
         <UploadCompanyPolicy company={company} />
         <CreateDepartments user={userSkills} departments={departments} />
         <CreateRequestsCategory user={userSkills} category={category} />
+        <PublicHolidays user={user} publicHoidays={publicHolidays} />
       </div>
     </>
   );
