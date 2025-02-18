@@ -33,6 +33,8 @@ const SettingsPage = async () => {
     },
   });
 
+  const publicHolidays = await db.publicHoliday.findMany();
+
   const departmentsWithUsers = departments.map((department) => ({
     ...department,
     users: department.users || [],
@@ -64,6 +66,7 @@ const SettingsPage = async () => {
               departments={departmentsWithUsers}
               userSkills={userWithSkills}
               company={user || null}
+              publicHolidays={publicHolidays}
             />
           </TabsContent>
         </div>

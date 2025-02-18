@@ -209,7 +209,7 @@ export const JobOfferSchema = z.object({
   department: z.string(),
   salary: z.string(),
   role: z.string(),
-})
+});
 
 export const JobOfferAcceptanceSchema = z.object({
   joiningDate: z.date(),
@@ -233,6 +233,11 @@ export const LeaveDeleteSchema = z.object({
 });
 
 export const DepartmentsSchema = z.object({
+  name: z.string(),
+});
+
+export const PublicHolidaySchema = z.object({
+  date: z.date(),
   name: z.string(),
 });
 
@@ -308,4 +313,9 @@ export const RaiseComplaintSchema = z.object({
   complaintTo: z.string(),
   message: z.string(),
   isAnonymous: z.boolean(),
+});
+
+export const CalculateAttendanceSchema = z.object({
+  dateFrom: z.date(),
+  dateTo: z.date(),
 });

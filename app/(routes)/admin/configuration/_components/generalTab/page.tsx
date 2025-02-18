@@ -1,24 +1,29 @@
 import {
   company,
   Department,
+  PublicHoliday,
   Skills,
   UserProfile,
 } from "@prisma/client";
 import { Card } from "@/components/ui/card";
 import CreateDepartments from "./_components/createdepartments";
 import CompanyBasicInfo from "./_components/basic";
+import PublicHolidays from "./_components/publicHolidays";
 
 interface GeneralTabPageProps {
   user: UserProfile | null;
   userSkills: (UserProfile & { skills: Skills[] }) | null;
   departments: (Department & { users: UserProfile[] })[];
   company: (UserProfile & { company: company | null }) | null;
+  publicHolidays: PublicHoliday[] | [];
 }
 
 const GeneralTabPage = ({
+  user,
   userSkills,
   departments,
   company,
+  publicHolidays,
 }: GeneralTabPageProps) => {
   return (
     <>
@@ -31,6 +36,7 @@ const GeneralTabPage = ({
           <CompanyBasicInfo company={company} />
         </Card>
         <CreateDepartments user={userSkills} departments={departments} />
+        <PublicHolidays user={user} publicHoidays={publicHolidays} />
       </div>
     </>
   );

@@ -7,6 +7,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AttendanceRecord, columns } from "./_components/columns";
 import UploadAttendancePage from "./_components/UploadCSV";
+import CalculateAttendancePage from "./_components/CalculateAttendaceRecord";
 
 const ManageAttendance = async () => {
   const cookieStore = cookies();
@@ -74,7 +75,7 @@ const ManageAttendance = async () => {
   );
 
   return (
-    <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
+    <div className='flex-col p-4 md:p-8 items-center justify-center flex w-full'>
       <div className='flex items-center justify-between w-full'>
         <CustomBreadCrumb
           breadCrumbPage='Manage Employee Attendance'
@@ -87,7 +88,10 @@ const ManageAttendance = async () => {
         />
       </div>
 
-      <UploadAttendancePage user={user} />
+      <div className="flex gap-1 justify-end w-full">
+        <UploadAttendancePage user={user} />
+        <CalculateAttendancePage user={user} />
+      </div>
 
       <div className='mt-6 w-full'>
         <DataTable

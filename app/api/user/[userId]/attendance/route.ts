@@ -145,8 +145,6 @@
 //             },
 //           });
 
-          
-
 //           return NextResponse.json({ message: "Check-out successful." });
 //         } else {
 //           // If there's no active check-in log, return an error
@@ -183,7 +181,6 @@
 //   ); // in minutes
 //   return `${hours} hours ${minutes} minutes`;
 // }
-
 
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
@@ -260,6 +257,23 @@ export async function POST(
         },
       });
 
+      const activeAttendance = await db.attendence.findFirst({
+        where: {
+          checkLog: {
+            id: activeCheckLog.id,
+          },
+        },
+      });
+
+      await db.attendence.update({
+        where: {
+          id: activeAttendance?.id,
+        },
+        data: {
+          workingHours: workingHours,
+        },
+      });
+
       return NextResponse.json({ message: "Check-out successful." });
     }
 
@@ -276,8 +290,6 @@ export async function POST(
 function calculateWorkingHours(checkInTime: Date, checkOutTime: Date): string {
   const timeDifference = checkOutTime.getTime() - checkInTime.getTime();
   const hours = Math.floor(timeDifference / (1000 * 3600)); // in hours
-  const minutes = Math.floor(
-    (timeDifference % (1000 * 3600)) / (1000 * 60)
-  ); // in minutes
+  const minutes = Math.floor((timeDifference % (1000 * 3600)) / (1000 * 60)); // in minutes
   return `${hours} hours ${minutes} minutes`;
 }

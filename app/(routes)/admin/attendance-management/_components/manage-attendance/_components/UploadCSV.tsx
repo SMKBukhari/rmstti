@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import axios from "axios";
 import { UserProfile } from "@prisma/client";
+import { Upload } from "lucide-react";
 
 // Zod Schema for Validation
 const FileUploadSchema = z.object({
@@ -77,8 +78,9 @@ export default function UploadAttendancePage({user}: UploadAttendancePageProps) 
 
   return (
     <>
-      <div className='flex w-full items-end justify-end'>
+      <div className=''>
         <Button variant={"primary"} onClick={() => setDialogOpen(true)}>
+          <Upload />
           Upload Attendance
         </Button>
       </div>
