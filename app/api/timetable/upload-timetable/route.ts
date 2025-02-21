@@ -1,66 +1,95 @@
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { parse } from "csv-parse/sync"; // CSV parsing library
-import fs from "fs";
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { parse } from "csv-parse/sync";
+import { dynamicDateParser } from "@/lib/dynamicDateParse";
 
-const db = new PrismaClient();
-
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File;
-
     if (!file) {
-      return NextResponse.json(
-        { success: false, error: "No file uploaded" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    // Convert file to Buffer for processing
-    const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const csvData = fileBuffer.toString("utf-8");
-
-    // Parse the CSV file
-    const records = parse(csvData, {
-      columns: true, // Use the first row as column headers
+    const csvContent = await file.text();
+    const records = parse(csvContent, {
+      columns: true,
       skip_empty_lines: true,
     });
 
-    // Validate and transform data
-    const timetableEntries = records.map((record: any) => {
+    for (const record of records) {
+      const {
+        "TimeTable ID": timeTableId,
+        "User ID": userId,
+        "Employee Name": employeeName,
+        Date: date,
+        "Shift Start": shiftStart,
+        "Shift End": shiftEnd,
+        "Shift Type": shiftType,
+      } = record;
+
+      // Validation
       if (
-        !record.userId ||
-        !record.date ||
-        !record.shiftStart ||
-        !record.shiftEnd ||
-        !record.shiftType
+        !timeTableId ||
+        !userId ||
+        !employeeName ||
+        !date ||
+        !shiftStart ||
+        !shiftEnd ||
+        !shiftType
       ) {
-        throw new Error("Invalid file format or missing fields");
+        console.error(
+          `Missing required fields for record: ${JSON.stringify(record)}`
+        );
+        continue;
       }
 
-      return {
-        userId: record.userId,
-        date: new Date(record.date),
-        shiftStart: new Date(record.shiftStart),
-        shiftEnd: new Date(record.shiftEnd),
-        shiftType: record.shiftType,
-      };
-    });
+      const parsedDate = dynamicDateParser(date);
+      const parsedShiftStart = dynamicDateParser(`${date} ${shiftStart}`);
+      const parsedShiftEnd = dynamicDateParser(`${date} ${shiftEnd}`);
 
-    // Insert timetable entries into the database
-    await db.timeTable.createMany({
-      data: timetableEntries,
-    });
+      if (!parsedDate || !parsedShiftStart || !parsedShiftEnd) {
+        console.error(
+          `Invalid date format for record: ${JSON.stringify(record)}`
+        );
+        continue;
+      }
+
+      // Base timeTable data
+      const timeTableData = {
+        id: timeTableId,
+        userId: userId,
+        employeeName: employeeName,
+        date: parsedDate, // Use parsed date
+        shiftStart: parsedShiftStart, // Use parsed shift start
+        shiftEnd: parsedShiftEnd, // Use parsed shift end
+        shiftType: shiftType,
+      };
+
+      console.log(`Parsed Date: ${parsedDate}`);
+      console.log(`Parsed Shift Start: ${parsedShiftStart}`);
+      console.log(`Parsed Shift End: ${parsedShiftEnd}`);
+
+      // Create or update Attendance record
+      try {
+        await db.timeTable.upsert({
+          where: { id: timeTableId },
+          create: { ...timeTableData },
+          update: { ...timeTableData },
+        });
+        console.log(`Successfully upserted record: ${timeTableId}`);
+      } catch (error) {
+        console.error(`Error upserting record with ID ${timeTableId}:`, error);
+      }
+    }
 
     return NextResponse.json({
-      success: true,
-      message: "Timetable uploaded and processed successfully",
+      message: "TimeTable data uploaded successfully",
     });
   } catch (error) {
-    console.error("Error processing uploaded timetable file:", error);
+    console.error("Error processing CSV:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to upload and process timetable" },
+      { error: "Failed to process Time Table data" },
       { status: 500 }
     );
   }

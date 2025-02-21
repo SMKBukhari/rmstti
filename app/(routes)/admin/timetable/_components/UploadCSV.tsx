@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import axios from "axios";
 import { UserProfile } from "@prisma/client";
+import { Upload } from "lucide-react";
 
 // Zod Schema for Validation
 const FileUploadSchema = z.object({
@@ -23,13 +24,11 @@ const FileUploadSchema = z.object({
 
 type FileUploadFormData = z.infer<typeof FileUploadSchema>;
 
-interface UploadTimeTablePageProps {
+interface UploadTimeTableProps {
   user: UserProfile | null;
 }
 
-export default function UploadTimeTablePage({
-  user,
-}: UploadTimeTablePageProps) {
+export default function UploadTimeTablePage({user}: UploadTimeTableProps) {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -48,46 +47,30 @@ export default function UploadTimeTablePage({
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (data: FileUploadFormData) => {
     if (!file) {
       toast.error("Please select a file to upload");
       return;
     }
 
+    console.log("Uploading file:", file);
+    console.log("Form data:", data);
     setIsUploading(true);
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const response = await axios.post(
-        `/api/timetable/upload-timeTable`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      if (response.data.success) {
-        router.refresh();
-        router.push("/ceo/timetable");
-        toast.success("Attendance data uploaded successfully");
-        setDialogOpen(false);
-      } else {
-        throw new Error(
-          response.data.error || "Failed to upload attendance data"
-        );
-      }
+      await axios.post(`/api/timetable/upload-timetable`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      toast.success("TimeTable data uploaded successfully");
+      setDialogOpen(false);
+      router.refresh();
     } catch (error) {
       console.error("Upload error:", error);
-      if (axios.isAxiosError(error)) {
-        toast.error(
-          `Upload failed: ${error.response?.data?.error || error.message}`
-        );
-      } else {
-        toast.error("Failed to upload attendance data");
-      }
+      toast.error("Failed to upload timetable data");
     } finally {
       setIsUploading(false);
     }
@@ -95,17 +78,18 @@ export default function UploadTimeTablePage({
 
   return (
     <>
-      <div className='flex w-full items-end justify-end'>
+      <div className=''>
         <Button variant={"primary"} onClick={() => setDialogOpen(true)}>
-          Upload Attendance
+          <Upload />
+          Upload TimeTable
         </Button>
       </div>
 
       <DialogForm
         isOpen={isDialogOpen}
         onOpenChange={setDialogOpen}
-        title='Upload Attendance CSV'
-        description='Please upload your attendance file in CSV format.'
+        title='Upload TimeTable CSV'
+        description='Please upload your timetable file in CSV format.'
         fields={[
           {
             name: "file",

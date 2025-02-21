@@ -339,15 +339,16 @@ model Notifications {
 }
 
 model TimeTable {
-  id         String      @id @unique @default(cuid())
-  userId     String
-  user       UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  date       DateTime
-  shiftStart DateTime
-  shiftEnd   DateTime
-  shiftType  ShiftType
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @default(now())
+  id           String      @id @unique @default(cuid())
+  userId       String
+  user         UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  employeeName String
+  date         DateTime
+  shiftStart   DateTime
+  shiftEnd     DateTime
+  shiftType    ShiftType
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @default(now())
 }
 
 // Company related models
