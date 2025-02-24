@@ -18,10 +18,15 @@ import DialogForm from "@/components/DialogForm";
 
 interface PublicHolidaysProps {
   user: UserProfile | null;
-  publicHoidays: PublicHoliday[] | [];
+  publicHolidays: (PublicHoliday & { employees: UserProfile[] })[] | [];
+  employees: UserProfile[];
 }
 
-const PublicHolidays = ({ user, publicHoidays }: PublicHolidaysProps) => {
+const PublicHolidays = ({
+  user,
+  publicHolidays,
+  employees,
+}: PublicHolidaysProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setDialogOpen] = useState(false);
   const router = useRouter();
@@ -33,6 +38,14 @@ const PublicHolidays = ({ user, publicHoidays }: PublicHolidaysProps) => {
       date: new Date(),
     },
   });
+
+  const forComboboxOptions = [
+    { label: "All", value: "all" },
+    ...employees.map((employee) => ({
+      label: employee.fullName,
+      value: employee.userId,
+    })),
+  ];
 
   const onSubmit = async (data: z.infer<typeof PublicHolidaySchema>) => {
     try {
@@ -59,14 +72,21 @@ const PublicHolidays = ({ user, publicHoidays }: PublicHolidaysProps) => {
     }
   };
 
-  const formattedPublicHolidayList: PubicHolidayList[] = publicHoidays.map(
-    (publicHoiday) => ({
+  const formattedPublicHolidayList: PubicHolidayList[] = publicHolidays.map(
+    (publicHoliday) => ({
       user: user,
-      id: publicHoiday.id,
-      date: publicHoiday.date
-        ? format(new Date(publicHoiday.date), "EEEE, MMMM d, yyyy")
+      id: publicHoliday.id,
+      date: publicHoliday.date
+        ? format(new Date(publicHoliday.date), "EEEE, MMMM d, yyyy")
         : "N/A",
-      name: publicHoiday.name ?? "",
+      for: publicHoliday.isForAll
+        ? "All"
+        : publicHoliday.employees
+        ? publicHoliday.employees
+            .map((employee) => employee.fullName)
+            .join(", ")
+        : "N/A",
+      name: publicHoliday.name ?? "",
     })
   );
   return (
@@ -93,6 +113,14 @@ const PublicHolidays = ({ user, publicHoidays }: PublicHolidaysProps) => {
               id: "fullName",
               title: "Name",
             },
+            {
+              id: "for",
+              title: "For",
+              options: [
+                "All",
+                ...employees.map((employee) => employee.fullName),
+              ],
+            },
           ]}
         />
       </div>
@@ -108,6 +136,12 @@ const PublicHolidays = ({ user, publicHoidays }: PublicHolidaysProps) => {
             placeholder: "Enter Holiday Name",
             name: "name",
             type: "input",
+          },
+          {
+            label: "For",
+            name: "for",
+            type: "select",
+            comboboxOptions: forComboboxOptions,
           },
           {
             label: "Date",

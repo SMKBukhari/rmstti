@@ -90,6 +90,7 @@ model UserProfile {
   Requests                Requests[]
   ProfieUpdateRequests    ProfieUpdateRequests[]
   Complaints              Complaints[]
+  publicHolidays          PublicHoliday[]        @relation("HolidayEmployees")
 }
 
 model ProfieUpdateRequests {
@@ -369,13 +370,15 @@ model company {
 }
 
 model PublicHoliday {
-  id        String   @id @unique @default(cuid())
+  id        String        @id @unique @default(cuid())
   date      DateTime
   name      String
   companyId String
-  company   company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  company   company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  isForAll  Boolean       @default(true)
+  employees UserProfile[] @relation("HolidayEmployees")
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now())
 }
 
 model Attendence {

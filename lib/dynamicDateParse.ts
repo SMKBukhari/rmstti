@@ -7,6 +7,7 @@ export function dynamicDateParser(dateString: string): Date | null {
     "yyyy-MM-dd",
     "MM/dd/yyyy h:mm:ss a",
     "dd-MM-yyyy h:mm:ss a",
+    "yyyy-MM-dd h:mm:ss a",
     "yyyy/MM/dd",
     "M/d/yyyy",
     "d/M/yyyy",

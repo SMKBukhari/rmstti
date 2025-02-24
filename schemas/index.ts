@@ -239,6 +239,7 @@ export const DepartmentsSchema = z.object({
 export const PublicHolidaySchema = z.object({
   date: z.date(),
   name: z.string(),
+  for: z.string(),
 });
 
 export const RequestCategorySchema = z.object({

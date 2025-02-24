@@ -20,7 +20,8 @@ interface GeneralTabPageProps {
   departments: (Department & { users: UserProfile[] })[];
   company: (UserProfile & { company: company | null }) | null;
   category: (RequestCategory & { requests: Requests[] })[];
-  publicHolidays: PublicHoliday[] | [];
+  publicHolidays: (PublicHoliday & { employees: UserProfile[] })[] | [];
+  employees: UserProfile[];
 }
 
 const GeneralTabPage = ({
@@ -30,6 +31,7 @@ const GeneralTabPage = ({
   category,
   company,
   publicHolidays,
+  employees,
 }: GeneralTabPageProps) => {
   return (
     <>
@@ -44,7 +46,11 @@ const GeneralTabPage = ({
         <UploadCompanyPolicy company={company} />
         <CreateDepartments user={userSkills} departments={departments} />
         <CreateRequestsCategory user={userSkills} category={category} />
-        <PublicHolidays user={user} publicHoidays={publicHolidays} />
+        <PublicHolidays
+          user={user}
+          publicHolidays={publicHolidays}
+          employees={employees}
+        />
       </div>
     </>
   );

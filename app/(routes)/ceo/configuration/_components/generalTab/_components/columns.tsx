@@ -1,8 +1,8 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import CellActions from "./CellActions";
 import { UserProfile } from "@prisma/client";
+import CellActions from "./CellActions";
 
 export type PubicHolidayList = {
   id: string;

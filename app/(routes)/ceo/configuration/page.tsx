@@ -27,6 +27,37 @@ const SettingsPage = async () => {
     },
   });
 
+  const publicHolidays = await db.publicHoliday.findMany({
+      include: {
+        employees: true,
+      },
+    });
+
+  const applicationStatus = await db.applicationStatus.findFirst({
+      where: { name: "Hired" },
+    });
+
+  const employees = await db.userProfile.findMany({
+      where: {
+        applicationStatusId: applicationStatus?.id,
+        role: {
+          name: {
+            notIn: ["User", "Applicant", "Interviewee", "CEO"],
+          },
+        },
+        status: {
+          name: "Active",
+        },
+      },
+      include: {
+        role: true,
+        workstatus: true,
+        status: true,
+        department: true,
+        company: true,
+      },
+    });
+
   const departments = await db.department.findMany({
     include: {
       users: true,
@@ -43,8 +74,6 @@ const SettingsPage = async () => {
     ...department,
     users: department.users || [],
   }));
-
-  const publicHolidays = await db.publicHoliday.findMany();
 
   const userWithSkills = user ? { ...user, skills: user.skills || [] } : null;
 
@@ -74,6 +103,7 @@ const SettingsPage = async () => {
               company={user || null}
               category={categories}
               publicHolidays={publicHolidays}
+              employees={employees}
             />
           </TabsContent>
         </div>
