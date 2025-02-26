@@ -91,6 +91,7 @@ model UserProfile {
   ProfieUpdateRequests    ProfieUpdateRequests[]
   Complaints              Complaints[]
   publicHolidays          PublicHoliday[]        @relation("HolidayEmployees")
+  WorkFromHome            WorkFromHome[]
 }
 
 model ProfieUpdateRequests {
@@ -158,6 +159,20 @@ model LeaveType {
   leaveRequests LeaveRequest[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @default(now())
+}
+
+model WorkFromHome {
+  id         String      @id @unique @default(cuid())
+  userId     String
+  user       UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  startDate  DateTime
+  endDate    DateTime
+  reason     String
+  status     String      @default("Pending")
+  aprrovedBy String?
+  rejectedBy String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @default(now())
 }
 
 model ResignationRequests {

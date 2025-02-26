@@ -53,15 +53,7 @@ const ManageLeaveRequests = async () => {
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
       <div className='flex items-center justify-between w-full'>
-        <CustomBreadCrumb
-          breadCrumbPage='Manage Employee Leave Requests'
-          breadCrumbItem={[
-            {
-              label: "Leave Management",
-              link: "/admin/leave-management/raise-requests",
-            },
-          ]}
-        />
+        <CustomBreadCrumb breadCrumbPage='Manage Employee Work From Home Requests' />
       </div>
 
       <div className='mt-6 w-full'>

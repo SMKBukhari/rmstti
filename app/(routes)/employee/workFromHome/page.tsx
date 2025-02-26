@@ -7,7 +7,7 @@ import { format } from "date-fns";
 import { cookies } from "next/headers";
 import RaiseRequest from "./_components/RaiseRequest";
 
-const LeaveManagementPage = async () => {
+const WorkFromHomePage = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
 
@@ -17,55 +17,43 @@ const LeaveManagementPage = async () => {
     },
   });
 
-  const leaveRequests = await db.leaveRequest.findMany({
+  const workFromHomeRequests = await db.workFromHome.findMany({
     where: {
       userId: user?.userId,
     },
     include: {
       user: true,
-      leaveType: true,
     },
   });
 
   // Formatting the applicants data for the table
-  const formattedLeaveRequests: LeaveRequestsColumns[] = leaveRequests.map(
-    (leaveRequest) => ({
+  const formattedWorkFromHomeRequests: LeaveRequestsColumns[] =
+    workFromHomeRequests.map((workFromHomeRequest) => ({
       user: user,
-      id: leaveRequest.id,
-      leaveType: leaveRequest.leaveType.name ?? "N/A",
-      startDate: leaveRequest.startDate
-        ? format(new Date(leaveRequest.startDate), "MMMM do, yyyy")
+      id: workFromHomeRequest.id,
+      startDate: workFromHomeRequest.startDate
+        ? format(new Date(workFromHomeRequest.startDate), "MMMM do, yyyy")
         : "N/A",
-      endDate: leaveRequest.endDate
-        ? format(new Date(leaveRequest.endDate), "MMMM do, yyyy")
+      endDate: workFromHomeRequest.endDate
+        ? format(new Date(workFromHomeRequest.endDate), "MMMM do, yyyy")
         : "N/A",
-      reason: leaveRequest.reason ?? "N/A",
-      status: leaveRequest.status,
-    })
-  );
-
-  const leaveTypes = await db.leaveType.findMany();
+      reason: workFromHomeRequest.reason ?? "N/A",
+      status: workFromHomeRequest.status,
+    }));
 
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
       <div className='flex items-center justify-between w-full'>
-        <CustomBreadCrumb breadCrumbPage='Leave Management' />
+        <CustomBreadCrumb breadCrumbPage='Wrok From Home' />
       </div>
 
-      <RaiseRequest leaveType={leaveTypes} user={user} />
+      <RaiseRequest user={user} />
 
       <div className='mt-6 w-full'>
         <DataTable
           columns={columns}
-          data={formattedLeaveRequests}
+          data={formattedWorkFromHomeRequests}
           filterableColumns={[
-            {
-              id: "leaveType",
-              title: "Leave Type",
-              options: leaveTypes
-                .map((leaveType) => leaveType.name)
-                .filter(Boolean),
-            },
             {
               id: "status",
               title: "Status",
@@ -78,4 +66,4 @@ const LeaveManagementPage = async () => {
   );
 };
 
-export default LeaveManagementPage;
+export default WorkFromHomePage;

@@ -54,15 +54,7 @@ const ApplicantsPage = async () => {
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
       <div className='flex items-center justify-between w-full'>
-        <CustomBreadCrumb
-          breadCrumbPage='Raise Requests'
-          breadCrumbItem={[
-            {
-              label: "Leave Management",
-              link: "/manager/leave-management/raise-requests",
-            },
-          ]}
-        />
+        <CustomBreadCrumb breadCrumbPage='Raise Requests' />
       </div>
 
       <RaiseRequest leaveType={leaveTypes} user={user} />

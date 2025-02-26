@@ -14,6 +14,7 @@ import {
   FolderOpenDot,
   Group,
   Hand,
+  HousePlug,
   LayoutDashboard,
   List,
   Lock,
@@ -128,6 +129,19 @@ export const leaveManagementTabs = [
   },
 ];
 
+export const workFromHomeTabs = [
+  {
+    icon: HousePlug,
+    label: "Raise Requests",
+    value: "raiseRequests",
+  },
+  {
+    icon: FolderOpen,
+    label: "Manage Requests",
+    value: "manageRequests",
+  },
+];
+
 export const attendanceManagementTabs = [
   {
     icon: CalendarPlus,
@@ -235,6 +249,11 @@ export const adminRoutes = [
     href: "/admin/leave-management",
   },
   {
+    icon: HousePlug,
+    label: "Work From Home",
+    href: "/admin/workFromHome",
+  },
+  {
     icon: Calendar,
     label: "Time Table",
     href: "/admin/timetable",
@@ -319,6 +338,11 @@ export const employeeRoutes = [
     href: "/employee/leave-management",
   },
   {
+    icon: HousePlug,
+    label: "Work From Home",
+    href: "/employee/workFromHome",
+  },
+  {
     icon: BadgeMinus,
     label: "Resignation Requests",
     href: "/employee/resign",
@@ -360,36 +384,17 @@ export const managerRoutes = [
   {
     icon: CalendarClock,
     label: "Attendance",
-    href: "/manager/attendance",
-    subitems: [
-      {
-        icon: CalendarPlus,
-        label: "Mark Attendance",
-        href: "/manager/attendance-management/mark-attendance",
-      },
-      {
-        icon: CalendarFold,
-        label: "Manage Attendance",
-        href: "/manager/attendance-management/manage-attendance",
-      },
-    ],
+    href: "/manager/attendance-management",
   },
   {
     icon: NotebookText,
     label: "Leave Management",
     href: "/manager/leave-management",
-    subitems: [
-      {
-        icon: Hand,
-        label: "Raise Leave Requests",
-        href: "/manager/leave-management/raise-requests",
-      },
-      {
-        icon: NotepadTextDashed,
-        label: "Manage Employee Leave Requests",
-        href: "/manager/leave-management/manage-requests",
-      },
-    ],
+  },
+  {
+    icons: HousePlug,
+    label: "Work From Home",
+    href: "/manager/workFromHome",
   },
   {
     icon: FileUser,
@@ -449,6 +454,11 @@ export const ceoRoutes = [
     icon: NotebookText,
     label: "Leave Management",
     href: "/ceo/leave-management",
+  },
+  {
+    icon: HousePlug,
+    label: "Work From Home",
+    href: "/ceo/workFromHome",
   },
   {
     icon: CalendarClock,

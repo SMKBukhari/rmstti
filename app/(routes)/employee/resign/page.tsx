@@ -7,7 +7,7 @@ import { format } from "date-fns";
 import { cookies } from "next/headers";
 import RaiseRequest from "./_components/RaiseRequest";
 
-const ApplicantsPage = async () => {
+const ResignationPage = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
 
@@ -60,4 +60,4 @@ const ApplicantsPage = async () => {
   );
 };
 
-export default ApplicantsPage;
+export default ResignationPage;

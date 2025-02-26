@@ -228,6 +228,12 @@ export const LeaveRequestSchema = z.object({
   reason: z.string(),
 });
 
+export const WorkFromHomeRequestSchema = z.object({
+  startDate: z.date(),
+  endDate: z.date(),
+  reason: z.string(),
+});
+
 export const LeaveDeleteSchema = z.object({
   agree: z.string(),
 });

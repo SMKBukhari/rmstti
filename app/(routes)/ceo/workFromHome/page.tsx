@@ -4,60 +4,51 @@ import { db } from "@/lib/db";
 import React from "react";
 import { format } from "date-fns";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { columns, LeaveRequestsColumns } from "./_components/columns";
-import RaiseRequest from "./_components/RaiseRequest";
 
-const RaiseLeaveRequest = async () => {
+const ManageLeaveRequests = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
-
-  if (!userId) {
-    redirect("/signIn");
-  }
 
   const user = await db.userProfile.findUnique({
     where: {
       userId: userId,
     },
+    include: {
+      department: true,
+    },
   });
 
-  const leaveRequests = await db.leaveRequest.findMany({
-    where: {
-      userId: user?.userId,
-    },
+  const workFromHomeRequests = await db.workFromHome.findMany({
     include: {
       user: true,
-      leaveType: true,
     },
   });
 
   // Formatting the applicants data for the table
-  const formattedLeaveRequests: LeaveRequestsColumns[] = leaveRequests.map(
-    (leaveRequest) => ({
+  const formattedLeaveRequests: LeaveRequestsColumns[] =
+    workFromHomeRequests.map((workFromRequest) => ({
       user: user,
-      id: leaveRequest.id,
-      leaveType: leaveRequest.leaveType.name ?? "N/A",
-      startDate: leaveRequest.startDate
-        ? format(new Date(leaveRequest.startDate), "MMMM do, yyyy")
+      id: workFromRequest.id,
+      fullName: workFromRequest.user.fullName ?? "N/A",
+      startDate: workFromRequest.startDate
+        ? format(new Date(workFromRequest.startDate), "MMMM do, yyyy")
         : "N/A",
-      endDate: leaveRequest.endDate
-        ? format(new Date(leaveRequest.endDate), "MMMM do, yyyy")
+      endDate: workFromRequest.endDate
+        ? format(new Date(workFromRequest.endDate), "MMMM do, yyyy")
         : "N/A",
-      reason: leaveRequest.reason ?? "N/A",
-      status: leaveRequest.status,
-    })
-  );
-
-  const leaveTypes = await db.leaveType.findMany();
+      reason: workFromRequest.reason ?? "N/A",
+      status: workFromRequest.status,
+      userImage: workFromRequest.user.userImage ?? "N/A",
+      approvedBy: workFromRequest.aprrovedBy ?? "N/A",
+      rejectedBy: workFromRequest.rejectedBy ?? "N/A",
+    }));
 
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
       <div className='flex items-center justify-between w-full'>
-        <CustomBreadCrumb breadCrumbPage='Raise Requests' />
+        <CustomBreadCrumb breadCrumbPage='Manage Employee Work From Home Requests' />
       </div>
-
-      <RaiseRequest leaveType={leaveTypes} user={user} />
 
       <div className='mt-6 w-full'>
         <DataTable
@@ -65,11 +56,8 @@ const RaiseLeaveRequest = async () => {
           data={formattedLeaveRequests}
           filterableColumns={[
             {
-              id: "leaveType",
-              title: "Leave Type",
-              options: leaveTypes
-                .map((leaveType) => leaveType.name)
-                .filter(Boolean),
+              id: "fullName",
+              title: "Name",
             },
             {
               id: "status",
@@ -83,4 +71,4 @@ const RaiseLeaveRequest = async () => {
   );
 };
 
-export default RaiseLeaveRequest;
+export default ManageLeaveRequests;

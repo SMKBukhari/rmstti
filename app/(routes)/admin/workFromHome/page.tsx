@@ -1,33 +1,15 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { requestsTabs } from "@/lib/data";
+import { workFromHomeTabs } from "@/lib/data";
 import React from "react";
-import { cookies } from "next/headers";
-import { db } from "@/lib/db";
-import ProfileUpdateRequestTab from "./_components/profileUpdateRequestTab/page";
-import RequestsTabs from "./_components/requestsTab/page";
-import ManageRequestsTabs from "./_components/mangeRequestsTab/page";
+import RaiseLeaveRequest from "./_components/raise-requests/page";
+import ManageLeaveRequests from "./_components/manage-requests/page";
 
-const RequestsPage = async () => {
-  const cookieStore = cookies();
-  const userId = (await cookieStore).get("userId")?.value;
-
-  const user = await db.userProfile.findUnique({
-    where: {
-      userId: userId,
-    },
-    include: {
-      role: true,
-      jobExperience: true,
-      education: true,
-      skills: true,
-    },
-  });
-
+const LeaveManagementPage = () => {
   return (
     <div>
       <Tabs defaultValue='raiseRequests' className='w-full'>
         <TabsList className='bg-transparent gap-10'>
-          {requestsTabs.map((tab) => (
+          {workFromHomeTabs.map((tab) => (
             <TabsTrigger
               key={tab.value}
               value={tab.value}
@@ -41,14 +23,11 @@ const RequestsPage = async () => {
           ))}
         </TabsList>
         <div className='mt-8'>
-          <TabsContent value='profileUpdateRequests'>
-            <ProfileUpdateRequestTab />
-          </TabsContent>
           <TabsContent value='raiseRequests'>
-            <RequestsTabs />
+            <RaiseLeaveRequest />
           </TabsContent>
           <TabsContent value='manageRequests'>
-            <ManageRequestsTabs />
+            <ManageLeaveRequests />
           </TabsContent>
         </div>
       </Tabs>
@@ -56,4 +35,4 @@ const RequestsPage = async () => {
   );
 };
 
-export default RequestsPage;
+export default LeaveManagementPage;

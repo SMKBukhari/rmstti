@@ -19,6 +19,9 @@ const workStatusSeed = async () => {
         { name: "Work From Home" },
         { name: "Half Day" },
         { name: "Absent" },
+        { name: "Late" },
+        { name: "Eearly" },
+        { name: "Late Early" },
       ],
     });
     console.log("Work statuses seeded successfully.");
