@@ -392,7 +392,7 @@ export const managerRoutes = [
     href: "/manager/leave-management",
   },
   {
-    icons: HousePlug,
+    icon: HousePlug,
     label: "Work From Home",
     href: "/manager/workFromHome",
   },
