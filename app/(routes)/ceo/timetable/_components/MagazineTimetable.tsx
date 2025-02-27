@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { uploadTimetableFile } from "@/actions/timeTableActions";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,10 +12,18 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 // import { Label } from "@/components/ui/label";
-import { TimetableDisplay } from "./TimeTableDisplay";
 import UploadTimeTablePage from "./UploadCSV";
 import { TimeTable, UserProfile } from "@prisma/client";
 import axios from "axios";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { format } from "date-fns";
 
 interface MagazineTimetableProps {
   user: UserProfile | null;
@@ -74,11 +81,15 @@ export function MagazineTimetable({
     setLoading(true);
     setError("");
     try {
-      const response = await axios.post("/api/timetable/upload-timetable", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        "/api/timetable/upload-timetable",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       if (response.data.success) {
         setTimetable(response.data.timetable);
@@ -97,14 +108,11 @@ export function MagazineTimetable({
     }
   };
 
-
   return (
     <Card className='w-full max-w-4xl mx-auto'>
       <CardHeader>
-        <CardTitle>Magazine Department Timetable</CardTitle>
-        <CardDescription>
-          Generate or upload a timetable for the Magazine Department
-        </CardDescription>
+        <CardTitle>Generate Timetable</CardTitle>
+        <CardDescription>Generate or upload a timetable</CardDescription>
       </CardHeader>
       <CardContent>
         <div className='flex justify-between items-center mb-6'>
@@ -112,10 +120,7 @@ export function MagazineTimetable({
             {loading ? "Generating..." : "Generate Timetable"}
           </Button>
           <div className='flex items-center space-x-2'>
-            {/* <Label htmlFor='file-upload' className='cursor-pointer'>
-              Upload Timetable
-            </Label> */}
-            {/* <UploadTimeTablePage user={user} /> */}
+            <UploadTimeTablePage user={user} />
             <Input
               id='file-upload'
               type='file'
@@ -127,7 +132,35 @@ export function MagazineTimetable({
         </div>
         {error && <p className='text-red-500 mb-4'>{error}</p>}
         {timetable.length > 0 ? (
-          <TimetableDisplay timetable={timetable} />
+          <Card>
+            <CardHeader></CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Employee Name</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Shift</TableHead>
+                    <TableHead>Shift Start (Timing)</TableHead>
+                    <TableHead>Shift End (Timing)</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {timetable.map((record) => (
+                    <TableRow key={record.id}>
+                      <TableCell>{record.fullName}</TableCell>
+                      <TableCell>{format(record.date, "EEE, MMMM d")}</TableCell>
+                      <TableCell>{record.shiftType}</TableCell>
+                      <TableCell>
+                        {format(record.shiftStart, "h:mm a")}
+                      </TableCell>
+                      <TableCell>{format(record.shiftEnd, "h:mm a")}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         ) : (
           <p>No timetable available. Generate a new timetable or upload one.</p>
         )}
