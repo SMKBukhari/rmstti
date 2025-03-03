@@ -64,13 +64,6 @@ const WarningEmployees = ({ warnings }: WarningEmployeesProps) => {
                             </div>
                           </div>
                         </div>
-                        <div className='flex-1 text-right'>
-                          {warning.isRead ? (
-                            <div className='text-sm text-gray-500'>Read</div>
-                          ) : (
-                            <div className='text-sm text-red-500'>Unread</div>
-                          )}
-                        </div>
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>

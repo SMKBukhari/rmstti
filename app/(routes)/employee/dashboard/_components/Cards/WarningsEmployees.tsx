@@ -11,11 +11,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserProfile, Warnings } from "@prisma/client";
 import { NotepadText } from "lucide-react";
 
-interface WarningEmployeesProps {
-  warnings: (Warnings & { user: UserProfile | null })[] | null;
+interface WarningEmployeeProps {
+  user: (UserProfile & { Warnings: Warnings[] | null }) | null;
 }
 
-const WarningEmployees = ({ warnings }: WarningEmployeesProps) => {
+const WarningEmployee = ({ user }: WarningEmployeeProps) => {
+  const warnings = user?.Warnings ?? [];
   return (
     <>
       <Card>
@@ -37,18 +38,16 @@ const WarningEmployees = ({ warnings }: WarningEmployeesProps) => {
                         <Avatar className='h-12 w-12 rounded-lg'>
                           <AvatarImage
                             className='w-full rounded-full h-full object-cover object-center'
-                            src={warning.user?.userImage || ""}
-                            alt={warning.user?.fullName || ""}
+                            src={user?.userImage || ""}
+                            alt={user?.fullName || ""}
                           />
                           <AvatarFallback className='rounded-full'>
-                            {warning.user?.fullName
-                              ?.slice(0, 2)
-                              ?.toUpperCase() || "CN"}
+                            {user?.fullName?.slice(0, 2)?.toUpperCase() || "CN"}
                           </AvatarFallback>
                         </Avatar>
                         <div className='ml-3'>
                           <div className='text-base font-semibold'>
-                            {warning.user?.fullName || ""}
+                            {user?.fullName || ""}
                           </div>
                           <div className='text-sm text-gray-500'>
                             {warning.title}
@@ -81,4 +80,4 @@ const WarningEmployees = ({ warnings }: WarningEmployeesProps) => {
   );
 };
 
-export default WarningEmployees;
+export default WarningEmployee;
