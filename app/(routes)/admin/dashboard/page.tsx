@@ -9,6 +9,7 @@ import EmployeeBannerWarning from "./_components/userBannerWarning";
 import LeaveRequests from "./_components/Cards/LeaveRequests";
 import { AttendanceChart } from "./_components/AttendanceChart";
 import BalanceLeaves from "./_components/Cards/BalanceLeaves";
+import WarningEmployees from "./_components/Cards/WarningsEmployees";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -60,6 +61,7 @@ const page = async () => {
     include: {
       role: true,
       status: true,
+      Warnings: true,
     },
   });
 
@@ -74,6 +76,12 @@ const page = async () => {
       status: {
         in: ["Pending", "PendingHigherApproval"],
       },
+    },
+  });
+
+  const warnings = await db.warnings.findMany({
+    include: {
+      user: true,
     },
   });
 
@@ -184,8 +192,13 @@ const page = async () => {
         />
         <BalanceLeaves user={user} />
       </div>
-      <div className='mt-10'>
-        <AttendanceChart />
+      <div className='mt-10 grid grid-cols-1 md:grid-cols-3 gap-4 h-full'>
+        <div className='col-span-2'>
+          <AttendanceChart />
+        </div>
+        <div className='h-full'>
+          <WarningEmployees warnings={warnings} />
+        </div>
       </div>
     </>
   );

@@ -53,6 +53,7 @@ const ApplicantsPage = async () => {
       status: true,
       department: true,
       company: true,
+      Warnings: true,
     },
   });
 

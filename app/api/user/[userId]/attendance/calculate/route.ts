@@ -1,126 +1,160 @@
 // import { db } from "@/lib/db";
-// import { type NextRequest, NextResponse } from "next/server";
+// import { NextRequest, NextResponse } from "next/server";
 
-import { db } from "@/lib/db";
-import { NextRequest, NextResponse } from "next/server";
+// type LeaveRequest = {
+//   startDate: string; // Assuming the date is a string
+//   endDate: string;
+//   status: string; // You can further specify the status if needed
+// };
 
 // export async function POST(req: NextRequest) {
 //   try {
 //     const { dateFrom, dateTo } = await req.json();
-//     const startDate = new Date(dateFrom);
-//     const endDate = new Date(dateTo);
 
-//     // Fetch all employees
-//     const employees = await db.userProfile.findMany({
-//       select: { userId: true, fullName: true, totalLeavesBalance: true },
-//     });
-
-//     // Fetch all attendance records for the date range
+//     // Find Attendance Records
 //     const attendanceRecords = await db.attendence.findMany({
 //       where: {
 //         date: {
-//           gte: startDate,
-//           lte: endDate,
+//           gte: new Date(dateFrom),
+//           lte: new Date(dateTo),
 //         },
 //       },
-//       select: { userId: true, date: true },
+//       include: {
+//         user: {
+//           select: {
+//             userId: true,
+//             fullName: true,
+//             totalLeavesBalance: true,
+//             leaveRequests: {
+//               select: {
+//                 startDate: true,
+//                 endDate: true,
+//                 status: true,
+//               },
+//             },
+//           },
+//         },
+//         checkLog: true,
+//       },
 //     });
 
-//     // Map attendance records to "YYYY-MM-DD" for faster lookup
-//     const attendanceMap = new Map();
-//     attendanceRecords.forEach((record) => {
-//       const dateString = record.date.toISOString().split("T")[0];
-//       if (!attendanceMap.has(dateString)) {
-//         attendanceMap.set(dateString, new Set());
-//       }
-//       attendanceMap.get(dateString).add(record.userId);
-//     });
+//     console.table(
+//       attendanceRecords.map((record) => {
+//         return {
+//           date: record.date,
+//           user: record.user.fullName,
+//           checkLog: {
+//             checkIn: record.checkLog?.checkInTime,
+//             checkOut: record.checkLog?.checkOutTime,
+//           },
+//         };
+//       })
+//     );
 
-//     // Fetch public holidays within the date range
+//     // Find Public Holidays
 //     const publicHolidays = await db.publicHoliday.findMany({
 //       where: {
 //         date: {
-//           gte: startDate,
-//           lte: endDate,
+//           gte: new Date(dateFrom),
+//           lte: new Date(dateTo),
 //         },
 //       },
-//       select: { date: true },
+//       include: {
+//         employees: true,
+//       },
 //     });
+
+//     // Convert public holiday dates to a Set for fast lookup
 //     const publicHolidayDates = new Set(
 //       publicHolidays.map((holiday) => holiday.date.toISOString().split("T")[0])
 //     );
 
-//     // Fetch all approved leave requests for the date range
-//     const leaveRequests = await db.leaveRequest.findMany({
-//       where: {
-//         status: "Approved",
-//         startDate: { lte: endDate },
-//         endDate: { gte: startDate },
-//       },
-//       select: { userId: true, startDate: true, endDate: true },
-//     });
+//     console.table(
+//       publicHolidays.map((holiday) => {
+//         return {
+//           date: holiday.date,
+//           name: holiday.name,
+//           isForAll: holiday.isForAll,
+//           employees: holiday.employees.map((employee) => employee.fullName),
+//         };
+//       })
+//     );
 
-//     // Map leave requests for quick lookup
-//     const leaveMap = new Map();
-//     leaveRequests.forEach((leave) => {
-//       const currentDate = new Date(leave.startDate);
-//       while (currentDate <= leave.endDate) {
-//         const dateString = currentDate.toISOString().split("T")[0];
-//         if (!leaveMap.has(dateString)) {
-//           leaveMap.set(dateString, new Set());
-//         }
-//         leaveMap.get(dateString).add(leave.userId);
+//     // Find all employees who have attendance records
+//     const employees = Array.from(
+//       new Set(attendanceRecords.map((record) => JSON.stringify(record.user)))
+//     ).map((userStr) => JSON.parse(userStr));
+
+//     console.table(
+//       employees.map((employee) => {
+//         return {
+//           userId: employee.userId,
+//           fullName: employee.fullName,
+//           totalLeavesBalance: employee.totalLeavesBalance,
+//           leaveRequests: employee.leaveRequests,
+//         };
+//       })
+//     );
+
+//     // Create a date range from dateFrom to dateTo
+//     const generateDateRange = (startDate: Date, endDate: Date): string[] => {
+//       const dates = [];
+//       const currentDate = new Date(startDate);
+//       while (currentDate <= endDate) {
+//         dates.push(currentDate.toISOString().split("T")[0]);
 //         currentDate.setDate(currentDate.getDate() + 1);
 //       }
+//       return dates;
+//     };
+//     const dateRange = generateDateRange(new Date(dateFrom), new Date(dateTo));
+
+//     // Initialize Missing Dates
+//     const missingDates: Record<string, string[]> = {};
+
+//     // Check each date in the range for missing attendance
+//     employees.forEach((employee) => {
+//       const employeeAttendanceDates = new Set(
+//         attendanceRecords
+//           .filter((record) => record.user.userId === employee.userId)
+//           .map((record) => record.date.toISOString().split("T")[0])
+//       );
+
+//       // Find dates that are not in the employee's attendance records
+//       missingDates[employee.fullName] = dateRange.filter((date) => {
+//         return (
+//           !employeeAttendanceDates.has(date) && // Date not in attendance
+//           !publicHolidayDates.has(date) && // Date not a public holiday
+//           !employee.leaveRequests.some(
+//             (leave: LeaveRequest) =>
+//               leave.status === "Approved" &&
+//               new Date(leave.startDate) <= new Date(date) &&
+//               new Date(leave.endDate) >= new Date(date)
+//           ) // Date not covered by approved leave
+//         );
+//       });
 //     });
 
-//     const attendanceReport = employees.map((employee) => ({
-//       userId: employee.userId,
-//       name: employee.fullName,
-//       missingDates: [],
-//       approvedLeaveDates: [],
-//       publicHolidayDates: [],
-//       daysToDeduct: 0,
-//     }));
+//     // Now Calculate Days to Deduct
+//     const daysToDeduct: Record<string, number> = {};
+//     employees.forEach((employee) => {
+//       daysToDeduct[employee.fullName] =
+//         missingDates[employee.fullName]?.length || 0;
+//     });
 
-//     // Iterate through each day in the date range
-//     for (
-//       let currentDate = new Date(startDate);
-//       currentDate <= endDate;
-//       currentDate.setDate(currentDate.getDate() + 1)
-//     ) {
-//       const dateString = currentDate.toISOString().split("T")[0];
+//     // TODO: Add more logic related to deduction cause Magazine Department is not clear and we want to check also from Magazine Department TimeTable that if not day of particular employee then also skip
 
-//       // Skip weekends (assuming Saturday and Sunday are non-working days)
-//       if (currentDate.getDay() === 0 || currentDate.getDay() === 6) continue;
+//     console.table(missingDates);
+//     console.table(daysToDeduct);
 
-//       // Check for public holidays
-//       if (publicHolidayDates.has(dateString)) {
-//         attendanceReport.forEach((report) => {
-//           report.publicHolidayDates.push(dateString);
-//         });
-//         continue;
-//       }
+//     // Now
 
-//       // Check for missing attendance for each employee
-//       attendanceReport.forEach((report) => {
-//         const isPresent =
-//           attendanceMap.has(dateString) &&
-//           attendanceMap.get(dateString).has(report.userId);
-//         const isOnLeave =
-//           leaveMap.has(dateString) &&
-//           leaveMap.get(dateString).has(report.userId);
-
-//         if (isOnLeave) {
-//           report.approvedLeaveDates.push(dateString);
-//         } else if (!isPresent) {
-//           report.missingDates.push(dateString);
-//           report.daysToDeduct++;
-//         }
-//       });
-//     }
-
-//     return NextResponse.json({ attendanceReport });
+//     return NextResponse.json({
+//       attendanceRecords,
+//       publicHolidays,
+//       employees,
+//       missingDates,
+//       daysToDeduct,
+//     });
 //   } catch (error) {
 //     console.error("Error in Calculating Attendance Report:", error);
 //     return NextResponse.json(
@@ -130,22 +164,55 @@ import { NextRequest, NextResponse } from "next/server";
 //   }
 // }
 
+import { db } from "@/lib/db";
+import { NextRequest, NextResponse } from "next/server";
+
 type LeaveRequest = {
-  startDate: string; // Assuming the date is a string
+  startDate: string;
   endDate: string;
-  status: string; // You can further specify the status if needed
+  status: string;
 };
+
+type Employee = {
+  userId: string;
+  fullName: string;
+  totalLeavesBalance: string | null;
+  leaveRequests: LeaveRequest[];
+  DOJ: Date | string | null;
+};
+
+type TimeTableEntry = {
+  userId: string;
+  date: Date;
+  shiftType: "Morning" | "Evening" | "Off";
+};
+
+function parseDate(date: Date | string | null): Date | null {
+  if (date instanceof Date) return date;
+  if (typeof date === "string") {
+    const parsedDate = new Date(date);
+    return isNaN(parsedDate.getTime()) ? null : parsedDate;
+  }
+  return null;
+}
+
+function formatDate(date: Date | string | null): string {
+  const parsedDate = parseDate(date);
+  return parsedDate ? parsedDate.toISOString().split("T")[0] : "Not available";
+}
 
 export async function POST(req: NextRequest) {
   try {
     const { dateFrom, dateTo } = await req.json();
+    const reportStartDate = new Date(dateFrom);
+    const reportEndDate = new Date(dateTo);
 
     // Find Attendance Records
     const attendanceRecords = await db.attendence.findMany({
       where: {
         date: {
-          gte: new Date(dateFrom),
-          lte: new Date(dateTo),
+          gte: reportStartDate,
+          lte: reportEndDate,
         },
       },
       include: {
@@ -154,6 +221,7 @@ export async function POST(req: NextRequest) {
             userId: true,
             fullName: true,
             totalLeavesBalance: true,
+            DOJ: true,
             leaveRequests: {
               select: {
                 startDate: true,
@@ -168,93 +236,192 @@ export async function POST(req: NextRequest) {
     });
 
     console.table(
-      attendanceRecords.map((record) => {
-        return {
-          date: record.date,
-          user: record.user.fullName,
-          checkLog: record.checkLog,
-        };
-      })
+      attendanceRecords.map((record) => ({
+        date: formatDate(record.date),
+        user: record.user.fullName,
+        checkLog: {
+          checkIn: record.checkLog?.checkInTime
+            ? formatDate(record.checkLog.checkInTime)
+            : "N/A",
+          checkOut: record.checkLog?.checkOutTime
+            ? formatDate(record.checkLog.checkOutTime)
+            : "N/A",
+        },
+      }))
     );
 
     // Find Public Holidays
     const publicHolidays = await db.publicHoliday.findMany({
       where: {
         date: {
-          gte: new Date(dateFrom),
-          lte: new Date(dateTo),
+          gte: reportStartDate,
+          lte: reportEndDate,
+        },
+      },
+      include: {
+        employees: true,
+      },
+    });
+
+    const publicHolidayDates = new Set(
+      publicHolidays.map((holiday) => formatDate(holiday.date))
+    );
+
+    console.table(
+      publicHolidays.map((holiday) => ({
+        date: formatDate(holiday.date),
+        name: holiday.name,
+        isForAll: holiday.isForAll,
+        employees: holiday.employees.map((employee) => employee.fullName),
+      }))
+    );
+
+    // Find all employees who have attendance records
+    const employees: Employee[] = Array.from(
+      new Set(attendanceRecords.map((record) => JSON.stringify(record.user)))
+    ).map((userStr) => JSON.parse(userStr));
+
+    console.table(
+      employees.map((employee) => ({
+        userId: employee.userId,
+        fullName: employee.fullName,
+        totalLeavesBalance: employee.totalLeavesBalance,
+        DOJ: formatDate(employee.DOJ),
+        leaveRequests: employee.leaveRequests,
+      }))
+    );
+
+    // Fetch Timetables
+    const timetables = await db.timeTable.findMany({
+      where: {
+        date: {
+          gte: reportStartDate,
+          lte: reportEndDate,
         },
       },
     });
 
-    // Convert public holiday dates to a Set for fast lookup
-    const publicHolidayDates = new Set(
-      publicHolidays.map((holiday) => holiday.date.toISOString().split("T")[0])
+    // Create a map of timetables for quick lookup
+    const timetableMap = new Map<string, Map<string, string>>();
+    timetables.forEach((entry: TimeTableEntry) => {
+      const userId = entry.userId;
+      const dateKey = formatDate(entry.date);
+      if (!timetableMap.has(userId)) {
+        timetableMap.set(userId, new Map<string, string>());
+      }
+      timetableMap.get(userId)?.set(dateKey, entry.shiftType);
+    });
+
+    console.table(
+      timetables.map((entry) => ({
+        userId: entry.userId,
+        date: formatDate(entry.date),
+        shiftType: entry.shiftType,
+      }))
     );
 
-    // Find all employees who have attendance records
-    const employees = Array.from(
-      new Set(attendanceRecords.map((record) => JSON.stringify(record.user)))
-    ).map((userStr) => JSON.parse(userStr));
-
-    // Create a date range from dateFrom to dateTo
     const generateDateRange = (startDate: Date, endDate: Date): string[] => {
       const dates = [];
       const currentDate = new Date(startDate);
       while (currentDate <= endDate) {
-        dates.push(currentDate.toISOString().split("T")[0]);
+        dates.push(formatDate(currentDate));
         currentDate.setDate(currentDate.getDate() + 1);
       }
       return dates;
     };
-    const dateRange = generateDateRange(new Date(dateFrom), new Date(dateTo));
 
-    // Initialize Missing Dates
     const missingDates: Record<string, string[]> = {};
+    const missingDateReasons: Record<string, Record<string, string>> = {};
 
-    // Check each date in the range for missing attendance
     employees.forEach((employee) => {
+      const employeeDOJ = parseDate(employee.DOJ);
+      const employeeStartDate =
+        employeeDOJ && employeeDOJ > reportStartDate
+          ? employeeDOJ
+          : reportStartDate;
+      const dateRange = generateDateRange(employeeStartDate, reportEndDate);
+
       const employeeAttendanceDates = new Set(
         attendanceRecords
           .filter((record) => record.user.userId === employee.userId)
-          .map((record) => record.date.toISOString().split("T")[0])
+          .map((record) => formatDate(record.date))
       );
 
-      // Find dates that are not in the employee's attendance records
-      missingDates[employee.fullName] = dateRange.filter((date) => {
-        return (
-          !employeeAttendanceDates.has(date) && // Date not in attendance
-          !publicHolidayDates.has(date) && // Date not a public holiday
-          !employee.leaveRequests.some(
-            (leave:LeaveRequest) =>
-              leave.status === "Approved" &&
-              new Date(leave.startDate) <= new Date(date) &&
-              new Date(leave.endDate) >= new Date(date)
-          ) // Date not covered by approved leave
-        );
+      missingDates[employee.fullName] = [];
+      missingDateReasons[employee.fullName] = {};
+
+      dateRange.forEach((date) => {
+        const currentDate = new Date(date);
+        const timetableEntry = timetableMap.get(employee.userId)?.get(date);
+
+        if (!employeeAttendanceDates.has(date)) {
+          if (publicHolidayDates.has(date)) {
+            missingDateReasons[employee.fullName][date] = "Public Holiday";
+          } else if (
+            employee.leaveRequests.some(
+              (leave: LeaveRequest) =>
+                leave.status === "Approved" &&
+                new Date(leave.startDate) <= currentDate &&
+                new Date(leave.endDate) >= currentDate
+            )
+          ) {
+            missingDateReasons[employee.fullName][date] = "Approved Leave";
+          } else if (timetableEntry === "Off") {
+            missingDateReasons[employee.fullName][date] = "Scheduled Off";
+          } else if (!timetableEntry) {
+            missingDateReasons[employee.fullName][date] = "Not Scheduled";
+          } else {
+            missingDates[employee.fullName].push(date);
+            missingDateReasons[employee.fullName][date] =
+              "Unauthorized Absence";
+          }
+        }
       });
     });
 
-    // Now Calculate Days to Deduct
     const daysToDeduct: Record<string, number> = {};
     employees.forEach((employee) => {
-      daysToDeduct[employee.fullName] =
-        missingDates[employee.fullName]?.length || 0;
+      daysToDeduct[employee.fullName] = missingDates[employee.fullName].length;
     });
 
-    // TODO: Add more logic related to deduction cause Magazine Department is not clear and we want to check also from Magazine Department TimeTable that if not day of particular employee then also skip
+    console.table(missingDates);
+    console.table(daysToDeduct);
+
+    console.log("\n=== DETAILED REPORT ===");
+    employees.forEach((employee) => {
+      console.log(`\nEmployee: ${employee.fullName}`);
+      console.log(`User ID: ${employee.userId}`);
+      console.log(`Leave Balance: ${employee.totalLeavesBalance}`);
+      console.log(`Date of Joining: ${formatDate(employee.DOJ)}`);
+      console.log(`Days to Deduct: ${daysToDeduct[employee.fullName]}`);
+
+      if (Object.keys(missingDateReasons[employee.fullName]).length > 0) {
+        console.log("Missing Dates and Reasons:");
+        Object.entries(missingDateReasons[employee.fullName]).forEach(
+          ([date, reason]) => {
+            console.log(`  ${date}: ${reason}`);
+          }
+        );
+      } else {
+        console.log("No missing dates");
+      }
+    });
 
     return NextResponse.json({
       attendanceRecords,
       publicHolidays,
       employees,
       missingDates,
+      missingDateReasons,
       daysToDeduct,
     });
   } catch (error) {
     console.error("Error in Calculating Attendance Report:", error);
     return NextResponse.json(
-      { error: "Failed to process attendance report calculation" },
+      {
+        error: "Failed to process attendance report calculation",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }

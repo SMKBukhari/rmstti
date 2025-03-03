@@ -26,6 +26,9 @@ const ManageLeaveRequests = async () => {
       user: true,
       leaveType: true,
     },
+    orderBy: {
+      createdAt: "desc",
+    }
   });
 
   // Formatting the applicants data for the table
