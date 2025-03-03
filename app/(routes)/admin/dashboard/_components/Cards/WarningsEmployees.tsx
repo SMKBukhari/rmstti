@@ -1,24 +1,21 @@
 "use client";
 import Preview from "@/components/PreviewEditorText";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-} from "@/components/ui/dialog";
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserProfile, Warnings } from "@prisma/client";
 import { NotepadText } from "lucide-react";
-import { useState } from "react";
 
 interface WarningEmployeesProps {
   warnings: (Warnings & { user: UserProfile | null })[] | null;
 }
 
 const WarningEmployees = ({ warnings }: WarningEmployeesProps) => {
-  const [showWarning, setShowWarning] = useState(false);
   return (
     <>
       <Card>
@@ -32,62 +29,55 @@ const WarningEmployees = ({ warnings }: WarningEmployeesProps) => {
           </div>
           <div className='mt-5'>
             {warnings && warnings.length > 0 ? (
-              warnings.map((warning) => (
-                <div
-                  className='py-2 flex items-center gap-3 cursor-pointer hover:bg-black/50 w-full px-3 rounded-lg'
-                  key={warning.id}
-                  onClick={() => setShowWarning(true)}
-                >
-                  <Avatar className='h-12 w-12 rounded-lg'>
-                    <AvatarImage
-                      className='w-full rounded-full h-full object-cover object-center'
-                      src={warning.user?.userImage || ""}
-                      alt={warning.user?.fullName || ""}
-                    />
-                    <AvatarFallback className='rounded-full'>
-                      {warning.user?.fullName?.slice(0, 2)?.toUpperCase() ||
-                        "CN"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className='ml-3'>
-                    <div className='text-base font-semibold'>
-                      {warning.user?.fullName || ""}
-                    </div>
-                    <div className='text-sm text-gray-500'>
-                      {warning.title}
-                      <div>
-                        <span className='text-sm text-gray-500'>
-                          {warning.createdAt.toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </span>
+              <Accordion type='single' collapsible className='w-full'>
+                {warnings.map((warning) => (
+                  <AccordionItem value={warning.id} key={warning.id}>
+                    <AccordionTrigger className='hover:no-underline'>
+                      <div className='py-2 flex flex-1 text-left gap-3 w-full px-3 rounded-lg'>
+                        <Avatar className='h-12 w-12 rounded-lg'>
+                          <AvatarImage
+                            className='w-full rounded-full h-full object-cover object-center'
+                            src={warning.user?.userImage || ""}
+                            alt={warning.user?.fullName || ""}
+                          />
+                          <AvatarFallback className='rounded-full'>
+                            {warning.user?.fullName
+                              ?.slice(0, 2)
+                              ?.toUpperCase() || "CN"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className='ml-3'>
+                          <div className='text-base font-semibold'>
+                            {warning.user?.fullName || ""}
+                          </div>
+                          <div className='text-sm text-gray-500'>
+                            {warning.title}
+                            <div>
+                              <span className='text-sm text-gray-500'>
+                                {warning.createdAt.toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className='flex-1 text-right'>
+                          {warning.isRead ? (
+                            <div className='text-sm text-gray-500'>Read</div>
+                          ) : (
+                            <div className='text-sm text-red-500'>Unread</div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className='flex-1 text-right'>
-                    {warning.isRead ? (
-                      <div className='text-sm text-gray-500'>Read</div>
-                    ) : (
-                      <div className='text-sm text-red-500'>Unread</div>
-                    )}
-                  </div>
-                  <Dialog open={showWarning} onOpenChange={setShowWarning}>
-                    <DialogContent>
-                      <DialogHeader>
-                        <h2>{warning.title}</h2>
-                      </DialogHeader>
+                    </AccordionTrigger>
+                    <AccordionContent>
                       <Preview value={warning.message} />
-                      <DialogFooter>
-                        <Button onClick={() => setShowWarning(false)}>
-                          Close
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              ))
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             ) : (
               <div className='text-sm text-gray-500'>No Warnings</div>
             )}
