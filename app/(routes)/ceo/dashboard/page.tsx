@@ -6,6 +6,7 @@ import TotalEmployee from "./_components/Cards/TotalEmployee";
 import TotalApplicant from "./_components/Cards/TotalApplicants";
 import LeaveRequests from "./_components/Cards/LeaveRequests";
 import { AttendanceChart } from "./_components/AttendanceChart";
+import WarningEmployees from "./_components/Cards/WarningsEmployees";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -111,6 +112,12 @@ const page = async () => {
     },
   });
 
+  const warnings = await db.warnings.findMany({
+      include: {
+        user: true,
+      },
+    });
+
   // Get the applicants from the previous month
   const previousMonthApplicants = await db.userProfile.findMany({
     where: {
@@ -157,8 +164,13 @@ const page = async () => {
           percentageChange={percentageChangeLeaves}
         />
       </div>
-      <div className="mt-10">
-        <AttendanceChart />
+      <div className='mt-10 grid grid-cols-1 md:grid-cols-3 gap-4 h-full'>
+        <div className='col-span-2'>
+          <AttendanceChart />
+        </div>
+        <div className='h-full'>
+          <WarningEmployees warnings={warnings} />
+        </div>
       </div>
     </>
   );
