@@ -6,6 +6,7 @@ import UserSkillsSection from "./_components/UserSkillsSection";
 import CustomBreadCrumb from "@/components/CustomBreadCrumb";
 import { cookies } from "next/headers";
 import { AttendanceChart } from "./_components/AttendanceChart";
+import UserResumeSection from "./_components/UserResumeSection";
 
 const ApplicantDetailsPage = async ({
   params,
@@ -87,6 +88,7 @@ const ApplicantDetailsPage = async ({
           <UserCoverLetterSection
             userJobApplications={userWithJobApplications}
           />
+          <UserResumeSection user={employee} />
         </div>
       </div>
     </div>
