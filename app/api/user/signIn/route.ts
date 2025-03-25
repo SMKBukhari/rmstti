@@ -18,11 +18,13 @@ export const POST = async (req: Request) => {
       },
       include: {
         role: true,
-      }
+      },
     });
 
     if (!user) {
-      return new NextResponse("User not found with this email", { status: 404 });
+      return new NextResponse("User not found with this email", {
+        status: 404,
+      });
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
@@ -35,7 +37,6 @@ export const POST = async (req: Request) => {
     const sessionToken = uuidv4();
     const sessionExpiry = addDays(new Date(), 1); // Expires in 1 day
 
-
     await db.userProfile.update({
       where: { email },
       data: {
@@ -46,7 +47,7 @@ export const POST = async (req: Request) => {
 
     await db.notifications.create({
       data: {
-        userId:user.userId,
+        userId: user.userId,
         title: "SinedIn",
         message: "You have successfully signed in.",
         createdBy: "Account",
@@ -54,7 +55,6 @@ export const POST = async (req: Request) => {
         type: "General",
       },
     });
-
 
     // Return userId and isVerified status in the response
     return NextResponse.json({

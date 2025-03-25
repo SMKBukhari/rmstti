@@ -394,7 +394,6 @@ export async function POST(req: NextRequest) {
       console.log(`Leave Balance: ${employee.totalLeavesBalance}`);
       console.log(`Date of Joining: ${formatDate(employee.DOJ)}`);
       console.log(`Days to Deduct: ${daysToDeduct[employee.fullName]}`);
-
       if (Object.keys(missingDateReasons[employee.fullName]).length > 0) {
         console.log("Missing Dates and Reasons:");
         Object.entries(missingDateReasons[employee.fullName]).forEach(
@@ -426,3 +425,205 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+// import { db } from "@/lib/db";
+// import { type NextRequest, NextResponse } from "next/server";
+
+// type TimingViolation = {
+//   date: string;
+//   checkInTime: string | null;
+//   checkOutTime: string | null;
+//   expectedCheckInTime: string;
+//   expectedCheckOutTime: string;
+//   isLate: boolean;
+//   isEarlyDeparture: boolean;
+// };
+
+// type EmployeeTimingReport = {
+//   userId: string;
+//   fullName: string;
+//   violations: TimingViolation[];
+//   totalLateArrivals: number;
+//   totalEarlyDepartures: number;
+//   totalBothViolations: number;
+// };
+
+// export async function POST(req: NextRequest) {
+//   try {
+//     const { dateFrom, dateTo } = await req.json();
+//     const reportStartDate = new Date(dateFrom);
+//     const reportEndDate = new Date(dateTo);
+
+//     // Find Attendance Records with check logs
+//     const attendanceRecords = await db.attendence.findMany({
+//       where: {
+//         date: {
+//           gte: reportStartDate,
+//           lte: reportEndDate,
+//         },
+//         checkLog: {
+//           isNot: null,
+//         },
+//       },
+//       include: {
+//         user: {
+//           select: {
+//             userId: true,
+//             fullName: true,
+//             officeTimingIn: true,
+//             OfficeTimingOut: true,
+//           },
+//         },
+//         checkLog: true,
+//       },
+//     });
+
+//     // Get all unique employees from attendance records
+//     const employeeIds = [
+//       ...new Set(attendanceRecords.map((record) => record.userId)),
+//     ];
+
+//     // Fetch all employees with their office timings
+//     const employees = await db.userProfile.findMany({
+//       where: {
+//         userId: {
+//           in: employeeIds,
+//         },
+//       },
+//       select: {
+//         userId: true,
+//         fullName: true,
+//         officeTimingIn: true,
+//         OfficeTimingOut: true,
+//       },
+//     });
+
+//     // Create employee timing reports
+//     const employeeTimingReports: EmployeeTimingReport[] = [];
+
+//     for (const employee of employees) {
+//       const employeeAttendance = attendanceRecords.filter(
+//         (record) => record.userId === employee.userId
+//       );
+
+//       const violations: TimingViolation[] = [];
+//       let totalLateArrivals = 0;
+//       let totalEarlyDepartures = 0;
+//       let totalBothViolations = 0;
+
+//       // Default office timings if not set for employee
+//       const defaultCheckInTime = "09:00";
+//       const defaultCheckOutTime = "18:00";
+
+//       // Get employee's expected check-in and check-out times
+//       const expectedCheckInTime = employee.officeTimingIn || defaultCheckInTime;
+//       const expectedCheckOutTime =
+//         employee.OfficeTimingOut || defaultCheckOutTime;
+
+//       for (const record of employeeAttendance) {
+//         if (!record.checkLog) continue;
+
+//         const checkInTime = record.checkLog.checkInTime;
+//         const checkOutTime = record.checkLog.checkOutTime;
+//         const recordDate = record.date.toISOString().split("T")[0];
+
+//         // Parse expected times for the day
+//         const [expectedCheckInHour, expectedCheckInMinute] = expectedCheckInTime
+//           .split(":")
+//           .map(Number);
+//         const [expectedCheckOutHour, expectedCheckOutMinute] =
+//           expectedCheckOutTime.split(":").map(Number);
+
+//         // Create date objects with expected times for comparison
+//         const expectedCheckInDateTime = new Date(record.date);
+//         expectedCheckInDateTime.setHours(
+//           expectedCheckInHour,
+//           expectedCheckInMinute,
+//           0,
+//           0
+//         );
+
+//         const expectedCheckOutDateTime = new Date(record.date);
+//         expectedCheckOutDateTime.setHours(
+//           expectedCheckOutHour,
+//           expectedCheckOutMinute,
+//           0,
+//           0
+//         );
+
+//         // Check if employee was late
+//         const isLate = checkInTime
+//           ? checkInTime > expectedCheckInDateTime
+//           : false;
+
+//         // Check if employee left early
+//         const isEarlyDeparture = checkOutTime
+//           ? checkOutTime < expectedCheckOutDateTime
+//           : false;
+
+//         // Only add to violations if there was a timing issue
+//         if (isLate || isEarlyDeparture) {
+//           violations.push({
+//             date: recordDate,
+//             checkInTime: checkInTime ? formatTime(checkInTime) : null,
+//             checkOutTime: checkOutTime ? formatTime(checkOutTime) : null,
+//             expectedCheckInTime: expectedCheckInTime,
+//             expectedCheckOutTime: expectedCheckOutTime,
+//             isLate,
+//             isEarlyDeparture,
+//           });
+
+//           if (isLate) totalLateArrivals++;
+//           if (isEarlyDeparture) totalEarlyDepartures++;
+//           if (isLate && isEarlyDeparture) totalBothViolations++;
+//         }
+//       }
+
+//       employeeTimingReports.push({
+//         userId: employee.userId,
+//         fullName: employee.fullName,
+//         violations,
+//         totalLateArrivals,
+//         totalEarlyDepartures,
+//         totalBothViolations,
+//       });
+//     }
+
+//     // Sort reports by total violations (most violations first)
+//     employeeTimingReports.sort((a, b) => {
+//       const totalA = a.totalLateArrivals + a.totalEarlyDepartures;
+//       const totalB = b.totalLateArrivals + b.totalEarlyDepartures;
+//       return totalB - totalA;
+//     });
+
+//     return NextResponse.json({
+//       employeeTimingReports,
+//       summary: {
+//         totalEmployees: employeeTimingReports.length,
+//         employeesWithLateArrivals: employeeTimingReports.filter(
+//           (e) => e.totalLateArrivals > 0
+//         ).length,
+//         employeesWithEarlyDepartures: employeeTimingReports.filter(
+//           (e) => e.totalEarlyDepartures > 0
+//         ).length,
+//         employeesWithBothViolations: employeeTimingReports.filter(
+//           (e) => e.totalBothViolations > 0
+//         ).length,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error in Calculating Timing Report:", error);
+//     return NextResponse.json(
+//       {
+//         error: "Failed to process timing report calculation",
+//         details: error instanceof Error ? error.message : String(error),
+//       },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+// // Helper function to format time as HH:MM
+// function formatTime(date: Date): string {
+//   return date.toTimeString().substring(0, 5);
+// }

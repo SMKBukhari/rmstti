@@ -149,7 +149,9 @@ export function MagazineTimetable({
                   {timetable.map((record) => (
                     <TableRow key={record.id}>
                       <TableCell>{record.fullName}</TableCell>
-                      <TableCell>{format(record.date, "EEE, MMMM d")}</TableCell>
+                      <TableCell>
+                        {format(record.date, "EEE, MMMM d")}
+                      </TableCell>
                       <TableCell>{record.shiftType}</TableCell>
                       <TableCell>
                         {format(record.shiftStart, "h:mm a")}

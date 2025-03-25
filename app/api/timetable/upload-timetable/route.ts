@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { parse } from "csv-parse/sync";
 import { dynamicDateParser } from "@/lib/dynamicDateParse";
+import { randomBytes } from "crypto";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,8 +20,7 @@ export async function POST(req: NextRequest) {
 
     for (const record of records) {
       const {
-        "TimeTable ID": timeTableId,
-        "User ID": userId,
+        CNIC: cnic,
         "Employee Name": employeeName,
         Date: date,
         "Shift Start": shiftStart,
@@ -30,8 +30,7 @@ export async function POST(req: NextRequest) {
 
       // Validation
       if (
-        !timeTableId ||
-        !userId ||
+        !cnic ||
         !employeeName ||
         !date ||
         !shiftStart ||
@@ -55,10 +54,22 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
+      // Find user by CNIC
+      const user = await db.userProfile.findFirst({
+        where: { cnic: cnic },
+      });
+
+      if (!user) {
+        console.error(`User not found for CNIC: ${cnic}`);
+        continue;
+      }
+
+      const timeTableId = randomBytes(16).toString("hex");
+
       // Base timeTable data
       const timeTableData = {
-        id: timeTableId,
-        userId: userId,
+        id: randomBytes(16).toString("hex"),
+        userId: user?.userId,
         employeeName: employeeName,
         date: parsedDate, // Use parsed date
         shiftStart: parsedShiftStart, // Use parsed shift start
@@ -72,12 +83,10 @@ export async function POST(req: NextRequest) {
 
       // Create or update Attendance record
       try {
-        await db.timeTable.upsert({
-          where: { id: timeTableId },
-          create: { ...timeTableData },
-          update: { ...timeTableData },
+        await db.timeTable.create({
+          data: timeTableData,
         });
-        console.log(`Successfully upserted record: ${timeTableId}`);
+        console.log(`Successfully created timetable record: ${timeTableId}`);
       } catch (error) {
         console.error(`Error upserting record with ID ${timeTableId}:`, error);
       }
