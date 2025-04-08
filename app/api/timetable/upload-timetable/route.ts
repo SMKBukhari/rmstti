@@ -18,82 +18,84 @@ export async function POST(req: NextRequest) {
       skip_empty_lines: true,
     });
 
+    const successRecords = [];
+    const errorRecords = [];
+
     for (const record of records) {
-      const {
-        CNIC: cnic,
-        "Employee Name": employeeName,
-        Date: date,
-        "Shift Start": shiftStart,
-        "Shift End": shiftEnd,
-        "Shift Type": shiftType,
-      } = record;
-
-      // Validation
-      if (
-        !cnic ||
-        !employeeName ||
-        !date ||
-        !shiftStart ||
-        !shiftEnd ||
-        !shiftType
-      ) {
-        console.error(
-          `Missing required fields for record: ${JSON.stringify(record)}`
-        );
-        continue;
-      }
-
-      const parsedDate = dynamicDateParser(date);
-      const parsedShiftStart = dynamicDateParser(`${date} ${shiftStart}`);
-      const parsedShiftEnd = dynamicDateParser(`${date} ${shiftEnd}`);
-
-      if (!parsedDate || !parsedShiftStart || !parsedShiftEnd) {
-        console.error(
-          `Invalid date format for record: ${JSON.stringify(record)}`
-        );
-        continue;
-      }
-
-      // Find user by CNIC
-      const user = await db.userProfile.findFirst({
-        where: { cnic: cnic },
-      });
-
-      if (!user) {
-        console.error(`User not found for CNIC: ${cnic}`);
-        continue;
-      }
-
-      const timeTableId = randomBytes(16).toString("hex");
-
-      // Base timeTable data
-      const timeTableData = {
-        id: randomBytes(16).toString("hex"),
-        userId: user?.userId,
-        employeeName: employeeName,
-        date: parsedDate, // Use parsed date
-        shiftStart: parsedShiftStart, // Use parsed shift start
-        shiftEnd: parsedShiftEnd, // Use parsed shift end
-        shiftType: shiftType,
-      };
-
-      console.log(`Parsed Date: ${parsedDate}`);
-      console.log(`Parsed Shift Start: ${parsedShiftStart}`);
-      console.log(`Parsed Shift End: ${parsedShiftEnd}`);
-
-      // Create or update Attendance record
       try {
-        await db.timeTable.create({
-          data: timeTableData,
+        const {
+          CNIC: cnic,
+          "Employee Name": employeeName,
+          Date: date,
+          "Shift Start": shiftStart,
+          "Shift End": shiftEnd,
+          "Shift Type": shiftType,
+        } = record;
+
+        // Validation
+        if (
+          !cnic ||
+          !employeeName ||
+          !date ||
+          !shiftStart ||
+          !shiftEnd ||
+          !shiftType
+        ) {
+          throw new Error("Missing required fields");
+        }
+
+        // Parse dates separately
+        const parsedDate = dynamicDateParser(date);
+        const parsedShiftStart = dynamicDateParser(`${date} ${shiftStart}`);
+        const parsedShiftEnd = dynamicDateParser(`${date} ${shiftEnd}`);
+
+        // For evening shifts ending at 1:00 AM, we need to add a day to the end time
+        if (shiftEnd.includes("1:00 AM")) {
+          parsedShiftEnd?.setDate(parsedShiftEnd.getDate() + 1);
+        }
+
+        if (!parsedDate || !parsedShiftStart || !parsedShiftEnd) {
+          console.log(`Date: ${date}, Start: ${shiftStart}, End: ${shiftEnd}`);
+          throw new Error("Invalid date format");
+        }
+
+        // Find user by CNIC
+        const user = await db.userProfile.findFirst({
+          where: { cnic: cnic },
         });
-        console.log(`Successfully created timetable record: ${timeTableId}`);
+
+        if (!user) {
+          throw new Error("User not found");
+        }
+
+        // Create timetable record
+        await db.timeTable.create({
+          data: {
+            id: randomBytes(16).toString("hex"),
+            userId: user.userId,
+            employeeName: employeeName,
+            date: parsedDate,
+            shiftStart: parsedShiftStart,
+            shiftEnd: parsedShiftEnd,
+            shiftType: shiftType,
+          },
+        });
+
+        successRecords.push(record);
       } catch (error) {
-        console.error(`Error upserting record with ID ${timeTableId}:`, error);
+        errorRecords.push({
+          record,
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
+        console.error(`Error processing record:`, record, error);
       }
     }
 
     return NextResponse.json({
-      message: "TimeTable data uploaded successfully",
+      message: "TimeTable data processed",
+      successCount: successRecords.length,
+      errorCount: errorRecords.length,
+      errors: errorRecords,
     });
   } catch (error) {
     console.error("Error processing CSV:", error);

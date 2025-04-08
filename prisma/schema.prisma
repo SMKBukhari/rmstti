@@ -92,6 +92,7 @@ model UserProfile {
   Complaints              Complaints[]
   publicHolidays          PublicHoliday[]        @relation("HolidayEmployees")
   WorkFromHome            WorkFromHome[]
+  LateCount               LateCount[]
 }
 
 model ProfieUpdateRequests {
@@ -418,6 +419,19 @@ model CheckLog {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @default(now())
   Attendence   Attendence[]
+}
+
+model LateCount {
+  id        String      @id @default(cuid())
+  userId    String
+  month     Int // 0-11 representing Jan-Dec
+  year      Int
+  count     Int         @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user      UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@unique([userId, month, year])
 }
 
 model Job {

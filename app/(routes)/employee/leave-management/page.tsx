@@ -44,7 +44,13 @@ const LeaveManagementPage = async () => {
     })
   );
 
-  const leaveTypes = await db.leaveType.findMany();
+  const leaveTypes = await db.leaveType.findMany({
+    where: {
+      NOT: {
+        name: "Unauthorised Absent",
+      },
+    },
+  });
 
   return (
     <div className='flex-col p-4 md:p-8 items-center justify-center flex'>

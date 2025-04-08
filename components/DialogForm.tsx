@@ -95,6 +95,8 @@ interface DialogFormProps<T extends FieldValues> {
   form: UseFormReturn<T>; // Pass the form instance
   isSubmitting?: boolean; // For form loading state
   accordionContent?: AccordionContentItem<T>[];
+  children?: React.ReactNode;
+  customContent?: React.ReactNode;
 }
 
 const DialogForm = <T extends FieldValues>({
@@ -109,6 +111,8 @@ const DialogForm = <T extends FieldValues>({
   isSteps,
   isSubmitting,
   accordionContent,
+  children,
+  customContent,
 }: DialogFormProps<T>) => {
   const renderField = (field: Field<T>) => {
     const innerField = form.register(field.name);
@@ -152,6 +156,7 @@ const DialogForm = <T extends FieldValues>({
             className='space-y-8 w-full'
             onSubmit={form.handleSubmit(onSubmit)}
           >
+            {customContent}
             <div className='grid grid-cols-1 gap-10 w-full'>
               {fields.map((field) => (
                 <FormField
@@ -381,6 +386,7 @@ const DialogForm = <T extends FieldValues>({
                 </div>
               )}
             </div>
+            {children}
             <div className='flex w-full'>
               <DialogFooter className='w-full flex gap-3'>
                 {buttons.map((button, index) => (
