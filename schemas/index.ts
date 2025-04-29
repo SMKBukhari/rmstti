@@ -326,3 +326,12 @@ export const CalculateAttendanceSchema = z.object({
   dateFrom: z.date(),
   dateTo: z.date(),
 });
+
+export const LeaveBalanceManagementSchema = z.object({
+  date: z.date(),
+  entitledLeaves: z.string().refine((val) => {
+    const num = parseFloat(val);
+    return !isNaN(num);
+  }, "Must be a valid number"),
+  reason: z.string().min(1, "Reason is required"),
+});

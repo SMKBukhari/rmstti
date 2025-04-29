@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -9,15 +9,11 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EditEmployeeSchema, WarningSchema } from "@/schemas";
-import { Department, Role, Status, UserProfile } from "@prisma/client";
-import { CountryOptions, getCityOptions } from "@/lib/data";
+import { WarningSchema } from "@/schemas";
+import { UserProfile } from "@prisma/client";
 
 interface CellActionsProps {
   user: UserProfile | null;
-  roleCombo: Role[] | null;
-  statusCombo: Status[] | null;
-  departmentCombo: Department[] | null;
   id: string;
   fullName: string;
   email: string;
@@ -25,18 +21,6 @@ interface CellActionsProps {
   designation: string;
   role: string;
   company: string;
-  gender: "Male" | "Female" | "Other" | "Select";
-  contactNumber: string;
-  cnic: string;
-  DOB: Date;
-  DOJ: Date;
-  city: string;
-  country: string;
-  address: string;
-  status: string;
-  salary: string;
-  officeTimingIn: string;
-  officeTimingOut: string;
 }
 
 const CellActions = ({
@@ -47,42 +31,11 @@ const CellActions = ({
   department,
   designation,
   company,
-  gender,
-  contactNumber,
-  cnic,
-  DOB,
-  DOJ,
-  city,
-  country,
-  address,
-  status,
-  salary,
-  officeTimingIn,
-  officeTimingOut,
-  roleCombo,
-  statusCombo,
-  departmentCombo,
 }: CellActionsProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
-  const [isSecondDialogOpen, setSecondDialogOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isWarning, setIsWarning] = useState(false);
-  const [cities, setCities] = useState<{ label: string; value: string }[]>([]);
   const router = useRouter();
-
-  useEffect(() => {
-    if (user?.country) {
-      const cityOptions = getCityOptions(user.country);
-      setCities(cityOptions);
-    }
-  }, [user?.country]);
-
-  const handleCountryChange = (countryCode: string) => {
-    const cityOptions = getCityOptions(countryCode);
-    setCities(cityOptions);
-    EditingForm.setValue("city", "");
-  };
+  const [isWarning, setIsWarning] = useState(false);
 
   const defaultWarningMessage = `
   <div style="font-family: Arial, sans-serif; line-height: 1.6; margin: 40px;">
@@ -124,28 +77,6 @@ const CellActions = ({
     },
   });
 
-  const EditingForm = useForm<z.infer<typeof EditEmployeeSchema>>({
-    resolver: zodResolver(EditEmployeeSchema),
-    defaultValues: {
-      fullName: fullName || "",
-      gender: gender || "Select",
-      contactNumber: contactNumber || "",
-      cnic: cnic || "",
-      DOB: DOB || new Date(),
-      DOJ: DOJ || new Date(),
-      city: city || "",
-      country: country || "",
-      address: address || "",
-      designation: designation || "",
-      status: status || "",
-      role: role || "",
-      department: department || "",
-      salary: salary || "",
-      officeTimingIn: officeTimingIn || "",
-      officeTimingOut: officeTimingOut || "",
-    },
-  });
-
   const onTerminate = async () => {
     try {
       setIsLoading(true);
@@ -165,48 +96,8 @@ const CellActions = ({
         }
       }
     } finally {
-      setSecondDialogOpen(false);
+      setDialogOpen(false);
       setIsLoading(false);
-    }
-  };
-
-  const onEditing = async (values: z.infer<typeof EditEmployeeSchema>) => {
-    try {
-      setIsEditing(true);
-      await axios.patch(`/api/user/${user?.userId}/editEmployee`, {
-        id: id,
-        fullName: values.fullName,
-        gender: values.gender,
-        contactNumber: values.contactNumber,
-        cnic: values.cnic,
-        DOB: values.DOB,
-        DOJ: values.DOJ,
-        city: values.city,
-        country: values.country,
-        address: values.address,
-        designation: values.designation,
-        status: values.status,
-        role: values.role,
-        department: values.department,
-        salary: values.salary,
-        officeTimingIn: values.officeTimingIn,
-        officeTimingOut: values.officeTimingOut,
-      });
-      toast.success(`Employee ${values.fullName} updated successfully.`);
-      setSecondDialogOpen(false);
-      setIsEditing(false);
-      router.refresh();
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        if (error.response && error.response.data) {
-          toast.error(error.response.data);
-        } else {
-          toast.error("An unexpected error occurred. Please try again.");
-        }
-      }
-    } finally {
-      setSecondDialogOpen(false);
-      setIsEditing(false);
     }
   };
 
@@ -260,6 +151,7 @@ const CellActions = ({
           <span>Warning</span>
         )}
       </Button>
+
       {/* Terminate Button */}
       <Button variant={"destructive"} onClick={onTerminate}>
         {isLoading ? (
@@ -268,14 +160,7 @@ const CellActions = ({
           <span>Terminate</span>
         )}
       </Button>
-      {/* Terminate Button */}
-      <Button variant={"primary"} onClick={() => setSecondDialogOpen(true)}>
-        {isLoading ? (
-          <Loader2 className='w-4 h-4 animate-spin' />
-        ) : (
-          <span>Edit</span>
-        )}
-      </Button>
+
       {/* Warning Dialog Form */}
       <DialogForm
         isOpen={isDialogOpen}
@@ -346,127 +231,6 @@ const CellActions = ({
         ]}
         onSubmit={onWarning}
         form={WarningForm}
-      />
-
-      {/* Edit Dialog Form */}
-      <DialogForm
-        isOpen={isSecondDialogOpen}
-        onOpenChange={setSecondDialogOpen}
-        title='Edit Employee'
-        description='Please enter the updated information.'
-        fields={[
-          {
-            name: "fullName",
-            label: "Full Name",
-            type: "input",
-          },
-          {
-            name: "contactNumber",
-            label: "Contact Number",
-            type: "input",
-            placeholder: "03251234567",
-          },
-          {
-            name: "cnic",
-            label: "CNIC",
-            type: "input",
-            placeholder: "12345-1234567-1",
-          },
-          {
-            name: "DOB",
-            label: "Date of Birth",
-            type: "date",
-          },
-          {
-            name: "DOJ",
-            label: "Date of Joining",
-            type: "date",
-          },
-          {
-            name: "city",
-            label: "City",
-            type: "select",
-            comboboxOptions: cities,
-            onChange: (e) => handleCountryChange(e.target.value),
-          },
-          {
-            name: "country",
-            label: "Country",
-            type: "select",
-            comboboxOptions: CountryOptions,
-            heading: "Country",
-          },
-          {
-            name: "address",
-            label: "Address",
-            type: "textarea",
-          },
-          {
-            name: "designation",
-            label: "Designation",
-            type: "input",
-          },
-          {
-            name: "status",
-            label: "Status",
-            type: "select",
-            comboboxOptions:
-              statusCombo?.map((status) => ({
-                label: status.name,
-                value: status.name,
-              })) ?? [],
-          },
-          {
-            name: "role",
-            label: "Role",
-            type: "select",
-            comboboxOptions:
-              roleCombo?.map((role) => ({
-                label: role.name,
-                value: role.name,
-              })) ?? [],
-          },
-          {
-            name: "department",
-            label: "Department",
-            type: "select",
-            comboboxOptions:
-              departmentCombo?.map((department) => ({
-                label: department.name,
-                value: department.name,
-              })) ?? [],
-          },
-          {
-            name: "salary",
-            label: "Salary",
-            type: "input",
-          },
-          {
-            name: "officeTimingIn",
-            label: "Office Timing In",
-            type: "input",
-          },
-          {
-            name: "officeTimingOut",
-            label: "Office Timing Out",
-            type: "input",
-          },
-        ]}
-        buttons={[
-          {
-            label: "Update",
-            type: "submit",
-            variant: "primary",
-            isLoading: isEditing,
-          },
-          {
-            label: "Cancel",
-            type: "button",
-            onClick: () => setSecondDialogOpen(false),
-          },
-        ]}
-        onSubmit={onEditing}
-        form={EditingForm}
       />
     </div>
   );

@@ -5,6 +5,7 @@ import React from "react";
 import { format } from "date-fns";
 import { cookies } from "next/headers";
 import { columns, LeaveRequestsColumns } from "./_components/columns";
+import LeaveBalanceManagement from "./_components/LeaveBalanceManagement";
 
 const ApplicantsPage = async () => {
   const cookieStore = cookies();
@@ -57,6 +58,8 @@ const ApplicantsPage = async () => {
       <div className='flex items-center justify-between w-full'>
         <CustomBreadCrumb breadCrumbPage='Manage Leave Requests' />
       </div>
+
+      <LeaveBalanceManagement user={user} />
 
       <div className='mt-6 w-full'>
         <DataTable

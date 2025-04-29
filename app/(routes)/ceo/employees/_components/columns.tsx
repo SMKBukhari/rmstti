@@ -1,53 +1,40 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import CellActions from "./CellActions";
-import { Department, Role, Status, UserProfile } from "@prisma/client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserProfile } from "@prisma/client";
+import { Badge } from "@/components/ui/badge";
 
-export type Employee = {
+export type EmployeeColumns = {
   user: UserProfile | null;
-  roleCombo: Role[] | null;
-  statusCombo: Status[] | null;
-  departmentCombo: Department[] | null;
   id: string;
   fullName: string;
   email: string;
+  contact: string;
+  userImage: string;
   department: string;
   designation: string;
-  userImage: string;
   role: string;
-  company: string;
-  gender: "Male" | "Female" | "Other" | "Select";
-  contactNumber: string;
-  cnic: string;
-  DOB: Date;
-  DOJ: Date;
-  city: string;
-  country: string;
-  address: string;
   status: string;
-  salary: string;
-  officeTimingIn: string;
-  officeTimingOut: string;
+  company: string;
 };
 
-export const columns: ColumnDef<Employee>[] = [
+export const columns: ColumnDef<EmployeeColumns>[] = [
   {
     accessorKey: "userImage",
     header: "",
     cell: ({ row }) => {
-      const employee = row.original;
+      const { userImage, fullName } = row.original;
       return (
-        <Avatar className='w-10 h-10 object-cover'>
+        <Avatar className='w-10 h-10'>
           <AvatarImage
-            className='object-cover object-center w-full h-full'
-            src={employee.userImage}
-            alt={employee.fullName}
+            className='w-full h-full object-cover object-center'
+            src={userImage}
+            alt={fullName}
           />
-          <AvatarFallback>{employee.fullName.charAt(0)}</AvatarFallback>
+          <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
         </Avatar>
       );
     },
@@ -56,11 +43,9 @@ export const columns: ColumnDef<Employee>[] = [
     accessorKey: "fullName",
     header: "Full Name",
     cell: ({ row }) => {
-      const employee = row.original;
+      const { fullName } = row.original;
       return (
-        <Link href={`/admin/employees/${employee.id}`}>
-          {employee.fullName}
-        </Link>
+        <Link href={`/admin/applicants/${row.original.id}`}>{fullName}</Link>
       );
     },
   },
@@ -114,21 +99,6 @@ export const columns: ColumnDef<Employee>[] = [
         department,
         designation,
         company,
-        DOB,
-        DOJ,
-        address,
-        city,
-        country,
-        cnic,
-        contactNumber,
-        gender, 
-        officeTimingIn,
-        officeTimingOut,
-        roleCombo,
-        statusCombo,
-        salary,
-        status,
-        departmentCombo,
       } = row.original;
       return (
         <CellActions
@@ -140,21 +110,6 @@ export const columns: ColumnDef<Employee>[] = [
           designation={designation}
           role={role}
           company={company}
-          DOB={DOB}
-          DOJ={DOJ}
-          address={address}
-          city={city}
-          country={country}
-          contactNumber={contactNumber}
-          cnic={cnic}
-          gender={gender}
-          officeTimingIn={officeTimingIn}
-          officeTimingOut={officeTimingOut}
-          roleCombo={roleCombo}
-          statusCombo={statusCombo}
-          departmentCombo={departmentCombo}
-          salary={salary}
-          status={status}
         />
       );
     },

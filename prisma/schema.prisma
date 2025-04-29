@@ -1,504 +1,21 @@
-// This is your Prisma schema file for MySQL.
-// Learn more about Prisma Schema at https://pris.ly/d/prisma-schema
+// =============================================
+// PRISMA SCHEMA CONFIGURATION
+// =============================================
 
+// Generator configuration for Prisma Client
 generator client {
   provider = "prisma-client-js"
 }
 
+// Database connection configuration
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-model UserProfile {
-  userId                  String                 @id @unique @default(cuid())
-  fullName                String
-  email                   String                 @unique
-  password                String
-  ConfirmPassword         String?
-  gender                  Gender                 @default(Male)
-  contactNumber           String?
-  emergencyContactNumber  String?
-  DOB                     DateTime?
-  bloodGroup              String?
-  city                    String?
-  country                 String?
-  address                 String?
-  userImage               String?
-  departmentId            String?
-  department              Department?            @relation(fields: [departmentId], references: [id])
-  departmentOffered       String?
-  designation             String?
-  designationOffered      String?
-  jobExperience           JobExperience[]
-  education               Education[]
-  resumeUrl               String?
-  resumeName              String?
-  resumePublicId          String?
-  DOJ                     DateTime?
-  cnic                    String?
-  workstatusId            String?
-  workstatus              WorkStatus?            @relation(fields: [workstatusId], references: [id])
-  statusId                String?
-  status                  Status?                @relation(fields: [statusId], references: [id])
-  applicationStatusId     String?
-  applicationStatus       ApplicationStatus?     @relation(fields: [applicationStatusId], references: [id])
-  skype                   String?
-  linkedIn                String?
-  github                  String?
-  twitter                 String?
-  facebook                String?
-  instagram               String?
-  behance                 String?
-  zoomId                  String?
-  googleMeetId            String?
-  otpCode                 String?
-  otpCodeExpiry           DateTime?
-  resetToken              String?
-  resetTokenExpiry        DateTime?
-  loginSessionToken       String?
-  loginSessionExpiry      DateTime?
-  isVerified              Boolean?               @default(false)
-  isHired                 Boolean?               @default(false)
-  salary                  String?
-  salaryOffered           String?
-  roleId                  String?
-  role                    Role?                  @relation(fields: [roleId], references: [id])
-  roleOffered             String?
-  notifications           Notifications[]
-  skills                  Skills[]
-  JobApplications         JobApplications[]
-  currentJobApplicationId String?
-  totalYearlyLeaves       String                 @default("36")
-  totalMonthlyLeaves      String                 @default("3")
-  totalLeavesTaken        String                 @default("0")
-  totalLeavesBalance      String?
-  leaveRequests           LeaveRequest[]
-  createdAt               DateTime               @default(now())
-  TimeTable               TimeTable[]
-  company                 company?               @relation(fields: [companyId], references: [id])
-  companyId               String?
-  officeTimingIn          String?
-  OfficeTimingOut         String?
-  offerLetterUrl          String?
-  offerLetterName         String?
-  offerLetterPublicId     String?
-  Attendence              Attendence[]
-  ResignationRequests     ResignationRequests[]
-  Warnings                Warnings[]
-  updatedAt               DateTime               @default(now())
-  Requests                Requests[]
-  ProfieUpdateRequests    ProfieUpdateRequests[]
-  Complaints              Complaints[]
-  publicHolidays          PublicHoliday[]        @relation("HolidayEmployees")
-  WorkFromHome            WorkFromHome[]
-  LateCount               LateCount[]
-}
-
-model ProfieUpdateRequests {
-  id                     String          @id @unique @default(cuid())
-  userId                 String
-  user                   UserProfile     @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  aprroved               Boolean?        @default(false)
-  rejected               Boolean?        @default(false)
-  fullName               String?
-  email                  String?
-  password               String?
-  ConfirmPassword        String?
-  gender                 String?
-  contactNumber          String?
-  emergencyContactNumber String?
-  DOB                    DateTime?
-  bloodGroup             String?
-  city                   String?
-  country                String?
-  address                String?
-  userImage              String?
-  jobExperience          JobExperience[]
-  education              Education[]
-  resumeUrl              String?
-  resumeName             String?
-  resumePublicId         String?
-  cnic                   String?
-  skype                  String?
-  linkedIn               String?
-  github                 String?
-  twitter                String?
-  facebook               String?
-  instagram              String?
-  behance                String?
-  zoomId                 String?
-  googleMeetId           String?
-  skills                 Skills[]
-  createdAt              DateTime        @default(now())
-  updatedAt              DateTime        @default(now())
-}
-
-model LeaveRequest {
-  id                    String      @id @unique @default(cuid())
-  userId                String
-  user                  UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  leaveTypeId           String
-  leaveType             LeaveType   @relation(fields: [leaveTypeId], references: [id])
-  startDate             DateTime
-  endDate               DateTime
-  reason                String
-  status                LeaveStatus @default(Pending)
-  managerApproval       Boolean?    @default(false)
-  adminApproval         Boolean?    @default(false)
-  ceoApproval           Boolean?    @default(false)
-  requireHigherApproval Boolean?    @default(false)
-  approvedBy            String?
-  rejectedBy            String?
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @default(now())
-}
-
-model LeaveType {
-  id            String         @id @unique @default(cuid())
-  name          String         @unique
-  leaveRequests LeaveRequest[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @default(now())
-}
-
-model WorkFromHome {
-  id         String      @id @unique @default(cuid())
-  userId     String
-  user       UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  startDate  DateTime
-  endDate    DateTime
-  reason     String
-  status     String      @default("Pending")
-  aprrovedBy String?
-  rejectedBy String?
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @default(now())
-}
-
-model ResignationRequests {
-  id            String            @id @unique @default(cuid())
-  userId        String
-  user          UserProfile       @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  reason        String            @db.LongText
-  status        ResignationStatus @default(Pending)
-  adminApproval Boolean?          @default(false)
-  ceoApproval   Boolean?          @default(false)
-  approvedBy    String?
-  rejectedBy    String?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @default(now())
-}
-
-model Warnings {
-  id                String              @id @unique @default(cuid())
-  userId            String
-  user              UserProfile         @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  title             String
-  message           String              @db.LongText
-  senderName        String
-  senderDesignation String
-  createdBy         NotificationCreator
-  senderImage       String?
-  link              String?
-  createdAt         DateTime            @default(now())
-  isRead            Boolean             @default(false)
-}
-
-model Role {
-  id        String        @id @unique @default(cuid())
-  name      String        @unique
-  users     UserProfile[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @default(now())
-}
-
-model WorkStatus {
-  id         String        @id @unique @default(cuid())
-  name       String        @unique
-  users      UserProfile[]
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @default(now())
-  Attendence Attendence[]
-}
-
-model Status {
-  id        String        @id @unique @default(cuid())
-  name      String        @unique
-  users     UserProfile[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @default(now())
-}
-
-model ApplicationStatus {
-  id              String            @id @unique @default(cuid())
-  name            String            @unique
-  users           UserProfile[]
-  JobApplications JobApplications[]
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @default(now())
-}
-
-model JobApplications {
-  id                     String             @id @unique @default(cuid())
-  jobId                  String
-  job                    Job                @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  userId                 String
-  user                   UserProfile        @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  applicationStatusId    String?
-  applicationStatus      ApplicationStatus? @relation(fields: [applicationStatusId], references: [id])
-  coverLetter            String?            @db.LongText
-  department             String?
-  resumeUrl              String?
-  resumeName             String?
-  resumePublicId         String?
-  reference              String?
-  referenceContact       String?
-  appliedDate            DateTime?          @default(now())
-  interviewDate          DateTime?
-  isInterviewed          Boolean?           @default(false)
-  experience             String?
-  skills                 String?
-  education              String?
-  jobKnowledge           String?
-  generalKnowledge       String?
-  culturalFit            String?
-  adaptability           String?
-  motivation             String?
-  problemSolving         String?
-  communication          String?
-  teamWork               String?
-  leaderShipPotential    String?
-  professionalism        String?
-  criticalThinking       String?
-  appearance             String?
-  maturity               String?
-  strengths              String?
-  weaknesses             String?
-  remarks                String?
-  salaryExpectation      String?
-  interviewerName        String?
-  interviewerDesignation String?
-  createdAt              DateTime           @default(now())
-  updatedAt              DateTime           @default(now())
-}
-
-model Department {
-  id        String        @id @unique @default(cuid())
-  name      String        @unique
-  users     UserProfile[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @default(now())
-}
-
-model JobExperience {
-  id                     String                @id @unique @default(cuid())
-  userProfileId          String
-  userProfile            UserProfile           @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
-  jobTitle               String
-  employmentType         String
-  companyName            String
-  location               String
-  startDate              DateTime?
-  currentlyWorking       Boolean?
-  endDate                DateTime?
-  description            String?
-  createdAt              DateTime              @default(now())
-  updatedAt              DateTime              @default(now())
-  ProfieUpdateRequests   ProfieUpdateRequests? @relation(fields: [profieUpdateRequestsId], references: [id])
-  profieUpdateRequestsId String?
-
-  @@index([userProfileId], name: "idj_userProfileId")
-}
-
-model Education {
-  id                     String                @id @unique @default(cuid())
-  userProfileId          String
-  userProfile            UserProfile           @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
-  university             String
-  degree                 String
-  fieldOfStudy           String
-  grade                  String?
-  startDate              DateTime?
-  currentlyStudying      Boolean?              @default(false)
-  endDate                DateTime?
-  description            String?
-  createdAt              DateTime              @default(now())
-  updatedAt              DateTime              @default(now())
-  ProfieUpdateRequests   ProfieUpdateRequests? @relation(fields: [profieUpdateRequestsId], references: [id])
-  profieUpdateRequestsId String?
-
-  @@index([userProfileId], name: "ide_userProfileId")
-}
-
-model Skills {
-  id                     String                @id @unique @default(cuid())
-  userProfileId          String
-  userProfile            UserProfile           @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
-  name                   String                @unique
-  experienceLevel        String
-  ProfieUpdateRequests   ProfieUpdateRequests? @relation(fields: [profieUpdateRequestsId], references: [id])
-  profieUpdateRequestsId String?
-}
-
-model Notifications {
-  id          String              @id @unique @default(cuid())
-  userId      String
-  user        UserProfile         @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  title       String
-  message     String
-  createdBy   NotificationCreator
-  senderImage String?
-  link        String?
-  createdAt   DateTime            @default(now())
-  isRead      Boolean             @default(false)
-  type        NotificationType
-}
-
-model TimeTable {
-  id           String      @id @unique @default(cuid())
-  userId       String
-  user         UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  employeeName String
-  date         DateTime
-  shiftStart   DateTime
-  shiftEnd     DateTime
-  shiftType    ShiftType
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @default(now())
-}
-
-// Company related models
-model company {
-  id                    String          @id @unique @default(cuid())
-  name                  String          @unique
-  logo                  String?
-  email                 String?
-  contact               String?
-  address               String?
-  companyPolicyUrl      String?
-  companyPolicyName     String?
-  companyPolicyPublicId String?
-  publicHoliday         PublicHoliday[]
-  createdAt             DateTime        @default(now())
-  updatedAt             DateTime        @default(now())
-  UserProfile           UserProfile[]
-}
-
-model PublicHoliday {
-  id        String        @id @unique @default(cuid())
-  date      DateTime
-  name      String
-  companyId String
-  company   company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  isForAll  Boolean       @default(true)
-  employees UserProfile[] @relation("HolidayEmployees")
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @default(now())
-}
-
-model Attendence {
-  id           String      @id @unique @default(cuid())
-  userId       String
-  user         UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  date         DateTime
-  workingHours String?
-  workStatusId String?
-  workStatus   WorkStatus? @relation(fields: [workStatusId], references: [id])
-  checkLodId   String?
-  checkLog     CheckLog?   @relation(fields: [checkLodId], references: [id])
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @default(now())
-}
-
-model CheckLog {
-  id           String       @id @unique @default(cuid())
-  checkInTime  DateTime
-  checkOutTime DateTime?
-  workingHours String?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @default(now())
-  Attendence   Attendence[]
-}
-
-model LateCount {
-  id        String      @id @default(cuid())
-  userId    String
-  month     Int // 0-11 representing Jan-Dec
-  year      Int
-  count     Int         @default(0)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  user      UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
-
-  @@unique([userId, month, year])
-}
-
-model Job {
-  id                String            @id @unique @default(cuid())
-  userId            String
-  title             String
-  description       String?           @db.LongText
-  shortDescription  String?           @db.Text
-  imageName         String?
-  imageUrl          String?
-  imagePublicId     String?
-  isPusblished      Boolean           @default(false)
-  shiftTiming       String?
-  salary            String?
-  yearsOfExperience String?
-  workMode          String?
-  department        String?
-  attachments       Attachments[]
-  applications      JobApplications[]
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @default(now())
-}
-
-model Attachments {
-  id        String   @id @unique @default(cuid())
-  name      String
-  url       String
-  publicId  String
-  jobId     String
-  job       Job?     @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-}
-
-model Requests {
-  id                String           @id @unique @default(cuid())
-  userId            String
-  user              UserProfile      @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  requestTo         String?
-  requestMessage    String           @db.LongText
-  status            String           @default("Pending")
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @default(now())
-  requestCategoryId String?
-  RequestCategory   RequestCategory? @relation(fields: [requestCategoryId], references: [id])
-}
-
-model RequestCategory {
-  id        String     @id @unique @default(cuid())
-  name      String     @unique
-  requests  Requests[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @default(now())
-}
-
-model Complaints {
-  id          String      @id @unique @default(cuid())
-  userId      String
-  user        UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  title       String
-  message     String      @db.LongText
-  isAnonymous Boolean?    @default(false)
-  complaintTo String?
-  status      String      @default("Pending")
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @default(now())
-}
+// =============================================
+// ENUM DEFINITIONS
+// =============================================
 
 enum Gender {
   Male
@@ -550,4 +67,595 @@ enum ShiftType {
   Morning
   Evening
   Off
+}
+
+// =============================================
+// USER MANAGEMENT MODELS
+// =============================================
+
+// Main user profile model containing all employee information
+model UserProfile {
+  // Identification and authentication fields
+  userId          String   @id @unique @default(cuid())
+  email           String   @unique
+  password        String
+  ConfirmPassword String?
+  isVerified      Boolean? @default(false)
+
+  // Personal information
+  fullName               String
+  gender                 Gender    @default(Male)
+  DOB                    DateTime?
+  contactNumber          String?
+  emergencyContactNumber String?
+  bloodGroup             String?
+  userImage              String?
+  cnic                   String?
+
+  // Address information
+  address String?
+  city    String?
+  country String?
+
+  // Professional information
+  departmentId       String?
+  department         Department? @relation(fields: [departmentId], references: [id])
+  departmentOffered  String?
+  designation        String?
+  designationOffered String?
+  roleId             String?
+  role               Role?       @relation(fields: [roleId], references: [id])
+  roleOffered        String?
+  isHired            Boolean?    @default(false)
+  salary             String?
+  salaryOffered      String?
+  DOJ                DateTime?
+
+  // Documents and attachments
+  resumeUrl           String?
+  resumeName          String?
+  resumePublicId      String?
+  offerLetterUrl      String?
+  offerLetterName     String?
+  offerLetterPublicId String?
+
+  // Work schedule
+  officeTimingIn  String?
+  OfficeTimingOut String?
+
+  // Social media and communication
+  skype        String?
+  linkedIn     String?
+  github       String?
+  twitter      String?
+  facebook     String?
+  instagram    String?
+  behance      String?
+  zoomId       String?
+  googleMeetId String?
+
+  // Authentication tokens
+  otpCode            String?
+  otpCodeExpiry      DateTime?
+  resetToken         String?
+  resetTokenExpiry   DateTime?
+  loginSessionToken  String?
+  loginSessionExpiry DateTime?
+
+  // Status and relations
+  workstatusId            String?
+  workstatus              WorkStatus?        @relation(fields: [workstatusId], references: [id])
+  statusId                String?
+  status                  Status?            @relation(fields: [statusId], references: [id])
+  applicationStatusId     String?
+  applicationStatus       ApplicationStatus? @relation(fields: [applicationStatusId], references: [id])
+  currentJobApplicationId String?
+  companyId               String?
+  company                 company?           @relation(fields: [companyId], references: [id])
+
+  // Leave management
+  totalYearlyLeaves  String  @default("36")
+  totalMonthlyLeaves String  @default("3")
+  totalLeavesTaken   String  @default("0")
+  totalLeavesBalance String?
+
+  // Relations to other models
+  jobExperience          JobExperience[]
+  education              Education[]
+  skills                 Skills[]
+  notifications          Notifications[]
+  JobApplications        JobApplications[]
+  leaveRequests          LeaveRequest[]
+  TimeTable              TimeTable[]
+  Attendence             Attendence[]
+  ResignationRequests    ResignationRequests[]
+  Warnings               Warnings[]
+  Requests               Requests[]
+  ProfieUpdateRequests   ProfieUpdateRequests[]
+  Complaints             Complaints[]
+  publicHolidays         PublicHoliday[]          @relation("HolidayEmployees")
+  WorkFromHome           WorkFromHome[]
+  LateCount              LateCount[]
+  leaveBalanceAdjustment LeaveBalanceAdjustment[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+// =============================================
+// COMPANY STRUCTURE MODELS
+// =============================================
+
+model company {
+  id                    String  @id @unique @default(cuid())
+  name                  String  @unique
+  logo                  String?
+  email                 String?
+  contact               String?
+  address               String?
+  companyPolicyUrl      String?
+  companyPolicyName     String?
+  companyPolicyPublicId String?
+
+  // Relations
+  UserProfile   UserProfile[]
+  publicHoliday PublicHoliday[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Department {
+  id        String        @id @unique @default(cuid())
+  name      String        @unique
+  users     UserProfile[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now())
+}
+
+model Role {
+  id        String        @id @unique @default(cuid())
+  name      String        @unique
+  users     UserProfile[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now())
+}
+
+model WorkStatus {
+  id         String        @id @unique @default(cuid())
+  name       String        @unique
+  users      UserProfile[]
+  Attendence Attendence[]
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @default(now())
+}
+
+model Status {
+  id        String        @id @unique @default(cuid())
+  name      String        @unique
+  users     UserProfile[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now())
+}
+
+model ApplicationStatus {
+  id              String            @id @unique @default(cuid())
+  name            String            @unique
+  users           UserProfile[]
+  JobApplications JobApplications[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now())
+}
+
+// =============================================
+// ATTENDANCE AND TIME MANAGEMENT MODELS
+// =============================================
+
+model TimeTable {
+  id           String      @id @unique @default(cuid())
+  userId       String
+  user         UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  employeeName String
+  date         DateTime
+  shiftStart   DateTime?
+  shiftEnd     DateTime?
+  shiftType    ShiftType
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @default(now())
+}
+
+model Attendence {
+  id           String      @id @unique @default(cuid())
+  userId       String
+  user         UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  date         DateTime
+  workingHours String?
+  workStatusId String?
+  workStatus   WorkStatus? @relation(fields: [workStatusId], references: [id])
+  checkLodId   String?
+  checkLog     CheckLog?   @relation(fields: [checkLodId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @default(now())
+}
+
+model CheckLog {
+  id           String       @id @unique @default(cuid())
+  checkInTime  DateTime
+  checkOutTime DateTime?
+  workingHours String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @default(now())
+  Attendence   Attendence[]
+}
+
+model LateCount {
+  id        String      @id @default(cuid())
+  userId    String
+  month     Int // 0-11 representing Jan-Dec
+  year      Int
+  count     Int         @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user      UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@unique([userId, month, year])
+}
+
+model LeaveBalanceAdjustment {
+  id             String      @id @unique @default(cuid())
+  userId         String
+  user           UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  entitledLeaves String
+  reason         String
+  date           DateTime
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @default(now())
+}
+
+model PublicHoliday {
+  id        String        @id @unique @default(cuid())
+  date      DateTime
+  name      String
+  companyId String
+  company   company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  isForAll  Boolean       @default(true)
+  employees UserProfile[] @relation("HolidayEmployees")
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now())
+}
+
+// =============================================
+// LEAVE AND REQUEST MANAGEMENT MODELS
+// =============================================
+
+model LeaveRequest {
+  id                    String      @id @unique @default(cuid())
+  userId                String
+  user                  UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  leaveTypeId           String
+  leaveType             LeaveType   @relation(fields: [leaveTypeId], references: [id])
+  startDate             DateTime
+  endDate               DateTime
+  reason                String      @db.LongText
+  status                LeaveStatus @default(Pending)
+  managerApproval       Boolean?    @default(false)
+  adminApproval         Boolean?    @default(false)
+  ceoApproval           Boolean?    @default(false)
+  requireHigherApproval Boolean?    @default(false)
+  approvedBy            String?
+  rejectedBy            String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @default(now())
+}
+
+model LeaveType {
+  id            String         @id @unique @default(cuid())
+  name          String         @unique
+  leaveRequests LeaveRequest[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now())
+}
+
+model WorkFromHome {
+  id         String      @id @unique @default(cuid())
+  userId     String
+  user       UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  startDate  DateTime
+  endDate    DateTime
+  reason     String      @db.LongText
+  status     String      @default("Pending")
+  aprrovedBy String?
+  rejectedBy String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @default(now())
+}
+
+model ResignationRequests {
+  id            String            @id @unique @default(cuid())
+  userId        String
+  user          UserProfile       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  reason        String            @db.LongText
+  status        ResignationStatus @default(Pending)
+  adminApproval Boolean?          @default(false)
+  ceoApproval   Boolean?          @default(false)
+  approvedBy    String?
+  rejectedBy    String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @default(now())
+}
+
+// =============================================
+// JOB AND RECRUITMENT MODELS
+// =============================================
+
+model Job {
+  id                String  @id @unique @default(cuid())
+  userId            String
+  title             String
+  description       String? @db.LongText
+  shortDescription  String? @db.Text
+  imageName         String?
+  imageUrl          String?
+  imagePublicId     String?
+  isPusblished      Boolean @default(false)
+  shiftTiming       String?
+  salary            String?
+  yearsOfExperience String?
+  workMode          String?
+  department        String?
+
+  // Relations
+  attachments  Attachments[]
+  applications JobApplications[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model JobApplications {
+  id                  String             @id @unique @default(cuid())
+  jobId               String
+  job                 Job                @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  userId              String
+  user                UserProfile        @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  applicationStatusId String?
+  applicationStatus   ApplicationStatus? @relation(fields: [applicationStatusId], references: [id])
+
+  // Application details
+  coverLetter      String? @db.LongText
+  department       String?
+  resumeUrl        String?
+  resumeName       String?
+  resumePublicId   String?
+  reference        String?
+  referenceContact String?
+
+  // Interview details
+  appliedDate   DateTime? @default(now())
+  interviewDate DateTime?
+  isInterviewed Boolean?  @default(false)
+
+  // Evaluation fields
+  experience             String?
+  skills                 String?
+  education              String?
+  jobKnowledge           String?
+  generalKnowledge       String?
+  culturalFit            String?
+  adaptability           String?
+  motivation             String?
+  problemSolving         String?
+  communication          String?
+  teamWork               String?
+  leaderShipPotential    String?
+  professionalism        String?
+  criticalThinking       String?
+  appearance             String?
+  maturity               String?
+  strengths              String?
+  weaknesses             String?
+  remarks                String?
+  salaryExpectation      String?
+  interviewerName        String?
+  interviewerDesignation String?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Attachments {
+  id        String   @id @unique @default(cuid())
+  name      String
+  url       String
+  publicId  String
+  jobId     String
+  job       Job?     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+// =============================================
+// EMPLOYEE PROFILE MODELS
+// =============================================
+
+model JobExperience {
+  id               String      @id @unique @default(cuid())
+  userProfileId    String
+  userProfile      UserProfile @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
+  jobTitle         String
+  employmentType   String
+  companyName      String
+  location         String
+  startDate        DateTime?
+  currentlyWorking Boolean?
+  endDate          DateTime?
+  description      String?
+
+  // Relations
+  ProfieUpdateRequests   ProfieUpdateRequests? @relation(fields: [profieUpdateRequestsId], references: [id])
+  profieUpdateRequestsId String?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@index([userProfileId], name: "idj_userProfileId")
+}
+
+model Education {
+  id                String      @id @unique @default(cuid())
+  userProfileId     String
+  userProfile       UserProfile @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
+  university        String
+  degree            String
+  fieldOfStudy      String
+  grade             String?
+  startDate         DateTime?
+  currentlyStudying Boolean?    @default(false)
+  endDate           DateTime?
+  description       String?
+
+  // Relations
+  ProfieUpdateRequests   ProfieUpdateRequests? @relation(fields: [profieUpdateRequestsId], references: [id])
+  profieUpdateRequestsId String?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@index([userProfileId], name: "ide_userProfileId")
+}
+
+model Skills {
+  id              String      @id @unique @default(cuid())
+  userProfileId   String
+  userProfile     UserProfile @relation(fields: [userProfileId], references: [userId], onDelete: Cascade)
+  name            String      @unique
+  experienceLevel String
+
+  // Relations
+  ProfieUpdateRequests   ProfieUpdateRequests? @relation(fields: [profieUpdateRequestsId], references: [id])
+  profieUpdateRequestsId String?
+}
+
+model ProfieUpdateRequests {
+  id     String      @id @unique @default(cuid())
+  userId String
+  user   UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Approval status
+  aprroved Boolean? @default(false)
+  rejected Boolean? @default(false)
+
+  // Personal information updates
+  fullName               String?
+  email                  String?
+  password               String?
+  ConfirmPassword        String?
+  gender                 String?
+  contactNumber          String?
+  emergencyContactNumber String?
+  DOB                    DateTime?
+  bloodGroup             String?
+  city                   String?
+  country                String?
+  address                String?
+  userImage              String?
+  cnic                   String?
+
+  // Professional information updates
+  skype        String?
+  linkedIn     String?
+  github       String?
+  twitter      String?
+  facebook     String?
+  instagram    String?
+  behance      String?
+  zoomId       String?
+  googleMeetId String?
+
+  // Document updates
+  resumeUrl      String?
+  resumeName     String?
+  resumePublicId String?
+
+  // Relations
+  jobExperience JobExperience[]
+  education     Education[]
+  skills        Skills[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+// =============================================
+// NOTIFICATION AND COMMUNICATION MODELS
+// =============================================
+
+model Notifications {
+  id          String              @id @unique @default(cuid())
+  userId      String
+  user        UserProfile         @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  title       String
+  message     String
+  createdBy   NotificationCreator
+  senderImage String?
+  link        String?
+  type        NotificationType
+  isRead      Boolean             @default(false)
+  createdAt   DateTime            @default(now())
+}
+
+model Warnings {
+  id                String              @id @unique @default(cuid())
+  userId            String
+  user              UserProfile         @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  title             String
+  message           String              @db.LongText
+  senderName        String
+  senderDesignation String
+  createdBy         NotificationCreator
+  senderImage       String?
+  link              String?
+  isRead            Boolean             @default(false)
+  createdAt         DateTime            @default(now())
+}
+
+model Requests {
+  id                String           @id @unique @default(cuid())
+  userId            String
+  user              UserProfile      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  requestTo         String?
+  requestMessage    String           @db.LongText
+  status            String           @default("Pending")
+  requestCategoryId String?
+  RequestCategory   RequestCategory? @relation(fields: [requestCategoryId], references: [id])
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @default(now())
+}
+
+model RequestCategory {
+  id        String     @id @unique @default(cuid())
+  name      String     @unique
+  requests  Requests[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
+}
+
+model Complaints {
+  id          String      @id @unique @default(cuid())
+  userId      String
+  user        UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  title       String
+  message     String      @db.LongText
+  isAnonymous Boolean?    @default(false)
+  complaintTo String?
+  status      String      @default("Pending")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now())
 }

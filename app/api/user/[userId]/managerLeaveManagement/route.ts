@@ -1,5 +1,10 @@
 import { db } from "@/lib/db";
-import { NotificationCreator, NotificationType } from "@prisma/client";
+import {
+  LeaveStatus,
+  NotificationCreator,
+  NotificationType,
+} from "@prisma/client";
+import { endOfMonth, startOfMonth, subMonths } from "date-fns";
 import { NextResponse } from "next/server";
 
 export const POST = async (
@@ -91,6 +96,36 @@ export const POST = async (
       },
     });
 
+    // Calculate carried over leaves
+    const calculateCarriedOverLeaves = async (userId: string) => {
+      let carriedOverLeaves = 0;
+      const lastMonth = subMonths(currentDate, 1);
+      const startOfLastMonth = startOfMonth(lastMonth);
+      const endOfLastMonth = endOfMonth(lastMonth);
+
+      const lastMonthLeaves = await db.leaveRequest.count({
+        where: {
+          userId: userId,
+          startDate: {
+            gte: startOfLastMonth,
+            lte: endOfLastMonth,
+          },
+          status: LeaveStatus.Approved,
+        },
+      });
+
+      if (lastMonthLeaves === 0) {
+        carriedOverLeaves = Math.min(
+          totalMonthlyLeaves,
+          36 - totalYearlyLeaves
+        );
+      }
+
+      return carriedOverLeaves;
+    };
+
+    const carriedOverLeaves = await calculateCarriedOverLeaves(userId);
+
     const notifications = [
       {
         userId,
@@ -154,6 +189,22 @@ export const POST = async (
 
     await db.notifications.createMany({
       data: notifications,
+    });
+
+    await db.userProfile.update({
+      where: {
+        userId: raiseLeaveRequest.userId,
+      },
+      data: {
+        totalYearlyLeaves: Math.min(
+          totalYearlyLeaves + carriedOverLeaves,
+          36
+        ).toString(),
+        totalMonthlyLeaves: Math.min(
+          totalMonthlyLeaves + carriedOverLeaves,
+          36
+        ).toString(),
+      },
     });
 
     return NextResponse.json(raiseLeaveRequest, { status: 201 });

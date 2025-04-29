@@ -11,8 +11,36 @@ import {
   UserProfile,
 } from "@prisma/client";
 import { Country } from "country-state-city";
-import { Check, Crown, Flag, Mail, User } from "lucide-react";
+import {
+  Check,
+  Crown,
+  HeartPulse,
+  IdCard,
+  Mail,
+  MapPin,
+  Phone,
+  User,
+} from "lucide-react";
 import CellActions from "../../_components/CellActions";
+import { BiLogoZoom, BiWorld } from "react-icons/bi";
+import {
+  LiaBehance,
+  LiaFacebook,
+  LiaGithub,
+  LiaInstagram,
+  LiaLinkedin,
+  LiaSkype,
+  LiaTwitter,
+} from "react-icons/lia";
+import { SiGooglemeet } from "react-icons/si";
+import Link from "next/link";
+import {
+  FaFemale,
+  FaMale,
+  FaMoneyBillWave,
+  FaTransgenderAlt,
+} from "react-icons/fa";
+import { GiBookStorm } from "react-icons/gi";
 
 interface UserAboutSectionProps {
   user: UserProfile | null;
@@ -45,7 +73,10 @@ const UserAboutSection = ({
             <div className='lg:w-32 lg:h-32 md:w-24 md:h-24 sm:w-40 sm:h-40 w-32 h-32'>
               {applicant?.userImage ? (
                 <Avatar className='w-full h-full'>
-                  <AvatarImage className="w-full h-full object-cover object-center" src={applicant.userImage} />
+                  <AvatarImage
+                    className='w-full h-full object-cover object-center'
+                    src={applicant.userImage}
+                  />
                   <AvatarFallback>{avatarFallback}</AvatarFallback>
                 </Avatar>
               ) : (
@@ -68,8 +99,18 @@ const UserAboutSection = ({
             <h3 className='text-muted-foreground text-base -mt-0.5'>{`Full Name: ${applicant?.fullName}`}</h3>
           </div>
           <div className='flex gap-2'>
-            <Mail className='w-5 h-5 text-muted-foreground' />
-            <h3 className='text-muted-foreground text-base -mt-0.5'>{`Email: ${applicant?.email}`}</h3>
+            {applicant?.gender === "Male" ? (
+              <FaMale className='w-5 h-5 text-muted-foreground' />
+            ) : applicant?.gender === "Female" ? (
+              <FaFemale className='w-5 h-5 text-muted-foreground' />
+            ) : (
+              <FaTransgenderAlt className='w-5 h-5 text-muted-foreground' />
+            )}
+            <h3 className='text-muted-foreground text-base -mt-0.5'>{`Gender: ${applicant?.gender}`}</h3>
+          </div>
+          <div className='flex gap-2'>
+            <IdCard className='w-5 h-5 text-muted-foreground' />
+            <h3 className='text-muted-foreground text-base -mt-0.5'>{`CNIC: ${applicant?.cnic}`}</h3>
           </div>
           <div className='flex gap-2'>
             <Check className='w-5 h-5 text-muted-foreground' />
@@ -81,10 +122,119 @@ const UserAboutSection = ({
             <Crown className='w-5 h-5 text-muted-foreground' />
             <h3 className='text-muted-foreground text-base -mt-0.5'>{`Role: ${applicant?.role?.name}`}</h3>
           </div>
+          {applicant?.designation && (
+            <div className='flex gap-2'>
+              <GiBookStorm className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5'>{`Designation: ${applicant?.designation}`}</h3>
+            </div>
+          )}
+          {applicant?.salary && (
+            <div className='flex gap-2'>
+              <FaMoneyBillWave className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5'>{`Salary: ${applicant.salary} PKR/month`}</h3>
+            </div>
+          )}
           <div className='flex gap-2'>
-            <Flag className='w-5 h-5 text-muted-foreground' />
+            <BiWorld className='w-5 h-5 text-muted-foreground' />
             <h3 className='text-muted-foreground text-base -mt-0.5'>{`Country: ${countryName}`}</h3>
           </div>
+          <div className='flex gap-2'>
+            <MapPin className='w-5 h-5 text-muted-foreground' />
+            <h3 className='text-muted-foreground text-base -mt-0.5'>{`Address: ${
+              applicant?.address === null ? "Not Entered" : applicant?.address
+            }`}</h3>
+          </div>
+          <div className='flex gap-2'>
+            <HeartPulse className='w-5 h-5 text-muted-foreground' />
+            <h3 className='text-muted-foreground text-base -mt-0.5'>{`Blood Group: ${applicant?.bloodGroup}`}</h3>
+          </div>
+        </div>
+        <div className='flex flex-col gap-4'>
+          <h3 className='uppercase text-neutral-600 dark:text-neutral-400 text-sm font-semibold tracking-wider'>
+            Contacts
+          </h3>
+          {applicant?.contactNumber && (
+            <div className='flex gap-2'>
+              <Phone className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5'>
+                {`Mobile No: `}
+                <Link href={`tel:${applicant?.contactNumber}`}>
+                  {applicant?.contactNumber}
+                </Link>
+              </h3>
+            </div>
+          )}
+          {applicant?.emergencyContactNumber && (
+            <div className='flex gap-2'>
+              <Phone className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5'>
+                {`Emergency Contact No: `}
+                <Link href={`tel:${applicant?.emergencyContactNumber}`}>
+                  {applicant?.emergencyContactNumber}
+                </Link>
+              </h3>
+            </div>
+          )}
+          {applicant?.email && (
+            <div className='flex gap-2'>
+              <Mail className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`Email: ${applicant?.email}`}</h3>
+            </div>
+          )}
+          {applicant?.skype && (
+            <div className='flex gap-2'>
+              <LiaSkype className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`Skype: ${applicant?.skype}`}</h3>
+            </div>
+          )}
+          {applicant?.zoomId && (
+            <div className='flex gap-2'>
+              <BiLogoZoom className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`Zoom Id: ${applicant?.zoomId}`}</h3>
+            </div>
+          )}
+          {applicant?.googleMeetId && (
+            <div className='flex gap-2'>
+              <SiGooglemeet className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`Google Meet Id: ${applicant?.googleMeetId}`}</h3>
+            </div>
+          )}
+          {applicant?.facebook && (
+            <div className='flex gap-2'>
+              <LiaFacebook className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`Facebook: ${applicant?.facebook}`}</h3>
+            </div>
+          )}
+          {applicant?.instagram && (
+            <div className='flex gap-2'>
+              <LiaInstagram className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`Instagram: ${applicant?.instagram}`}</h3>
+            </div>
+          )}
+          {applicant?.linkedIn && (
+            <div className='flex gap-2'>
+              <LiaLinkedin className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`LinkedIn: ${applicant?.linkedIn}`}</h3>
+            </div>
+          )}
+          {applicant?.twitter && (
+            <div className='flex gap-2'>
+              <LiaTwitter className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`Twitter: ${applicant?.twitter}`}</h3>
+            </div>
+          )}
+          {applicant?.github && (
+            <div className='flex gap-2'>
+              <LiaGithub className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`Github: ${applicant?.github}`}</h3>
+            </div>
+          )}
+          {applicant?.behance && (
+            <div className='flex gap-2'>
+              <LiaBehance className='w-5 h-5 text-muted-foreground' />
+              <h3 className='text-muted-foreground text-base -mt-0.5 truncate'>{`Behance: ${applicant?.behance}`}</h3>
+            </div>
+          )}
         </div>
         <h3 className='uppercase text-neutral-600 dark:text-neutral-400 text-sm font-semibold tracking-wider'>
           Reference
@@ -125,8 +275,6 @@ const UserAboutSection = ({
           />
         </div>
       </div>
-
-      
     </main>
   );
 };

@@ -20,13 +20,29 @@ export async function POST(req: NextRequest) {
     const parseDateString = (dateStr: string, timeStr?: string) => {
       try {
         if (timeStr) {
-          return parseDate(
+          // Parse in local time (as it appears in CSV)
+          const localDate = parseDate(
             `${dateStr} ${timeStr}`,
-            "M/d/yyyy h:mm:ss a",
+            "d/M/yyyy h:mm:ss a",
             new Date()
           );
+
+          // Convert to ISO string without timezone conversion
+          const isoString = `${localDate.getFullYear()}-${String(
+            localDate.getMonth() + 1
+          ).padStart(2, "0")}-${String(localDate.getDate()).padStart(
+            2,
+            "0"
+          )}T${String(localDate.getHours()).padStart(2, "0")}:${String(
+            localDate.getMinutes()
+          ).padStart(2, "0")}:${String(localDate.getSeconds()).padStart(
+            2,
+            "0"
+          )}`;
+
+          return new Date(isoString);
         }
-        return parseDate(dateStr, "M/d/yyyy", new Date());
+        return parseDate(dateStr, "d/M/yyyy", new Date());
       } catch (error) {
         console.error(`Error parsing date: ${dateStr} ${timeStr || ""}`, error);
         return null;

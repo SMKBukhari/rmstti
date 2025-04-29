@@ -6,6 +6,10 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import AddNewEmployee from "./_components/AddNewEmployee";
 import { DataTable } from "@/components/ui/data-table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { employeesListTabs } from "@/lib/data";
+import LeaveManagementReport from "./_components/LeaveManagementReport";
+import LeaveBalanceManagement from "./_components/LeaveBalanceManagement";
 
 const ApplicantsPage = async () => {
   const cookieStore = cookies();
@@ -54,6 +58,29 @@ const ApplicantsPage = async () => {
       department: true,
       company: true,
       Warnings: true,
+      leaveBalanceAdjustment: {
+        orderBy: {
+          date: "desc",
+        },
+      },
+      leaveRequests: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+      Attendence: {
+        where: {
+          workStatus: {
+            name: "Absent",
+          },
+        },
+        include: {
+          workStatus: true,
+        },
+        orderBy: {
+          date: "desc",
+        },
+      },
     },
   });
 
@@ -83,42 +110,82 @@ const ApplicantsPage = async () => {
       );
     });
 
+  const leaveBalanceManagement = await db.leaveBalanceAdjustment.findMany({
+    include: {
+      user: true,
+    },
+  });
+
   return (
-    <div className='flex-col p-4 md:p-8 items-center justify-center flex'>
+    <div className='flex-col p-4 md:p-8 items-center justify-center flex space-y-8'>
       <div className='flex items-center justify-between w-full'>
         <CustomBreadCrumb breadCrumbPage='Employees' />
       </div>
 
-      <AddNewEmployee user={user} department={departments} role={roles} />
+      <Tabs defaultValue='employeesList' className='w-full'>
+        <TabsList className='bg-transparent gap-10'>
+          {employeesListTabs.map((tab) => (
+            <TabsTrigger
+              key={tab.value}
+              value={tab.value}
+              className='px-8 py-3 text-base data-[state=active]:bg-[#295B81] data-[state=active]:dark:bg-[#1034ff] rounded-md dark:shadow-white dark:text-[#fff] data-[state=active]:text-[#fff] text-neutral-800 font-medium'
+            >
+              <div className='flex gap-2 items-center justify-center w-full'>
+                <tab.icon className='w-5 h-5' />
+                {tab.label}
+              </div>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <div className='mt-8'>
+          <TabsContent value='employeesList'>
+            <AddNewEmployee user={user} department={departments} role={roles} />
 
-      <div className='mt-6 w-full'>
-        <DataTable
-          columns={columns}
-          data={formattedEmployees}
-          routePrefix='admin/employees'
-          filterableColumns={[
-            {
-              id: "status",
-              title: "Status",
-              options: status.map((status) => status.name).filter(Boolean),
-            },
-            {
-              id: "department",
-              title: "Department",
-              options: departments.map((dept) => dept.name).filter(Boolean),
-            },
-            {
-              id: "role",
-              title: "Role",
-              options: roles.map((role) => role.name).filter(Boolean),
-            },
-            {
-              id: "fullName",
-              title: "Name",
-            },
-          ]}
-        />
-      </div>
+            <div className='mt-6 w-full'>
+              <DataTable
+                columns={columns}
+                data={formattedEmployees}
+                routePrefix='admin/employees'
+                title='Employees List'
+                filterableColumns={[
+                  {
+                    id: "status",
+                    title: "Status",
+                    options: status
+                      .map((status) => status.name)
+                      .filter(Boolean),
+                  },
+                  {
+                    id: "department",
+                    title: "Department",
+                    options: departments
+                      .map((dept) => dept.name)
+                      .filter(Boolean),
+                  },
+                  {
+                    id: "role",
+                    title: "Role",
+                    options: roles.map((role) => role.name).filter(Boolean),
+                  },
+                  {
+                    id: "fullName",
+                    title: "Name",
+                  },
+                ]}
+              />
+            </div>
+          </TabsContent>
+          <TabsContent value='leaveBalanceManagement'>
+            <LeaveBalanceManagement
+              user={user}
+              leaveBalanceManagement={leaveBalanceManagement}
+            />
+          </TabsContent>
+          <TabsContent value='leaveBalanceReport'>
+            <LeaveManagementReport employees={employees} />
+          </TabsContent>
+        </div>
+      </Tabs>
     </div>
   );
 };

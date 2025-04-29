@@ -30,7 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DayPicker } from "react-day-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { CalendarIcon } from "lucide-react";
@@ -50,6 +50,8 @@ interface DataTableProps<TData, TValue> {
   filterableColumns?: FilterableColumn[];
   routePrefix?: string;
   userId?: string;
+  title?: string;
+  description?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -58,6 +60,8 @@ export function DataTable<TData, TValue>({
   filterableColumns = [],
   routePrefix,
   userId,
+  title,
+  description,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -116,6 +120,14 @@ export function DataTable<TData, TValue>({
   return (
     <Card className='w-full'>
       <CardHeader>
+        <div className='flex items-center justify-between'>
+          <div className='space-y-1'>
+            <CardTitle>{title}</CardTitle>
+            {description && (
+              <p className='text-sm text-muted-foreground'>{description}</p>
+            )}
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className='flex flex-col space-y-4'>

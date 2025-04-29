@@ -14,6 +14,10 @@ export async function PATCH(
       where: {
         id: attendanceId,
       },
+      include: {
+        user: true,
+        workStatus: true,
+      }
     });
 
     if (!attendance) {
@@ -48,6 +52,17 @@ export async function PATCH(
         },
       },
     });
+
+    // if (status === "Absent") {
+    //   await db.userProfile.update({
+    //     where: {
+    //       userId: attendance.userId,
+    //     },
+    //     data: {
+    //       totalLeavesBalance: 
+    //     },
+    //   })
+    // }
 
     return NextResponse.json(updateWorkStatus, { status: 200 });
   } catch (error) {

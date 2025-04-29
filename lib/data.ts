@@ -4,6 +4,7 @@ import {
   Bell,
   BookUser,
   Building2,
+  CalculatorIcon,
   Calendar,
   CalendarClock,
   CalendarFold,
@@ -17,6 +18,7 @@ import {
   HousePlug,
   LayoutDashboard,
   List,
+  ListCheck,
   Lock,
   Mailbox,
   NotebookText,
@@ -139,6 +141,37 @@ export const workFromHomeTabs = [
     icon: FolderOpen,
     label: "Manage Requests",
     value: "manageRequests",
+  },
+];
+
+export const employeesTabs = [
+  {
+    icon: Users,
+    label: "Profile",
+    value: "profile",
+  },
+  {
+    icon: ListCheck,
+    label: "Report",
+    value: "report",
+  },
+];
+
+export const employeesListTabs = [
+  {
+    icon: Users,
+    label: "Employees List",
+    value: "employeesList",
+  },
+  {
+    icon: CalculatorIcon,
+    label: "Leave Balance Management",
+    value: "leaveBalanceManagement",
+  },
+  {
+    icon: ListCheck,
+    label: "Leave Balance Report",
+    value: "leaveBalanceReport",
   },
 ];
 
