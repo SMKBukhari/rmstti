@@ -19,6 +19,9 @@ const RejectedApplicantDetailsPage = async ({
     where: {
       userId: userId,
     },
+    include: {
+      role: true,
+    }
   });
 
   const rejectedApplicant = await db.userProfile.findFirst({
@@ -68,7 +71,9 @@ const RejectedApplicantDetailsPage = async ({
       <div className='flex items-center justify-between w-full'>
         <CustomBreadCrumb
           breadCrumbPage={rejectedApplicant?.fullName || ""}
-          breadCrumbItem={[{ link: "/admin/rejected", label: "Rejected" }]}
+          breadCrumbItem={[
+            { link: "/admin/rejected", label: "Rejected Candidates" },
+          ]}
         />
       </div>
       <div className='grid md:grid-cols-3 grid-cols-1 md:gap-5 gap-0'>

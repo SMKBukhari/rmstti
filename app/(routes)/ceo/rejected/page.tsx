@@ -5,15 +5,10 @@ import React from "react";
 import { ApplicantsColumns, columns } from "./_components/columns";
 import { format } from "date-fns";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 const RejectedApplicantPage = async () => {
   const cookieStore = cookies();
   const userId = (await cookieStore).get("userId")?.value;
-
-  if (!userId) {
-    redirect("/signIn");
-  }
 
   const user = await db.userProfile.findUnique({
     where: {
@@ -49,6 +44,23 @@ const RejectedApplicantPage = async () => {
         : "N/A",
       department: applicant.department ?? "N/A",
       userImage: applicant.user?.userImage ?? "N/A",
+      isInterviewed: applicant.isInterviewed ?? false,
+      experience: applicant.experience ?? "N/A",
+      skills: applicant.skills ?? "N/A",
+      education: applicant.education ?? "N/A",
+      jobKnowledge: applicant.jobKnowledge ?? "N/A",
+      generalKnowledge: applicant.generalKnowledge ?? "N/A",
+      culturalFit: applicant.culturalFit ?? "N/A",
+      adaptability: applicant.adaptability ?? "N/A",
+      motivation: applicant.motivation ?? "N/A",
+      problemSolving: applicant.problemSolving ?? "N/A",
+      communication: applicant.communication ?? "N/A",
+      teamWork: applicant.teamWork ?? "N/A",
+      leaderShipPotential: applicant.leaderShipPotential ?? "N/A",
+      professionalism: applicant.professionalism ?? "N/A",
+      criticalThinking: applicant.criticalThinking ?? "N/A",
+      appearance: applicant.appearance ?? "N/A",
+      maturity: applicant.maturity ?? "N/A",
     })
   );
 

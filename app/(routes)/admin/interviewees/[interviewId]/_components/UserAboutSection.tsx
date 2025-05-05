@@ -56,7 +56,7 @@ const UserAboutSection = ({
 
   useEffect(() => {
     if (applicant?.isHired) {
-      router.push("/manager/interviewees");
+      router.push("/admin/interviewees");
     }
   }, [applicant, router]);
 

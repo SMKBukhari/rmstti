@@ -19,6 +19,9 @@ const RejectedApplicantDetailsPage = async ({
     where: {
       userId: userId,
     },
+    include: {
+      role: true,
+    }
   });
 
   const rejectedApplicant = await db.userProfile.findFirst({
@@ -69,7 +72,7 @@ const RejectedApplicantDetailsPage = async ({
         <CustomBreadCrumb
           breadCrumbPage={rejectedApplicant?.fullName || ""}
           breadCrumbItem={[
-            { link: "/ceo/rejected", label: "Rejected Candidates" },
+            { link: "/admin/rejected", label: "Rejected Candidates" },
           ]}
         />
       </div>

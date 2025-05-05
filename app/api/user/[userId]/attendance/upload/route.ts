@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { parse } from "csv-parse/sync";
 import { parse as parseDate, format } from "date-fns";
 import { db } from "@/lib/db";
+import redis from "@/lib/redis";
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,6 +13,21 @@ export async function POST(req: NextRequest) {
     }
 
     const csvContent = await file.text();
+    const cacheKey = `attendance:${csvContent}`;
+
+    // Check Redis cache first with proper type handling
+    const cachedResponse = await redis.get<string>(cacheKey);
+
+    if (cachedResponse) {
+      console.log("Serving from cache");
+      try {
+        const parsedData = JSON.parse(cachedResponse);
+        return NextResponse.json(parsedData);
+      } catch (e) {
+        console.error("Error parsing cached response", e);
+        // Continue with processing if cache is corrupted
+      }
+    }
     const records = parse(csvContent, {
       columns: true,
       skip_empty_lines: true,
@@ -20,27 +36,11 @@ export async function POST(req: NextRequest) {
     const parseDateString = (dateStr: string, timeStr?: string) => {
       try {
         if (timeStr) {
-          // Parse in local time (as it appears in CSV)
-          const localDate = parseDate(
+          return parseDate(
             `${dateStr} ${timeStr}`,
             "d/M/yyyy h:mm:ss a",
             new Date()
           );
-
-          // Convert to ISO string without timezone conversion
-          const isoString = `${localDate.getFullYear()}-${String(
-            localDate.getMonth() + 1
-          ).padStart(2, "0")}-${String(localDate.getDate()).padStart(
-            2,
-            "0"
-          )}T${String(localDate.getHours()).padStart(2, "0")}:${String(
-            localDate.getMinutes()
-          ).padStart(2, "0")}:${String(localDate.getSeconds()).padStart(
-            2,
-            "0"
-          )}`;
-
-          return new Date(isoString);
         }
         return parseDate(dateStr, "d/M/yyyy", new Date());
       } catch (error) {
@@ -237,10 +237,21 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({
+    // After successful processing, cache the result
+    const responseData = {
       message: `Attendance data processed successfully. Records: ${attendanceRecords.length}`,
       data: attendanceRecords,
-    });
+    };
+
+    // Cache for 1 hour (3600 seconds) with error handling
+    try {
+      await redis.setex(cacheKey, 3600, JSON.stringify(responseData));
+    } catch (e) {
+      console.error("Failed to cache response", e);
+      // Don't fail the request if caching fails
+    }
+
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error("Error processing CSV:", error);
     return NextResponse.json(

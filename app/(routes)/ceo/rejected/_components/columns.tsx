@@ -4,7 +4,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import Link from "next/link";
-import CellActions from "./CellActions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserProfile } from "@prisma/client";
 
@@ -17,6 +16,23 @@ export type ApplicantsColumns = {
   appliedAt: string;
   userImage: string;
   department: string;
+  isInterviewed: boolean;
+  experience: string;
+  skills: string;
+  education: string;
+  jobKnowledge: string;
+  generalKnowledge: string;
+  culturalFit: string;
+  adaptability: string;
+  motivation: string;
+  problemSolving: string;
+  communication: string;
+  teamWork: string;
+  leaderShipPotential: string;
+  professionalism: string;
+  criticalThinking: string;
+  appearance: string;
+  maturity: string;
 };
 
 export const columns: ColumnDef<ApplicantsColumns>[] = [
@@ -76,10 +92,71 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const { user, id, fullName, email } = row.original;
-      return (
-        <CellActions user={user} id={id} fullName={fullName} email={email} />
-      );
+      const {
+        isInterviewed,
+        experience,
+        skills,
+        education,
+        jobKnowledge,
+        generalKnowledge,
+        culturalFit,
+        adaptability,
+        motivation,
+        problemSolving,
+        communication,
+        teamWork,
+        leaderShipPotential,
+        professionalism,
+        criticalThinking,
+        appearance,
+        maturity,
+      } = row.original;
+      if (isInterviewed) {
+        const criteria = {
+          experience,
+          skills,
+          education,
+          jobKnowledge,
+          generalKnowledge,
+          culturalFit,
+          adaptability,
+          motivation,
+          problemSolving,
+          communication,
+          teamWork,
+          leaderShipPotential,
+          professionalism,
+          criticalThinking,
+          appearance,
+          maturity,
+        };
+
+        const validCriteria = Object.values(criteria).filter(
+          (value) => value !== "N/A"
+        );
+
+        const obtainedPoints = validCriteria.reduce(
+          (total, value) => total + parseInt(value || "0"),
+          0
+        );
+        const totalPoints = validCriteria.length * 5; // Assuming each criterion is out of 5 points
+        const percentage = (obtainedPoints / totalPoints) * 100;
+
+        return (
+          <div
+            className={`w-16 md:h-10 h-8 text-lg font-bold flex items-center justify-center rounded-md ${
+              percentage >= 80
+                ? "text-green-500 bg-green-200"
+                : percentage >= 40
+                ? "text-yellow-600 bg-yellow-200"
+                : "text-red-500 bg-red-300"
+            }
+              `}
+          >
+            {obtainedPoints}/{totalPoints}
+          </div>
+        );
+      }
     },
   },
 ];

@@ -3,16 +3,22 @@ import ClientAvatar from "@/components/AvatarClient";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { InterviewRatingFormSchema } from "@/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { JobApplications, Role, Status, UserProfile } from "@prisma/client";
 import axios from "axios";
 import { Country } from "country-state-city";
 import { Check, Crown, Flag, Loader2, Mail, User } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
+import { ScoreGauge } from "./ScoreGauge";
+import DialogForm from "@/components/DialogForm";
 
 interface UserAboutSectionProps {
-  user: UserProfile | null;
+  user: (UserProfile & { role: Role | null }) | null;
   applicant:
     | (UserProfile & { role: Role | null } & { status: Status | null })
     | null;
@@ -29,10 +35,121 @@ const UserAboutSection = ({
   isRejectedApplicant,
 }: UserAboutSectionProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [currentJobApplication, setCurrentJobApplication] =
+    useState<JobApplications | null>(null);
   const router = useRouter();
   const countryName = applicant?.country
     ? Country.getCountryByCode(applicant.country)?.name || applicant.country
     : "Not Specified";
+
+  useEffect(() => {
+    if (applicant?.currentJobApplicationId && userJobApplications) {
+      const currentApp = userJobApplications.jobApplications.find(
+        (app) => app.id === applicant.currentJobApplicationId
+      );
+      setCurrentJobApplication(currentApp || null);
+    }
+  }, [applicant, userJobApplications]);
+
+  const form = useForm<z.infer<typeof InterviewRatingFormSchema>>({
+    resolver: zodResolver(InterviewRatingFormSchema),
+    defaultValues: {
+      candidateName: applicant?.fullName ?? "",
+      experience: currentJobApplication?.experience ?? "N/A",
+      skills: currentJobApplication?.skills ?? "N/A",
+      education: currentJobApplication?.education ?? "N/A",
+      jobKnowledge: currentJobApplication?.jobKnowledge ?? "N/A",
+      generalKnowledge: currentJobApplication?.generalKnowledge ?? "N/A",
+      culturalFit: currentJobApplication?.culturalFit ?? "N/A",
+      adaptability: currentJobApplication?.adaptability ?? "N/A",
+      motivation: currentJobApplication?.motivation ?? "N/A",
+      problemSolving: currentJobApplication?.problemSolving ?? "N/A",
+      communication: currentJobApplication?.communication ?? "N/A",
+      teamWork: currentJobApplication?.teamWork ?? "N/A",
+      leaderShipPotential: currentJobApplication?.leaderShipPotential ?? "N/A",
+      professionalism: currentJobApplication?.professionalism ?? "N/A",
+      criticalThinking: currentJobApplication?.criticalThinking ?? "N/A",
+      appearance: currentJobApplication?.appearance ?? "N/A",
+      maturity: currentJobApplication?.maturity ?? "N/A",
+      salaryExpectations: currentJobApplication?.salaryExpectation ?? "",
+      strengths: currentJobApplication?.strengths ?? "",
+      weaknesses: currentJobApplication?.weaknesses ?? "",
+      remarks: currentJobApplication?.remarks ?? "",
+      interviewDate: currentJobApplication?.interviewDate ?? new Date(),
+      positionApplied: currentJobApplication?.department ?? "IT Department",
+      interviewerName: user?.fullName ?? "",
+      interviewerDesignation: user?.role?.name ?? "",
+    },
+  });
+
+  useEffect(() => {
+    if (currentJobApplication) {
+      form.reset({
+        candidateName: applicant?.fullName ?? "",
+        experience: currentJobApplication.experience ?? "N/A",
+        skills: currentJobApplication.skills ?? "N/A",
+        education: currentJobApplication.education ?? "N/A",
+        jobKnowledge: currentJobApplication.jobKnowledge ?? "N/A",
+        generalKnowledge: currentJobApplication.generalKnowledge ?? "N/A",
+        culturalFit: currentJobApplication.culturalFit ?? "N/A",
+        adaptability: currentJobApplication.adaptability ?? "N/A",
+        motivation: currentJobApplication.motivation ?? "N/A",
+        problemSolving: currentJobApplication.problemSolving ?? "N/A",
+        communication: currentJobApplication.communication ?? "N/A",
+        teamWork: currentJobApplication.teamWork ?? "N/A",
+        leaderShipPotential: currentJobApplication.leaderShipPotential ?? "N/A",
+        professionalism: currentJobApplication.professionalism ?? "N/A",
+        criticalThinking: currentJobApplication.criticalThinking ?? "N/A",
+        appearance: currentJobApplication.appearance ?? "N/A",
+        maturity: currentJobApplication.maturity ?? "N/A",
+        salaryExpectations: currentJobApplication.salaryExpectation ?? "",
+        strengths: currentJobApplication.strengths ?? "",
+        weaknesses: currentJobApplication.weaknesses ?? "",
+        remarks: currentJobApplication.remarks ?? "",
+        interviewDate: currentJobApplication.interviewDate ?? new Date(),
+        positionApplied: currentJobApplication.department ?? "IT Department",
+        interviewerName: user?.fullName ?? "",
+        interviewerDesignation: user?.role?.name ?? "",
+      });
+    }
+  }, [currentJobApplication, applicant, user, form]);
+
+  const criteria = {
+    experience: currentJobApplication?.experience,
+    skills: currentJobApplication?.skills,
+    education: currentJobApplication?.education,
+    jobKnowledge: currentJobApplication?.jobKnowledge,
+    generalKnowledge: currentJobApplication?.generalKnowledge,
+    culturalFit: currentJobApplication?.culturalFit,
+    adaptability: currentJobApplication?.adaptability,
+    motivation: currentJobApplication?.motivation,
+    problemSolving: currentJobApplication?.problemSolving,
+    communication: currentJobApplication?.communication,
+    teamWork: currentJobApplication?.teamWork,
+    leaderShipPotential: currentJobApplication?.leaderShipPotential,
+    professionalism: currentJobApplication?.professionalism,
+    criticalThinking: currentJobApplication?.criticalThinking,
+    appearance: currentJobApplication?.appearance,
+    maturity: currentJobApplication?.maturity,
+  };
+
+  const calculateScore = () => {
+    if (!currentJobApplication) return 0;
+
+    const validCriteria = Object.values(criteria).filter(
+      (value) => value !== "N/A"
+    );
+
+    return validCriteria.reduce(
+      (total, value) => total + Number.parseInt(value || "0"),
+      0
+    );
+  };
+
+  const score = calculateScore();
+  const totalPoints =
+    Object.values(criteria).filter((value) => value !== "N/A").length * 5;
 
   const onSubmit = async () => {
     try {
@@ -139,6 +256,23 @@ const UserAboutSection = ({
             )}
           </div>
         ))}
+        {currentJobApplication?.isInterviewed && (
+          <div className='mt-4'>
+            <h3 className='uppercase text-neutral-600 dark:text-neutral-400 text-sm font-semibold tracking-wider mb-4'>
+              Interview Score
+            </h3>
+            <ScoreGauge score={score} maxScore={totalPoints} />
+          </div>
+        )}
+        <div className='flex sm:flex-row flex-col flex-wrap gap-4'>
+          <Button
+            variant={"outline"}
+            className='w-full'
+            onClick={() => setDialogOpen(!isDialogOpen)}
+          >
+            <h3>Interview Rating Form</h3>
+          </Button>
+        </div>
         <div className='flex sm:flex-row flex-col flex-wrap gap-4'>
           <Button variant={"primary"} className='w-full' onClick={onSubmit}>
             {isLoading ? (
@@ -149,6 +283,177 @@ const UserAboutSection = ({
           </Button>
         </div>
       </div>
+
+      <DialogForm
+        isOpen={isDialogOpen}
+        onOpenChange={setDialogOpen}
+        title='Interview Rating Form'
+        description="Check the candidate's interview rating."
+        fields={[
+          {
+            name: "candidateName",
+            label: "Candidate Name",
+            placeholder: "Enter candidate name",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "interviewDate",
+            label: "Interview Date",
+            type: "date",
+            disabled: true,
+          },
+          {
+            name: "positionApplied",
+            label: "Position Applied For",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "experience",
+            label: "Experience",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "skills",
+            label: "Skills",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "education",
+            label: "Education",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "jobKnowledge",
+            label: "Job Knowledge",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "generalKnowledge",
+            label: "General Knowledge/IQ",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "culturalFit",
+            label: "Cultural Fit",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "adaptability",
+            label: "Adaptability",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "motivation",
+            label: "Motivation",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "problemSolving",
+            label: "Problem Solving",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "communication",
+            label: "Communication",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "teamWork",
+            label: "Team Work",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "leaderShipPotential",
+            label: "Leadership Potential",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "professionalism",
+            label: "Professionalism",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "criticalThinking",
+            label: "Critical Thinking",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "appearance",
+            label: "Appearance",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "maturity",
+            label: "Maturity",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "salaryExpectations",
+            label: "Salary Expectations",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "strengths",
+            label: "Strengths for this job",
+            type: "textarea",
+            disabled: true,
+          },
+          {
+            name: "weaknesses",
+            label: "Weakness for this job",
+            type: "textarea",
+            disabled: true,
+          },
+          {
+            name: "remarks",
+            label: "Remarks",
+            type: "textarea",
+            disabled: true,
+          },
+          {
+            name: "interviewerName",
+            label: "Interviewer Name",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "interviewerDesignation",
+            label: "Interviewer Designation",
+            type: "input",
+            disabled: true,
+          },
+        ]}
+        buttons={[
+          {
+            label: "Cancel",
+            type: "button",
+            onClick: () => setDialogOpen(false),
+          },
+        ]}
+        onSubmit={() => {
+          console.log("Form submitted");
+        }}
+        form={form}
+      />
     </main>
   );
 };

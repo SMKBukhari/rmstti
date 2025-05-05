@@ -14,7 +14,7 @@ interface CellActionsProps {
   email: string;
 }
 
-const CellActions = ({ user, id, fullName, email }: CellActionsProps) => {
+const CellActions = ({ user, id, fullName }: CellActionsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   

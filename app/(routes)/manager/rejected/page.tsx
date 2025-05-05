@@ -38,6 +38,8 @@ const RejectedApplicantPage = async () => {
     },
   });
 
+  const departments = await db.department.findMany();
+
   // Formatting the applicants data for the table
   const formattedApplicants: ApplicantsColumns[] = rejectedApplicants.map(
     (applicant) => ({
@@ -51,6 +53,23 @@ const RejectedApplicantPage = async () => {
         : "N/A",
       department: applicant.department ?? "N/A",
       userImage: applicant.user?.userImage ?? "N/A",
+      isInterviewed: applicant.isInterviewed ?? false,
+      experience: applicant.experience ?? "N/A",
+      skills: applicant.skills ?? "N/A",
+      education: applicant.education ?? "N/A",
+      jobKnowledge: applicant.jobKnowledge ?? "N/A",
+      generalKnowledge: applicant.generalKnowledge ?? "N/A",
+      culturalFit: applicant.culturalFit ?? "N/A",
+      adaptability: applicant.adaptability ?? "N/A",
+      motivation: applicant.motivation ?? "N/A",
+      problemSolving: applicant.problemSolving ?? "N/A",
+      communication: applicant.communication ?? "N/A",
+      teamWork: applicant.teamWork ?? "N/A",
+      leaderShipPotential: applicant.leaderShipPotential ?? "N/A",
+      professionalism: applicant.professionalism ?? "N/A",
+      criticalThinking: applicant.criticalThinking ?? "N/A",
+      appearance: applicant.appearance ?? "N/A",
+      maturity: applicant.maturity ?? "N/A",
     })
   );
 
@@ -64,8 +83,18 @@ const RejectedApplicantPage = async () => {
         <DataTable
           columns={columns}
           data={formattedApplicants}
-          searchKey='fullName'
           routePrefix='manager/rejected'
+          filterableColumns={[
+            {
+              id: "department",
+              title: "Department",
+              options: departments.map((dept) => dept.name).filter(Boolean),
+            },
+            {
+              id: "fullName",
+              title: "Name",
+            },
+          ]}
         />
       </div>
     </div>

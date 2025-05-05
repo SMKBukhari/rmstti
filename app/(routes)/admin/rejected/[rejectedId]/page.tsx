@@ -19,6 +19,9 @@ const RejectedApplicantDetailsPage = async ({
     where: {
       userId: userId,
     },
+    include: {
+      role: true,
+    }
   });
 
   const rejectedApplicant = await db.userProfile.findFirst({
