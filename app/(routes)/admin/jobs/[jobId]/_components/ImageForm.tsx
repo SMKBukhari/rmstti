@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Job, UserProfile } from "@prisma/client";
 import axios, { AxiosProgressEvent } from "axios";
+import { motion } from "framer-motion";
 import { File, FilePlus, Loader2, Plus, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -91,7 +92,7 @@ const ImageForm = ({ initialData, jobId, user }: ImageFormProps) => {
       router.refresh();
       setIsEditing(false);
       setImageUrl(response.data.imageUrl);
-      toast.success("Job cover image uploaded successfully!");
+      toast.success("Job/Internship cover image uploaded successfully!");
     } catch (error: unknown) {
       toast.error(
         axios.isAxiosError(error) && error.response?.data
@@ -112,10 +113,10 @@ const ImageForm = ({ initialData, jobId, user }: ImageFormProps) => {
       );
       router.refresh();
       setImageUrl(null);
-      toast.success("Job cover image deleted successfully");
+      toast.success("Job/Internship cover image deleted successfully");
     } catch (error) {
       console.error("Error in API request:", error);
-      toast.error("Failed to delete job cover image");
+      toast.error("Failed to delete job/internship cover image");
     } finally {
       setIsLoading(false);
     }
@@ -125,7 +126,7 @@ const ImageForm = ({ initialData, jobId, user }: ImageFormProps) => {
     <Card className='w-full flex flex-col items-center justify-center gap-10 px-10 py-10 pt-13 bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-xl mt-5'>
       <div className='flex justify-between w-full'>
         <h2 className='text-xl font-medium text-muted-foreground self-start'>
-          Job Cover Image
+          Job/Internship Cover Image
         </h2>
         {initialData?.imageUrl ? (
           <Button
@@ -189,10 +190,10 @@ const ImageForm = ({ initialData, jobId, user }: ImageFormProps) => {
                       Uploading: {uploadProgress}%
                     </div>
                     <div className='h-2 bg-gray-200 rounded-full mt-2'>
-                      <div
+                      <motion.div
                         className='h-full bg-[#295B81] dark:bg-[#1034ff] rounded-full'
                         style={{ width: `${uploadProgress}%` }}
-                      ></div>
+                      ></motion.div>
                     </div>
                   </div>
                 )}

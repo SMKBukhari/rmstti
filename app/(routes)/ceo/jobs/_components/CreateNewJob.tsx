@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 const formSchema = z.object({
-  title: z.string().min(1, { message: "Job title cannot be empty" }),
+  title: z.string().min(1, { message: "Job/Internship title cannot be empty" }),
 });
 
 interface CreateNewJobProps {
@@ -68,9 +68,9 @@ const CreateNewJob = ({ user }: CreateNewJobProps) => {
       <DialogForm
         isOpen={isDialogOpen}
         onOpenChange={setDialogOpen}
-        title='Name Your Job'
-        description="What would you like to name your job? Dont't worry, you can
-          change this later"
+        title='Name Your Job/Internship'
+        description="What would you like to name your job/internship? Dont't worry, you can
+          change this later."
         fields={[
           {
             name: "title",

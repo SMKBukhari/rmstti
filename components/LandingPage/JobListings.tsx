@@ -20,10 +20,10 @@ const JobListings = ({ jobs }: JobListing) => {
           className='text-center mb-12'
         >
           <h2 className='text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl'>
-            Featured Job Openings
+            Featured Job/Internship Openings
           </h2>
           <p className='mt-3 max-w-2xl mx-auto text-xl text-gray-500 dark:text-gray-300 sm:mt-4'>
-            Explore our latest job opportunities and take the next step in your
+            Explore our latest job/internship opportunities and take the next step in your
             career.
           </p>
         </motion.div>
@@ -42,7 +42,7 @@ const JobListings = ({ jobs }: JobListing) => {
             </motion.div>
           </AnimatePresence>
         ) : (
-          <p className="flex items-center justify-center">Jobs not available at this time</p>
+          <p className="flex items-center justify-center">Jobs/Internships not available at this time</p>
         )}
       </div>
     </section>

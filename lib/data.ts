@@ -293,7 +293,7 @@ export const adminRoutes = [
   },
   {
     icon: List,
-    label: "Jobs",
+    label: "Jobs/Internships",
     href: "/admin/jobs",
   },
   {
@@ -505,7 +505,7 @@ export const ceoRoutes = [
   },
   {
     icon: List,
-    label: "Jobs",
+    label: "Jobs/Internships",
     href: "/ceo/jobs",
   },
   {

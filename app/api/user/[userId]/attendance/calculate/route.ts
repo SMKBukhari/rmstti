@@ -477,6 +477,9 @@ export async function POST(
               attendanceRecord.checkLog.checkInTime,
               employee.officeTimingIn
             );
+            console.log(
+              `Check-in time: ${attendanceRecord.checkLog.checkInTime}, Expected time: ${employee.officeTimingIn}`
+            );
 
             console.log(
               `=========Employee ${employee.fullName} is late on ${dateStr}===========`

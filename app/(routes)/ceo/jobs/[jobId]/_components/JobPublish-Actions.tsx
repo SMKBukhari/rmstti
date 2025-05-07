@@ -60,7 +60,7 @@ const JobPublishActions = ({
       await axios.delete(`/api/user/${user?.userId}/createNewJob/${jobId}`);
 
       router.refresh();
-      return router.push("/ceo/jobs");
+      return router.push("/admin/jobs");
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         if (error.response && error.response.data) {

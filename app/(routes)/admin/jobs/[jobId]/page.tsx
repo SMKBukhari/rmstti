@@ -59,13 +59,13 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
         className='inline-flex items-center text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors mb-8'
       >
         <ArrowLeft className='w-4 h-4 mr-2' />
-        Back to Jobs
+        Back to Jobs/Interships
       </Link>
 
       <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8'>
         <div className='mb-4 sm:mb-0'>
           <h1 className='text-3xl font-bold text-gray-900 dark:text-white mb-2'>
-            Job Setup
+          Job/Internship Setup
           </h1>
           <span className='text-sm text-gray-600 dark:text-gray-400'>
             Complete All Fields {completionText}
@@ -82,7 +82,7 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
       {!job?.isPusblished && (
         <Banner
           variant='warning'
-          label='This Job is unpublished. It will not be visible in the jobs list'
+          label='This Job/Internship is unpublished. It will not be visible in the jobs/internships list'
           className='mb-8'
         />
       )}
@@ -91,7 +91,7 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
         <div className='space-y-8'>
           <SectionWrapper
             iconName='LayoutDashboard'
-            title='Customize your Job Details'
+            title='Customize your Job/Internship Details'
           >
             <TitleForm initialData={job} jobId={job?.id} user={user} />
             <ImageForm initialData={job} jobId={job?.id} user={user} />
@@ -104,7 +104,7 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
         </div>
 
         <div className='space-y-8'>
-          <SectionWrapper iconName='ListChecks' title='Job Requirements'>
+          <SectionWrapper iconName='ListChecks' title='Job/Internship Requirements'>
             <JobDepartment
               initialData={job}
               jobId={job?.id}
@@ -113,13 +113,13 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
             />
           </SectionWrapper>
 
-          <SectionWrapper iconName='File' title='Job Attachments'>
+          <SectionWrapper iconName='File' title='Job/Internship Attachments'>
             <AttachmentsForm initialData={job} jobId={job?.id} user={user} />
           </SectionWrapper>
         </div>
 
         <div className='lg:col-span-2'>
-          <SectionWrapper iconName='Building2' title='Job Description'>
+          <SectionWrapper iconName='Building2' title='Job/Internship Description'>
             <JobDescription initialData={job} jobId={job?.id} user={user} />
           </SectionWrapper>
         </div>

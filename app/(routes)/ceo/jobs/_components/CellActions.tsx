@@ -16,7 +16,7 @@ const CellActions = ({ id }: CellActionsProps) => {
     <div className='flex gap-3' onClick={handleButtonClick}>
       <Button variant={"outline"} className='bg-transparent border-white'>
         <Link
-          href={`/ceo/jobs/${id}`}
+          href={`/admin/jobs/${id}`}
           className='flex gap-2 items-center justify-center'
         >
           <Pencil className='h-4 w-4 mr-2' />
