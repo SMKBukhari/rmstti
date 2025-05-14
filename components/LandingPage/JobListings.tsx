@@ -42,7 +42,7 @@ const JobListings = ({ jobs }: JobListing) => {
             </motion.div>
           </AnimatePresence>
         ) : (
-          <p className="flex items-center justify-center">Jobs/Internships not available at this time.</p>
+          <p className="flex items-center justify-center">Jobs/Internships not available at this time</p>
         )}
       </div>
     </section>
