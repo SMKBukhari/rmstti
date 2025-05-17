@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   LiaFacebookF,
   LiaInstagram,
+  LiaLinkedin,
   LiaTwitter,
   LiaYoutube,
 } from "react-icons/lia";
@@ -36,8 +37,9 @@ const Footer = () => {
           <div>
             <h3 className='text-lg font-semibold mb-4'>Contact Us</h3>
             <p className='text-gray-400'>Email: info@tti.org.pk</p>
-            <p className='text-gray-400'>Phone: 051-2820180
-            <br />
+            <p className='text-gray-400'>
+              Phone: 051-2820180
+              <br />
               051-2820181
             </p>
           </div>
@@ -71,6 +73,13 @@ const Footer = () => {
                 className='text-gray-400 hover:text-white'
               >
                 <LiaYoutube className='w-6 h-6' />
+              </Link>
+              <Link
+                href='https://www.linkedin.com/company/the-truth-international'
+                target='_blank'
+                className='text-gray-400 hover:text-white'
+              >
+                <LiaLinkedin className='w-6 h-6' />
               </Link>
             </div>
           </div>
