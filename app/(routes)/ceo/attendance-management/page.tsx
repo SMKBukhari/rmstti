@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { AttendanceRecord, columns } from "./_components/columns";
 import UploadAttendancePage from "./_components/UploadCSV";
 import CalculateAttendancePage from "./_components/CalculateAttendaceRecord";
+import { formatInTimeZone } from "date-fns-tz";
 
 const ApplicantsPage = async () => {
   const cookieStore = cookies();
@@ -62,11 +63,29 @@ const ApplicantsPage = async () => {
       date: attendanceRecord.date
         ? format(new Date(attendanceRecord.date), "EEEE, MMMM d, yyyy")
         : "N/A",
+      // In your frontend component:
+      // checkIn: attendanceRecord.checkLog?.checkInTime
+      //   ? format(new Date(attendanceRecord.checkLog.checkInTime), "hh:mm:ss a")
+      //   : "Not Checked in",
       checkIn: attendanceRecord.checkLog?.checkInTime
-        ? format(new Date(attendanceRecord.checkLog.checkInTime), "hh:mm a")
+        ? formatInTimeZone(
+            attendanceRecord.checkLog.checkInTime,
+            "UTC",
+            "hh:mm:ss a"
+          )
         : "Not Checked in",
+      // checkOut: attendanceRecord.checkLog?.checkOutTime
+      //   ? format(
+      //       new Date(attendanceRecord.checkLog?.checkOutTime),
+      //       "hh:mm:ss a"
+      //     )
+      //   : "Not Checked Out",
       checkOut: attendanceRecord.checkLog?.checkOutTime
-        ? format(new Date(attendanceRecord.checkLog?.checkOutTime), "hh:mm a")
+        ? formatInTimeZone(
+            attendanceRecord.checkLog.checkOutTime,
+            "UTC",
+            "hh:mm:ss a"
+          )
         : "Not Checked Out",
       workingHours: attendanceRecord.workingHours || "N/A",
       department: attendanceRecord.user.department?.name || "N/A",
