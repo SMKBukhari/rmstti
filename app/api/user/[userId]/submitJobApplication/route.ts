@@ -47,6 +47,19 @@ export const POST = async (
       return new NextResponse("Applicant role not found", { status: 404 });
     }
 
+    const existingApplication = await db.jobApplications.findFirst({
+      where: {
+        jobId: job.id,
+        userId: user.userId,
+      },
+    });
+
+    if (existingApplication) {
+      return new NextResponse("You have already applied for this job", {
+        status: 400,
+      });
+    }
+
     const [admins, ceo] = await Promise.all([
       db.userProfile.findMany({
         where: {

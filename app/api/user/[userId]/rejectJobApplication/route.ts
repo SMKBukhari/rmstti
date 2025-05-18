@@ -123,7 +123,7 @@ export const POST = async (
         currentJobApplicationId: jobApplication.id,
         role: {
           connect: {
-            name: "User",
+            name: "Applicant",
           },
         },
       },

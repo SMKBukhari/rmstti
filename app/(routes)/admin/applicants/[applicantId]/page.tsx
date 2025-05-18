@@ -20,10 +20,6 @@ const ApplicantDetailsPage = async ({
     redirect("/signIn");
   }
 
-  if (userId.length < 24) {
-    redirect("/signIn");
-  }
-
   const user = await db.userProfile.findFirst({
     where: {
       userId: userId,
