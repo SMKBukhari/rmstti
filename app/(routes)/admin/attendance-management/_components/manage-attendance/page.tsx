@@ -3,6 +3,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { db } from "@/lib/db";
 import React from "react";
 import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AttendanceRecord, columns } from "./_components/columns";
@@ -44,7 +45,7 @@ const ManageAttendance = async () => {
       checkLog: true,
     },
     orderBy: {
-      createdAt: "desc",
+      createdAt: "asc",
     },
   });
 
@@ -62,11 +63,29 @@ const ManageAttendance = async () => {
       date: attendanceRecord.date
         ? format(new Date(attendanceRecord.date), "EEEE, MMMM d, yyyy")
         : "N/A",
+      // In your frontend component:
+      // checkIn: attendanceRecord.checkLog?.checkInTime
+      //   ? format(new Date(attendanceRecord.checkLog.checkInTime), "hh:mm:ss a")
+      //   : "Not Checked in",
       checkIn: attendanceRecord.checkLog?.checkInTime
-        ? format(new Date(attendanceRecord.checkLog.checkInTime), "hh:mm:ss a")
+        ? formatInTimeZone(
+            attendanceRecord.checkLog.checkInTime,
+            "UTC",
+            "hh:mm:ss a"
+          )
         : "Not Checked in",
+      // checkOut: attendanceRecord.checkLog?.checkOutTime
+      //   ? format(
+      //       new Date(attendanceRecord.checkLog?.checkOutTime),
+      //       "hh:mm:ss a"
+      //     )
+      //   : "Not Checked Out",
       checkOut: attendanceRecord.checkLog?.checkOutTime
-        ? format(new Date(attendanceRecord.checkLog?.checkOutTime), "hh:mm:ss a")
+        ? formatInTimeZone(
+            attendanceRecord.checkLog.checkOutTime,
+            "UTC",
+            "hh:mm:ss a"
+          )
         : "Not Checked Out",
       workingHours: attendanceRecord.workingHours || "N/A",
       department: attendanceRecord.user.department?.name || "N/A",
@@ -88,7 +107,7 @@ const ManageAttendance = async () => {
         />
       </div>
 
-      <div className="flex gap-1 justify-end w-full">
+      <div className='flex gap-1 justify-end w-full'>
         <UploadAttendancePage user={user} />
         <CalculateAttendancePage user={user} />
       </div>

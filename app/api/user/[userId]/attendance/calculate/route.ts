@@ -53,13 +53,25 @@ type AttendanceCalculationResult = {
   newLateCount: number;
 };
 
+// function parseDate(date: Date | string | null): Date | null {
+//   if (date instanceof Date) return date;
+//   if (typeof date === "string") {
+//     const parsedDate = new Date(date);
+//     return isNaN(parsedDate.getTime()) ? null : parsedDate;
+//   }
+//   return null;
+// }
+
 function parseDate(date: Date | string | null): Date | null {
+  if (!date) return null;
   if (date instanceof Date) return date;
-  if (typeof date === "string") {
+  
+  try {
     const parsedDate = new Date(date);
     return isNaN(parsedDate.getTime()) ? null : parsedDate;
+  } catch {
+    return null;
   }
-  return null;
 }
 
 function formatDate(date: Date | string | null): string {
@@ -71,23 +83,81 @@ function isDateInRange(date: Date, startDate: Date, endDate: Date): boolean {
   return date >= startDate && date <= endDate;
 }
 
-function parseTimeToMinutes(timeString: string | null): number {
+// function parseTimeToMinutes(timeString: string | null): number {
+//   if (!timeString) return 9 * 60; // Default to 9:00 AM if not specified
+
+//   const [hours, minutes] = timeString.split(":").map(Number);
+//   return hours * 60 + minutes;
+// }
+
+// function parseTimeToMinutes(timeString: string | null): number {
+//   if (!timeString) return 9 * 60; // Default to 9:00 AM if not specified
+
+//   try {
+//     const [hours, minutes] = timeString.split(":").map(Number);
+//     if (isNaN(hours)) return 9 * 60;
+//     if (isNaN(minutes)) return hours * 60;
+//     return hours * 60 + minutes;
+//   } catch {
+//     return 9 * 60;
+//   }
+// }
+
+function parseTimeToMinutes(timeString: string): number {
   if (!timeString) return 9 * 60; // Default to 9:00 AM if not specified
 
-  const [hours, minutes] = timeString.split(":").map(Number);
+  // Handle both "9:00" and "9:00 AM" formats
+  const [timePart, period] = timeString.split(' ');
+  const [hoursStr, minutesStr] = timePart.split(':');
+  
+  let hours = parseInt(hoursStr, 10);
+  const minutes = parseInt(minutesStr || '0', 10);
+
+  // Handle 12-hour format if period is specified
+  if (period) {
+    if (period.toLowerCase() === 'pm' && hours < 12) {
+      hours += 12;
+    } else if (period.toLowerCase() === 'am' && hours === 12) {
+      hours = 0;
+    }
+  }
+
   return hours * 60 + minutes;
 }
 
-function isLate(checkInTime: Date, expectedTimeString: string | null): boolean {
+// function isLate(checkInTime: Date, expectedTimeString: string | null): boolean {
+//   if (!checkInTime) return false;
+
+//   const expectedMinutes = parseTimeToMinutes(expectedTimeString);
+//   const checkInHours = checkInTime.getHours();
+//   const checkInMinutes = checkInTime.getMinutes();
+//   const checkInTotalMinutes = checkInHours * 60 + checkInMinutes;
+
+//   console.log(
+//     `Check-in time: ${checkInTime.toLocaleTimeString()}, Expected time: ${expectedTimeString}, Check-in total minutes: ${checkInTotalMinutes}, Expected total minutes: ${expectedMinutes}`
+//   );
+
+//   return checkInTotalMinutes > expectedMinutes;
+// }
+
+function isLate(checkInTime: Date | null, expectedTimeString: string | null): boolean {
   if (!checkInTime) return false;
 
-  const expectedMinutes = parseTimeToMinutes(expectedTimeString);
-  const checkInHours = checkInTime.getHours();
-  const checkInMinutes = checkInTime.getMinutes();
+  // Convert checkInTime to local time string for comparison
+  const localCheckInTime = new Date(checkInTime.toLocaleString('en-US', { timeZone: 'Asia/Karachi' }));
+  
+  // Get expected time (default to 9:00 AM if not specified)
+  const expectedMinutes = parseTimeToMinutes(expectedTimeString || "9:00");
+  
+  const checkInHours = localCheckInTime.getHours();
+  const checkInMinutes = localCheckInTime.getMinutes();
   const checkInTotalMinutes = checkInHours * 60 + checkInMinutes;
 
   console.log(
-    `Check-in time: ${checkInTime.toLocaleTimeString()}, Expected time: ${expectedTimeString}, Check-in total minutes: ${checkInTotalMinutes}, Expected total minutes: ${expectedMinutes}`
+    `Check-in time: ${localCheckInTime.toLocaleTimeString()}, ` +
+    `Expected time: ${expectedTimeString || "9:00"}, ` +
+    `Check-in total minutes: ${checkInTotalMinutes}, ` +
+    `Expected total minutes: ${expectedMinutes}`
   );
 
   return checkInTotalMinutes > expectedMinutes;
@@ -473,9 +543,13 @@ export async function POST(
         } else {
           // Check for late arrival
           if (attendanceRecord.checkLog?.checkInTime) {
+            // const isLateArrival = isLate(
+            //   attendanceRecord.checkLog.checkInTime,
+            //   employee.officeTimingIn
+            // );
             const isLateArrival = isLate(
-              attendanceRecord.checkLog.checkInTime,
-              employee.officeTimingIn
+              attendanceRecord.checkLog?.checkInTime,
+              employee.officeTimingIn || "9:00" // Default to 9:00 AM if not specified
             );
             console.log(
               `Check-in time: ${attendanceRecord.checkLog.checkInTime}, Expected time: ${employee.officeTimingIn}`
@@ -661,7 +735,10 @@ export async function POST(
       employeeResults: calculationResults,
     });
   } catch (error) {
-    console.error("Error in Calculating Attendance Report:", error);
+    console.error(
+      "Error in Calculating Attendance Report:",
+      error instanceof Error ? error.message : String(error)
+    );
     return NextResponse.json(
       {
         error: "Failed to process attendance report calculation",

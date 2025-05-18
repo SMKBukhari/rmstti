@@ -281,13 +281,15 @@ model Attendence {
 }
 
 model CheckLog {
-  id           String       @id @unique @default(cuid())
-  checkInTime  DateTime
-  checkOutTime DateTime?
-  workingHours String?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @default(now())
-  Attendence   Attendence[]
+  id                String       @id @unique @default(cuid())
+  checkInTime       DateTime
+  checkInTimeString String?
+  checkOutTime      DateTime?
+  checkOutTimeString String?
+  workingHours      String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @default(now())
+  Attendence        Attendence[]
 }
 
 model LateCount {

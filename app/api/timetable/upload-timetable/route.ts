@@ -135,29 +135,33 @@ export async function POST(req: NextRequest) {
 
         // Parse the date (assuming format is dd/mm/yyyy)
         const [day, month, year] = date.split("/");
-        const parsedDate = new Date(`${year}-${month}-${day}`);
+        const parsedDate = new Date(
+          Date.UTC(Number(year), Number(month) - 1, Number(day))
+        );
 
         // Handle "Off" shifts differently
         let parsedShiftStart = null;
         let parsedShiftEnd = null;
 
         if (shiftType !== "Off" && shiftStart && shiftEnd) {
-          // Parse time (assuming format like "9:15 am")
           const startTime = convertTimeStringToDate(shiftStart);
           const endTime = convertTimeStringToDate(shiftEnd);
 
           parsedShiftStart = new Date(parsedDate);
-          parsedShiftStart.setHours(
-            startTime.getHours(),
-            startTime.getMinutes()
+          parsedShiftStart.setUTCHours(
+            startTime.getUTCHours(),
+            startTime.getUTCMinutes()
           );
 
           parsedShiftEnd = new Date(parsedDate);
-          parsedShiftEnd.setHours(endTime.getHours(), endTime.getMinutes());
+          parsedShiftEnd.setUTCHours(
+            endTime.getUTCHours(),
+            endTime.getUTCMinutes()
+          );
 
           // Handle overnight shifts (ending at 1:00 AM)
           if (shiftEnd.includes("1:00 AM")) {
-            parsedShiftEnd.setDate(parsedShiftEnd.getDate() + 1);
+            parsedShiftEnd.setUTCDate(parsedShiftEnd.getUTCDate() + 1);
           }
         }
 
@@ -209,6 +213,24 @@ export async function POST(req: NextRequest) {
 }
 
 // Helper function to convert time strings to Date objects
+// function convertTimeStringToDate(timeString: string): Date {
+//   if (!timeString) return new Date();
+
+//   // Handle "9:15 am" format
+//   const [time, period] = timeString.split(" ");
+//   const [hours, minutes] = time.split(":").map(Number);
+
+//   let hours24 = hours;
+//   if (period?.toLowerCase() === "pm" && hours < 12) {
+//     hours24 += 12;
+//   } else if (period?.toLowerCase() === "am" && hours === 12) {
+//     hours24 = 0;
+//   }
+
+//   const date = new Date();
+//   date.setHours(hours24, minutes, 0, 0);
+//   return date;
+// }
 function convertTimeStringToDate(timeString: string): Date {
   if (!timeString) return new Date();
 
@@ -223,7 +245,6 @@ function convertTimeStringToDate(timeString: string): Date {
     hours24 = 0;
   }
 
-  const date = new Date();
-  date.setHours(hours24, minutes, 0, 0);
-  return date;
+  // Create date in UTC to avoid timezone conversion
+  return new Date(Date.UTC(1970, 0, 1, hours24, minutes, 0));
 }

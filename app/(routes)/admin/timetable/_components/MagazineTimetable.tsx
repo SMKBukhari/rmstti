@@ -23,6 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format, parse } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 
 interface MagazineTimetableProps {
   user: UserProfile | null;
@@ -329,7 +330,8 @@ export function MagazineTimetable({
                             autoFocus
                           />
                         ) : record.shiftStart !== null ? (
-                          format(record.shiftStart, "h:mm a")
+                          // format(record.shiftStart, "h:mm a")
+                          formatInTimeZone(record.shiftStart, "UTC", "hh:mm a")
                         ) : (
                           "-"
                         )}
@@ -353,7 +355,8 @@ export function MagazineTimetable({
                             autoFocus
                           />
                         ) : record.shiftEnd !== null ? (
-                          format(record.shiftEnd, "h:mm a")
+                          // format(record.shiftEnd, "h:mm a")
+                          formatInTimeZone(record.shiftEnd, "UTC", "hh:mm a")
                         ) : (
                           "-"
                         )}

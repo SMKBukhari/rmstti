@@ -28,18 +28,42 @@ export async function POST(req: NextRequest) {
         // Continue with processing if cache is corrupted
       }
     }
+
     const records = parse(csvContent, {
       columns: true,
       skip_empty_lines: true,
     });
 
+    // const parseDateString = (dateStr: string, timeStr?: string) => {
+    //   try {
+    //     if (timeStr) {
+    //       // Combine date and time, then parse
+    //       const combined = `${dateStr} ${timeStr}`;
+    //       return parseDate(combined, "d/M/yyyy h:mm:ss a", new Date());
+    //     }
+    //     return parseDate(dateStr, "d/M/yyyy", new Date());
+    //   } catch (error) {
+    //     console.error(`Error parsing date: ${dateStr} ${timeStr || ""}`, error);
+    //     return null;
+    //   }
+    // };
     const parseDateString = (dateStr: string, timeStr?: string) => {
       try {
         if (timeStr) {
-          return parseDate(
-            `${dateStr} ${timeStr}`,
-            "d/M/yyyy h:mm:ss a",
-            new Date()
+          // Combine date and time, then parse in local time
+          const combined = `${dateStr} ${timeStr}`;
+          const parsed = parseDate(combined, "d/M/yyyy h:mm:ss a", new Date());
+
+          // Create a new date with the same local time but marked as UTC
+          return new Date(
+            Date.UTC(
+              parsed.getFullYear(),
+              parsed.getMonth(),
+              parsed.getDate(),
+              parsed.getHours(),
+              parsed.getMinutes(),
+              parsed.getSeconds()
+            )
           );
         }
         return parseDate(dateStr, "d/M/yyyy", new Date());
@@ -59,7 +83,8 @@ export async function POST(req: NextRequest) {
     }[] = [];
 
     for (const record of records) {
-      const { cnic, Date: date, Time: time, Checks } = record;
+      // Note: Using lowercase column names to match CSV
+      const { cnic, date, time, checks } = record;
 
       const employee = await db.userProfile.findFirst({
         where: {
@@ -83,6 +108,7 @@ export async function POST(req: NextRequest) {
       }
 
       const formattedDate = format(parsedDate, "yyyy-MM-dd");
+      // const formattedTime = format(parsedCheckTime, "hh:mm:ss a");
       const formattedTime = format(parsedCheckTime, "hh:mm:ss a");
 
       // Get the last entry of the same CNIC
@@ -93,10 +119,10 @@ export async function POST(req: NextRequest) {
         lastEntryIndex !== -1 ? attendanceRecords[lastEntryIndex] : null;
 
       console.log(
-        `Processing CNIC: ${cnic}, Date: ${formattedDate}, Time: ${formattedTime}, Check: ${Checks}`
+        `Processing CNIC: ${cnic}, Date: ${formattedDate}, Time: ${formattedTime}, Check: ${checks}`
       );
 
-      if (Checks === "IN") {
+      if (checks === "IN") {
         if (lastEntry && lastEntry.timeIn) {
           console.log(
             `⏳ Duplicate IN found for CNIC: ${cnic} at ${lastEntry.timeIn}. Removing previous entry and adding new IN at ${formattedTime}`
@@ -107,10 +133,10 @@ export async function POST(req: NextRequest) {
         attendanceRecords.push({
           cnic,
           date: formattedDate,
-          timeIn: formattedTime, // Only timeIn, no timeOut
-          checkType: Checks,
+          timeIn: formattedTime,
+          checkType: checks,
         });
-      } else if (Checks === "OUT") {
+      } else if (checks === "OUT") {
         if (lastEntry && lastEntry.timeOut) {
           console.log(
             `🚫 Skipping duplicate OUT for CNIC: ${cnic} at ${formattedTime}, as last entry was also OUT at ${lastEntry.timeOut}`
@@ -123,8 +149,8 @@ export async function POST(req: NextRequest) {
         attendanceRecords.push({
           cnic,
           date: formattedDate,
-          timeOut: formattedTime, // Only timeOut, no timeIn
-          checkType: Checks,
+          timeOut: formattedTime,
+          checkType: checks,
         });
       }
     }
@@ -134,7 +160,7 @@ export async function POST(req: NextRequest) {
 
     // Process and save attendance records
     for (const record of attendanceRecords) {
-      const { cnic, date, timeIn, timeOut } = record;
+      const { cnic, date, timeIn, timeOut } = record;   
 
       // Find the user by CNIC
       const user = await db.userProfile.findFirst({
@@ -167,9 +193,12 @@ export async function POST(req: NextRequest) {
           },
         });
 
+        const checkInDate = new Date(`${date} ${timeIn}`);
+
         await db.checkLog.create({
           data: {
-            checkInTime: new Date(`${date} ${timeIn}`),
+            checkInTime: checkInDate, // For calculations
+            checkInTimeString: timeIn, // Original format
             Attendence: {
               connect: { id: attendance.id },
             },
@@ -198,42 +227,49 @@ export async function POST(req: NextRequest) {
           console.error(
             `❌ No active check-in found for ${userName} on ${date}`
           );
+          continue;
         }
 
         // Calculate working hours
         const utcTime = new Date(`${date} ${timeOut}`);
         const workingHours = calculateWorkingHours(
-          new Date(activeCheckLog!.checkInTime),
+          new Date(activeCheckLog.checkInTime),
           utcTime
         );
 
         // Update the check log with check-out time and working hours
+        const checkOutDate = new Date(`${date} ${timeOut}`);
+
         await db.checkLog.update({
-          where: {
-            id: activeCheckLog?.id,
-          },
+          where: { id: activeCheckLog.id },
           data: {
-            checkOutTime: new Date(`${date} ${timeOut}`),
+            checkOutTime: checkOutDate, // For calculations
+            checkOutTimeString: timeOut, // Original format
             workingHours,
           },
         });
-
         const activeAttendance = await db.attendence.findFirst({
           where: {
             checkLog: {
-              id: activeCheckLog?.id,
+              id: activeCheckLog.id,
             },
           },
         });
 
-        await db.attendence.update({
-          where: {
-            id: activeAttendance?.id,
-          },
-          data: {
-            workingHours: workingHours,
-          },
-        });
+        if (activeAttendance) {
+          await db.attendence.update({
+            where: {
+              id: activeAttendance.id,
+            },
+            data: {
+              workingHours: workingHours,
+            },
+          });
+        }
+
+        console.log(
+          `✅ Check-out recorded for ${userName} on ${date} at ${timeOut}`
+        );
       }
     }
 
