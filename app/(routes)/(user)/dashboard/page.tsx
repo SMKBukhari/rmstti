@@ -63,7 +63,7 @@ const page = async () => {
   ]
 
   const userRole = user?.role?.name === "User"
-  const applicantRole = user?.role?.name === "Applicant"
+  const applicantRole = user?.role?.name === "Applicant" && user?.applicationStatus?.name !== "Rejected"
   const intervieweeRole = user?.role?.name === "Interviewee"
 
   const totalFields = requiredFieldsForApply.length

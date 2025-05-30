@@ -281,15 +281,15 @@ model Attendence {
 }
 
 model CheckLog {
-  id                String       @id @unique @default(cuid())
-  checkInTime       DateTime
-  checkInTimeString String?
-  checkOutTime      DateTime?
+  id                 String       @id @unique @default(cuid())
+  checkInTime        DateTime
+  checkInTimeString  String?
+  checkOutTime       DateTime?
   checkOutTimeString String?
-  workingHours      String?
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @default(now())
-  Attendence        Attendence[]
+  workingHours       String?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @default(now())
+  Attendence         Attendence[]
 }
 
 model LateCount {
@@ -425,6 +425,7 @@ model JobApplications {
   user                UserProfile        @relation(fields: [userId], references: [userId], onDelete: Cascade)
   applicationStatusId String?
   applicationStatus   ApplicationStatus? @relation(fields: [applicationStatusId], references: [id])
+  rejectedReason      String?            @db.LongText
 
   // Application details
   coverLetter      String? @db.LongText

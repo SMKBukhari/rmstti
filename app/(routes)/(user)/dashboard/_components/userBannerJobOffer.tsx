@@ -74,6 +74,32 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
     }
   };
 
+  const onRejected = async () => {
+    try {
+      setIsLoading(true);
+      await axios.post(`/api/user/${user?.userId}/rejectJobOffer`, {
+        id: user?.userId,
+      });
+      toast.success(
+        `${user?.fullName} Your job offer has been rejected successfully.`
+      );
+      closeDialog();
+      router.push("/dashboard");
+      router.refresh();
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response && error.response.data) {
+          toast.error(error.response.data);
+        } else {
+          toast.error("An unexpected error occurred. Please try again.");
+        }
+      }
+    } finally {
+      setIsDialogOpen(false);
+      setIsLoading(false);
+    }
+  };
+
   const router = useRouter();
 
   return (
@@ -146,11 +172,18 @@ const UserBannerJobOffer = ({ label, user }: UserBannerJobOfferProps) => {
         ]}
         buttons={[
           {
-            label: "Submit",
+            label: "Accept",
             type: "submit",
             variant: "primary",
             isLoading: isLoading,
             disabled: !acceptPrivacyPolicy,
+          },
+          {
+            label: "Rejected",
+            type: "button",
+            variant: "destructive",
+            onClick: onRejected,
+            disabled: isLoading,
           },
           {
             label: "Cancel",
