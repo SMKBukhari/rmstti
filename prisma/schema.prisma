@@ -177,6 +177,7 @@ model UserProfile {
   WorkFromHome           WorkFromHome[]
   LateCount              LateCount[]
   leaveBalanceAdjustment LeaveBalanceAdjustment[]
+  Appraisal              Appraisal[]
 
   // Timestamps
   createdAt DateTime @default(now())
@@ -661,4 +662,55 @@ model Complaints {
   status      String      @default("Pending")
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @default(now())
+}
+
+// =============================================
+// APPRAISAL AND FEEDBACK MODELS
+// =============================================
+
+model Appraisal {
+  id            String      @id @unique @default(cuid())
+  userId        String
+  user          UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  appraisalDate DateTime
+  isAppraised   Boolean?    @default(false)
+
+  // =============================================
+  // APPRAISAL FIELDS
+  // =============================================
+  // Personality
+  appearance                             String?
+  intelligence                           String?
+  relWithSupervisor                      String?
+  relWithColleagues                      String?
+  teamWork                               String?
+  abilityToCommunicateWrittenly          String?
+  abilityToCommunicateSpokenly           String?
+  // Attitude
+  integrityGeneral                       String?
+  integrityIntellectual                  String?
+  dedicationToWork                       String?
+  reliability                            String?
+  responseUnderStressMentalPhysical      String?
+  willingnessToAcceptAddedResponsibility String?
+  initiative                             String?
+  financialAbility                       String?
+  // Professional Abilities
+  professionalKnowledge                  String?
+  creativeness                           String?
+  abilityToTakeDecisions                 String?
+  tendencyToLearn                        String?
+  abilityToPlanAndOrganizeWork           String?
+  optimalUseOfResources                  String?
+  outputRelativeToGoalsQuantity          String?
+  outputRelativeToGoalsQuality           String?
+  analyticalAbility                      String?
+
+  // =============================================
+  // =============================================
+
+  appraisaledBy            String?
+  appraisaledByDesignation String?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @default(now())
 }

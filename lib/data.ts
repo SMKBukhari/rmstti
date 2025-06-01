@@ -21,6 +21,7 @@ import {
   ListCheck,
   Lock,
   Mailbox,
+  NotebookPen,
   NotebookText,
   NotepadTextDashed,
   Settings,
@@ -155,6 +156,11 @@ export const employeesTabs = [
     label: "Report",
     value: "report",
   },
+  {
+    icon: NotebookPen,
+    label: "Appraisal",
+    value: "appraisal",
+  }
 ];
 
 export const employeesListTabs = [

@@ -322,6 +322,69 @@ export const RaiseComplaintSchema = z.object({
   isAnonymous: z.boolean(),
 });
 
+export const AppraisalRatingFormSchema = z.object({
+  employeeName: z.string().min(1, "Employee name is required"),
+  appraisalDate: z.date(),
+  department: z.string().min(1, "Department is required"),
+  designation: z.string().min(1, "Designation is required"),
+  dob: z.date().optional(),
+  doj: z.date().optional(),
+  appearance: z.string().min(1, "Appearance rating is required"),
+  intelligence: z.string().min(1, "Intelligence rating is required"),
+  relWithSupervisor: z
+    .string()
+    .min(1, "Relationship with Supervisor rating is required"),
+  relWithColleagues: z
+    .string()
+    .min(1, "Relationship with Colleagues rating is required"),
+  teamWork: z.string().min(1, "Team Work rating is required"),
+  abilityToCommunicateWrittenly: z
+    .string()
+    .min(1, "Ability to Communicate Writtenly rating is required"),
+  abilityToCommunicateSpokenly: z
+    .string()
+    .min(1, "Ability to Communicate Spokenly rating is required"),
+  integrityGeneral: z.string().min(1, "Integrity General rating is required"),
+  integrityIntellectual: z
+    .string()
+    .min(1, "Integrity Intellectual rating is required"),
+  dedicationToWork: z.string().min(1, "Dedication to Work rating is required"),
+  reliability: z.string().min(1, "Reliability rating is required"),
+  responseUnderStressMentalPhysical: z
+    .string()
+    .min(1, "Response Under Stress Mental Physical rating is required"),
+  willingnessToAcceptAddedResponsibility: z
+    .string()
+    .min(1, "Willingness to Accept Added Responsibility rating is required"),
+  initiative: z.string().min(1, "Initiative rating is required"),
+  financialAbility: z.string().min(1, "Financial Ability rating is required"),
+  professionalKnowledge: z
+    .string()
+    .min(1, "Professional Knowledge rating is required"),
+  creativeness: z.string().min(1, "Salary Expectations rating is required"),
+  abilityToTakeDecisions: z
+    .string()
+    .min(1, "Salary Expectations rating is required"),
+  tendencyToLearn: z.string().min(1, "Tendency to Learn rating is required"),
+  abilityToPlanAndOrganizeWork: z
+    .string()
+    .min(1, "Ability to Plan and Organize Work rating is required"),
+  optimalUseOfResources: z
+    .string()
+    .min(1, "Optimal Use of Resources rating is required"),
+  outputRelativeToGoalsQuantity: z
+    .string()
+    .min(1, "Output Relative to Goals Quantity rating is required"),
+  outputRelativeToGoalsQuality: z
+    .string()
+    .min(1, "Analytical Ability rating is required"),
+  analyticalAbility: z.string().min(1, "Analytical Ability rating is required"),
+  appraisaledBy: z.string().min(1, "Appraised by is required"),
+  appraisaledByDesignation: z
+    .string()
+    .min(1, "Appraised by designation is required"),
+});
+
 export const CalculateAttendanceSchema = z.object({
   dateFrom: z.date(),
   dateTo: z.date(),

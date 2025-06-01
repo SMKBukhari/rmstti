@@ -5,6 +5,7 @@ import EmployeeProfilePage from "./_components/Profile";
 import CustomBreadCrumb from "@/components/CustomBreadCrumb";
 import { db } from "@/lib/db";
 import EmployeeReportPage from "./_components/Report";
+import AppraisalPage from "./_components/appraisal/Appraisal";
 
 const AttendanceManagementPage = async ({
   params,
@@ -27,7 +28,7 @@ const AttendanceManagementPage = async ({
     },
   });
   return (
-    <div className="space-y-8">
+    <div className='space-y-8'>
       <div className='flex items-center justify-between w-full'>
         <CustomBreadCrumb
           breadCrumbPage={employee?.fullName || ""}
@@ -55,6 +56,9 @@ const AttendanceManagementPage = async ({
           </TabsContent>
           <TabsContent value='report'>
             <EmployeeReportPage employeeId={params.employeeId} />
+          </TabsContent>
+          <TabsContent value='appraisal'>
+            <AppraisalPage employeeId={params.employeeId} />
           </TabsContent>
         </div>
       </Tabs>
