@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -9,12 +9,13 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { InterviewRatingFormSchema } from "@/schemas";
-import { Role, UserProfile } from "@prisma/client";
+import { AppraisalRatingFormSchema } from "@/schemas";
+import { Appraisal, Role, UserProfile } from "@prisma/client";
 import { InterviewMarkingOptions } from "@/lib/data";
 
 interface CellActionsProps {
   user: (UserProfile & { role: Role | null }) | null;
+  userAppraisals: (UserProfile & { Appraisal: Appraisal[] }) | null;
   id: string;
   fullName: string;
   designation?: string;
@@ -23,51 +24,134 @@ interface CellActionsProps {
   department: string;
 }
 
-const CellActions = ({ user, id, fullName, department }: CellActionsProps) => {
+const CellActions = ({
+  user,
+  id,
+  fullName,
+  department,
+  designation,
+  userAppraisals,
+}: CellActionsProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentAppraisal, setCurrentAppraisal] = useState<Appraisal | null>(
+    null
+  );
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof InterviewRatingFormSchema>>({
-    resolver: zodResolver(InterviewRatingFormSchema),
+  useEffect(() => {
+    if (id && userAppraisals) {
+      const currentApp = userAppraisals.Appraisal.find((app) => app.id === id);
+      setCurrentAppraisal(currentApp || null);
+    }
+  }, [id, userAppraisals]);
+
+  console.log("Current Appraisal:", currentAppraisal);
+
+  const form = useForm<z.infer<typeof AppraisalRatingFormSchema>>({
+    resolver: zodResolver(AppraisalRatingFormSchema),
     defaultValues: {
-      candidateName: fullName,
-      experience: "N/A",
-      skills: "N/A",
-      education: "N/A",
-      jobKnowledge: "N/A",
-      generalKnowledge: "N/A",
-      culturalFit: "N/A",
-      adaptability: "N/A",
-      motivation: "N/A",
-      problemSolving: "N/A",
-      communication: "N/A",
-      teamWork: "N/A",
-      leaderShipPotential: "N/A",
-      professionalism: "N/A",
-      criticalThinking: "N/A",
-      appearance: "N/A",
-      maturity: "N/A",
-      salaryExpectations: "",
-      strengths: "",
-      weaknesses: "",
-      remarks: "",
-      interviewDate: new Date(),
-      positionApplied: department,
-      interviewerName: user?.fullName ?? "",
-      interviewerDesignation: user?.role?.name ?? "",
+      employeeName: fullName ?? "",
+      department: department ?? "",
+      designation: designation ?? "",
+      appraisalDate: currentAppraisal?.appraisalDate
+        ? new Date(currentAppraisal.appraisalDate)
+        : new Date(),
+      appearance: currentAppraisal?.appearance || "N/A",
+      intelligence: currentAppraisal?.intelligence || "N/A",
+      relWithSupervisor: currentAppraisal?.relWithSupervisor || "N/A",
+      relWithColleagues: currentAppraisal?.relWithColleagues || "N/A",
+      teamWork: currentAppraisal?.teamWork || "N/A",
+      abilityToCommunicateWrittenly:
+        currentAppraisal?.abilityToCommunicateWrittenly || "N/A",
+      abilityToCommunicateSpokenly:
+        currentAppraisal?.abilityToCommunicateSpokenly || "N/A",
+      integrityGeneral: currentAppraisal?.integrityGeneral || "N/A",
+      integrityIntellectual: currentAppraisal?.integrityIntellectual || "N/A",
+      dedicationToWork: currentAppraisal?.dedicationToWork || "N/A",
+      reliability: currentAppraisal?.reliability || "N/A",
+      responseUnderStressMentalPhysical:
+        currentAppraisal?.responseUnderStressMentalPhysical || "N/A",
+      willingnessToAcceptAddedResponsibility:
+        currentAppraisal?.willingnessToAcceptAddedResponsibility || "N/A",
+      initiative: currentAppraisal?.initiative || "N/A",
+      financialAbility: currentAppraisal?.financialAbility || "N/A",
+      professionalKnowledge: currentAppraisal?.professionalKnowledge || "N/A",
+      creativeness: currentAppraisal?.creativeness || "N/A",
+      abilityToTakeDecisions: currentAppraisal?.abilityToTakeDecisions || "N/A",
+      tendencyToLearn: currentAppraisal?.tendencyToLearn || "N/A",
+      abilityToPlanAndOrganizeWork:
+        currentAppraisal?.abilityToPlanAndOrganizeWork || "N/A",
+      optimalUseOfResources: currentAppraisal?.optimalUseOfResources || "N/A",
+      outputRelativeToGoalsQuantity:
+        currentAppraisal?.outputRelativeToGoalsQuantity || "N/A",
+      outputRelativeToGoalsQuality:
+        currentAppraisal?.outputRelativeToGoalsQuality || "N/A",
+      analyticalAbility: currentAppraisal?.analyticalAbility || "N/A",
+      appraisaledBy: user?.fullName || "N/A",
+      appraisaledByDesignation: user?.designation || "N/A",
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof InterviewRatingFormSchema>) => {
+  useEffect(() => {
+    if (currentAppraisal) {
+      form.reset({
+        employeeName: fullName ?? "",
+        department: department ?? "",
+        designation: designation ?? "",
+        appraisalDate: currentAppraisal?.appraisalDate
+          ? new Date(currentAppraisal.appraisalDate)
+          : new Date(),
+        appearance: currentAppraisal?.appearance || "N/A",
+        intelligence: currentAppraisal?.intelligence || "N/A",
+        relWithSupervisor: currentAppraisal?.relWithSupervisor || "N/A",
+        relWithColleagues: currentAppraisal?.relWithColleagues || "N/A",
+        teamWork: currentAppraisal?.teamWork || "N/A",
+        abilityToCommunicateWrittenly:
+          currentAppraisal?.abilityToCommunicateWrittenly || "N/A",
+        abilityToCommunicateSpokenly:
+          currentAppraisal?.abilityToCommunicateSpokenly || "N/A",
+        integrityGeneral: currentAppraisal?.integrityGeneral || "N/A",
+        integrityIntellectual: currentAppraisal?.integrityIntellectual || "N/A",
+        dedicationToWork: currentAppraisal?.dedicationToWork || "N/A",
+        reliability: currentAppraisal?.reliability || "N/A",
+        responseUnderStressMentalPhysical:
+          currentAppraisal?.responseUnderStressMentalPhysical || "N/A",
+        willingnessToAcceptAddedResponsibility:
+          currentAppraisal?.willingnessToAcceptAddedResponsibility || "N/A",
+        initiative: currentAppraisal?.initiative || "N/A",
+        financialAbility: currentAppraisal?.financialAbility || "N/A",
+        professionalKnowledge: currentAppraisal?.professionalKnowledge || "N/A",
+        creativeness: currentAppraisal?.creativeness || "N/A",
+        abilityToTakeDecisions:
+          currentAppraisal?.abilityToTakeDecisions || "N/A",
+        tendencyToLearn: currentAppraisal?.tendencyToLearn || "N/A",
+        abilityToPlanAndOrganizeWork:
+          currentAppraisal?.abilityToPlanAndOrganizeWork || "N/A",
+        optimalUseOfResources: currentAppraisal?.optimalUseOfResources || "N/A",
+        outputRelativeToGoalsQuantity:
+          currentAppraisal?.outputRelativeToGoalsQuantity || "N/A",
+        outputRelativeToGoalsQuality:
+          currentAppraisal?.outputRelativeToGoalsQuality || "N/A",
+        analyticalAbility: currentAppraisal?.analyticalAbility || "N/A",
+        appraisaledBy: user?.fullName || "N/A",
+        appraisaledByDesignation: user?.designation || "N/A",
+      });
+    }
+  }, [currentAppraisal, form, fullName, department, designation, user]);
+
+  const onSubmit = async (data: z.infer<typeof AppraisalRatingFormSchema>) => {
     try {
       setIsLoading(true);
-      await axios.post(`/api/user/${user?.userId}/interviewRatingForm`, {
-        id,
-        ...data,
-      });
+      await axios.patch(
+        `/api/user/${user?.userId}/appraisalRatingForm/update`,
+        {
+          id,
+          ...data,
+        }
+      );
       console.log(data);
-      toast.success(`Interview updated successfully for ${fullName}.`);
+      toast.success(`Appraisal updated successfully for ${fullName}.`);
       setDialogOpen(false);
       setIsLoading(false);
       router.refresh();
@@ -106,102 +190,59 @@ const CellActions = ({ user, id, fullName, department }: CellActionsProps) => {
       <DialogForm
         isOpen={isDialogOpen}
         onOpenChange={setDialogOpen}
-        title='Interview Rating Form'
-        description='Fill out the interview rating form for the applicant.'
+        title='Appraisal Rating Form'
+        description='Please fill out the appraisal rating form for the employee.'
         fields={[
           {
-            name: "candidateName",
-            label: "Candidate Name",
-            placeholder: "Enter candidate name",
+            name: "employeeName",
+            label: "Employee Name",
             type: "input",
             disabled: true,
           },
           {
-            name: "interviewDate",
-            label: "Interview Date",
+            name: "appraisalDate",
+            label: "Appraisal Date",
             type: "date",
           },
           {
-            name: "positionApplied",
-            label: "Position Applied For",
+            name: "department",
+            label: "Department",
             type: "input",
             disabled: true,
           },
           {
-            name: "experience",
-            label: "Experience",
+            name: "designation",
+            label: "Designation",
+            type: "input",
+            disabled: true,
+          },
+          {
+            name: "appearance",
+            label: "Appearance",
             type: "select",
             comboboxOptions: InterviewMarkingOptions
               ? InterviewMarkingOptions
               : [],
           },
           {
-            name: "skills",
-            label: "Skills",
+            name: "intelligence",
+            label: "Intelligence",
             type: "select",
             comboboxOptions: InterviewMarkingOptions
               ? InterviewMarkingOptions
               : [],
           },
           {
-            name: "education",
-            label: "Education",
+            name: "relWithSupervisor",
+            label: "Relationship with Supervisor",
             type: "select",
             comboboxOptions: InterviewMarkingOptions
               ? InterviewMarkingOptions
               : [],
           },
           {
-            name: "jobKnowledge",
-            label: "Job Knowledge",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "generalKnowledge",
-            label: "General Knowledge/IQ",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "culturalFit",
-            label: "Cultural Fit",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "adaptability",
-            label: "Adaptability",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "motivation",
-            label: "Motivation",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "problemSolving",
-            label: "Problem Solving",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "communication",
-            label: "Communication",
+            name: "relWithColleagues",
+            label: "Relationship with Colleagues",
             type: "select",
             comboboxOptions: InterviewMarkingOptions
               ? InterviewMarkingOptions
@@ -216,77 +257,174 @@ const CellActions = ({ user, id, fullName, department }: CellActionsProps) => {
               : [],
           },
           {
-            name: "leaderShipPotential",
-            label: "Leadership Potential",
+            name: "abilityToCommunicateWrittenly",
+            label: "Ability to Communicate Writtenly",
             type: "select",
             comboboxOptions: InterviewMarkingOptions
               ? InterviewMarkingOptions
               : [],
           },
           {
-            name: "professionalism",
-            label: "Professionalism",
+            name: "abilityToCommunicateSpokenly",
+            label: "Ability to Communicate Spokenly",
             type: "select",
             comboboxOptions: InterviewMarkingOptions
               ? InterviewMarkingOptions
               : [],
           },
           {
-            name: "criticalThinking",
-            label: "Critical Thinking",
+            name: "integrityGeneral",
+            label: "Integrity (General)",
             type: "select",
             comboboxOptions: InterviewMarkingOptions
               ? InterviewMarkingOptions
               : [],
           },
           {
-            name: "appearance",
-            label: "Appearance",
+            name: "integrityIntellectual",
+            label: "Integrity (Intellectual)",
             type: "select",
             comboboxOptions: InterviewMarkingOptions
               ? InterviewMarkingOptions
               : [],
           },
           {
-            name: "maturity",
-            label: "Maturity",
+            name: "dedicationToWork",
+            label: "Dedication to Work",
             type: "select",
             comboboxOptions: InterviewMarkingOptions
               ? InterviewMarkingOptions
               : [],
           },
           {
-            name: "salaryExpectations",
-            label: "Salary Expectations",
+            name: "reliability",
+            label: "Reliability",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "responseUnderStressMentalPhysical",
+            label: "Response Under Stress (Mental and Physical)",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "willingnessToAcceptAddedResponsibility",
+            label: "Willingness to Accept Added Responsibility",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "initiative",
+            label: "Initiative",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "financialAbility",
+            label: "Financial Ability",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "professionalKnowledge",
+            label: "Professional Knowledge",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "creativeness",
+            label: "Creativeness",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "abilityToTakeDecisions",
+            label: "Ability to Take Decisions",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "tendencyToLearn",
+            label: "Tendency to Learn",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "abilityToPlanAndOrganizeWork",
+            label: "Ability to Plan and Organize Work",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "optimalUseOfResources",
+            label: "Optimal Use of Resources",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "outputRelativeToGoalsQuantity",
+            label: "Output Relative to Goals (Quantity)",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "outputRelativeToGoalsQuality",
+            label: "Output Relative to Goals (Quality)",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "analyticalAbility",
+            label: "Analytical Ability",
+            type: "select",
+            comboboxOptions: InterviewMarkingOptions
+              ? InterviewMarkingOptions
+              : [],
+          },
+          {
+            name: "appraisaledBy",
+            label: "Appraised By (Your Name)",
             type: "input",
           },
           {
-            name: "strengths",
-            label: "Strengths for this job",
-            type: "textarea",
-          },
-          {
-            name: "weaknesses",
-            label: "Weakness for this job",
-            type: "textarea",
-          },
-          { name: "remarks", label: "Remarks", type: "textarea" },
-          { name: "interviewerName", label: "Interviewer Name", type: "input" },
-          {
-            name: "interviewerDesignation",
-            label: "Interviewer Designation",
+            name: "appraisaledByDesignation",
+            label: "Appraised By Designation",
             type: "input",
           },
         ]}
         buttons={[
           {
-            label: "Submit and Generate PDF",
+            label: "Update",
             type: "submit",
             variant: "primary",
             isLoading: isLoading,
-            // onClick: () => {
-            //   onSubmit(form.getValues());
-            // },
           },
           {
             label: "Cancel",
@@ -294,7 +432,10 @@ const CellActions = ({ user, id, fullName, department }: CellActionsProps) => {
             onClick: () => setDialogOpen(false),
           },
         ]}
-        onSubmit={onSubmit}
+        onSubmit={(data) => {
+          onSubmit(data);
+          setDialogOpen(false);
+        }}
         form={form}
       />
     </div>

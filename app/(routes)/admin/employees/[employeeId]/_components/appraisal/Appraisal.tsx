@@ -30,6 +30,7 @@ const AppraisalPage = async ({ employeeId }: AppraisalPageProps) => {
     include: {
       department: true,
       role: true,
+      Appraisal: true,
     },
   });
 
@@ -50,6 +51,7 @@ const AppraisalPage = async ({ employeeId }: AppraisalPageProps) => {
   const formattedApplicants: ApplicantsColumns[] = appraisals.map(
     (appraisal) => ({
       user: user,
+      userAppraisals: employee,
       department: appraisal.user?.department?.name || "N/A",
       fullName: appraisal.user?.fullName || "N/A",
       designation: appraisal.user?.designation || "N/A",

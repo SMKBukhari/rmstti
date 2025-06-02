@@ -4,10 +4,11 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import CellActions from "./CellActions";
-import { Role, UserProfile } from "@prisma/client";
+import { Appraisal, Role, UserProfile } from "@prisma/client";
 
 export type ApplicantsColumns = {
   user: (UserProfile & { role: Role | null }) | null;
+  userAppraisals: (UserProfile & { Appraisal: Appraisal[] }) | null;
   id: string;
   appraisalDate: string;
   isAppraised: boolean;
@@ -75,6 +76,7 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
     id: "actions",
     cell: ({ row }) => {
       const {
+        userAppraisals,
         department,
         fullName,
         designation,
@@ -148,7 +150,7 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
         const percentage = (obtainedPoints / totalPoints) * 100;
 
         return (
-          <div className="flex gap-5">
+          <div className='flex gap-5'>
             <div
               className={`w-16 md:h-10 h-8 px-2 text-lg font-bold flex items-center justify-center rounded-md ${
                 percentage >= 80
@@ -170,6 +172,7 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
               designation={designation}
               dob={dob}
               doj={doj}
+              userAppraisals={userAppraisals}
             />
           </div>
         );

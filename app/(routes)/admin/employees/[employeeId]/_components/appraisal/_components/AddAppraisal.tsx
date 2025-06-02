@@ -329,7 +329,7 @@ const AddAppraisal = ({ user, employee }: AddAppraisalProps) => {
         ]}
         buttons={[
           {
-            label: "Submit and Generate PDF",
+            label: "Submit",
             type: "submit",
             variant: "primary",
             isLoading: isLoading,
