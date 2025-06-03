@@ -53,18 +53,8 @@ export type ApplicantsColumns = {
 
 export const columns: ColumnDef<ApplicantsColumns>[] = [
   {
-    accessorKey: "appraisalDate",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant='ghost'
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Appraisal Date
-          <ArrowUpDown className='ml-2 h-4 w-4' />
-        </Button>
-      );
-    },
+    accessorKey: "fullName",
+    header: "Full Name",
   },
   {
     accessorKey: "department",
@@ -77,6 +67,20 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
   {
     accessorKey: "appraisaledByDesignation",
     header: "Appraised By Designation",
+  },
+  {
+    accessorKey: "appraisalDate",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant='ghost'
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Appraisal Date
+          <ArrowUpDown className='ml-2 h-4 w-4' />
+        </Button>
+      );
+    },
   },
   {
     id: "actions",

@@ -160,7 +160,7 @@ export const employeesTabs = [
     icon: NotebookPen,
     label: "Appraisal",
     value: "appraisal",
-  }
+  },
 ];
 
 export const employeesListTabs = [
@@ -178,6 +178,11 @@ export const employeesListTabs = [
     icon: ListCheck,
     label: "Leave Balance Report",
     value: "leaveBalanceReport",
+  },
+  {
+    icon: NotebookPen,
+    label: "Appraisals",
+    value: "appraisals",
   },
 ];
 
