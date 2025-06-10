@@ -1,7 +1,6 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import Link from "next/link";
 import CellActions from "./CellActions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserProfile } from "@prisma/client";
@@ -42,12 +41,6 @@ export const columns: ColumnDef<EmployeeColumns>[] = [
   {
     accessorKey: "fullName",
     header: "Full Name",
-    cell: ({ row }) => {
-      const { fullName } = row.original;
-      return (
-        <Link href={`/admin/applicants/${row.original.id}`}>{fullName}</Link>
-      );
-    },
   },
   {
     accessorKey: "email",

@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { employeesListTabs } from "@/lib/data";
 import LeaveManagementReport from "./_components/LeaveManagementReport";
 import LeaveBalanceManagement from "./_components/LeaveBalanceManagement";
+import AppraisalPage from "./_components/appraisal/Appraisal";
 
 const ApplicantsPage = async () => {
   const cookieStore = cookies();
@@ -145,7 +146,7 @@ const ApplicantsPage = async () => {
               <DataTable
                 columns={columns}
                 data={formattedEmployees}
-                routePrefix='admin/employees'
+                routePrefix='ceo/employees'
                 title='Employees List'
                 filterableColumns={[
                   {
@@ -183,6 +184,9 @@ const ApplicantsPage = async () => {
           </TabsContent>
           <TabsContent value='leaveBalanceReport'>
             <LeaveManagementReport employees={employees} />
+          </TabsContent>
+          <TabsContent value='appraisals'>
+            <AppraisalPage />
           </TabsContent>
         </div>
       </Tabs>
