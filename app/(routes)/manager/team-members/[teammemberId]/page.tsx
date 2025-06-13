@@ -1,27 +1,17 @@
 import { db } from "@/lib/db";
-import UserAboutSection from "./_components/UserAboutSection";
-import UserExperienceEducationSection from "./_components/UserExperienceEducationSection";
-import UserCoverLetterSection from "./_components/UserCoverLetterSection";
-import UserSkillsSection from "./_components/UserSkillsSection";
 import CustomBreadCrumb from "@/components/CustomBreadCrumb";
-import UserResumeSection from "./_components/UserResumeSection";
-import { cookies } from "next/headers";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { employeesTabs } from "@/lib/data";
+import EmployeeProfilePage from "./_components/Profile";
+import EmployeeReportPage from "./_components/Report";
+import AppraisalPage from "./_components/appraisal/Appraisal";
 
 const ApplicantDetailsPage = async ({
   params,
 }: {
   params: { teammemberId: string };
 }) => {
-  const cookieStore = cookies();
-  const userId = (await cookieStore).get("userId")?.value;
-
-  const user = await db.userProfile.findFirst({
-    where: {
-      userId: userId,
-    },
-  });
-
-  const applicant = await db.userProfile.findFirst({
+  const employee = await db.userProfile.findFirst({
     where: {
       userId: params.teammemberId,
     },
@@ -37,60 +27,44 @@ const ApplicantDetailsPage = async ({
     },
   });
 
-  const userWithJobExperiences = applicant
-    ? {
-        ...applicant,
-        jobExperiences: applicant?.jobExperience || [],
-        userId: applicant.userId || "", // Ensure `userId` is a string
-      }
-    : null;
-
-  const userWithEducations = applicant
-    ? {
-        ...applicant,
-        educations: applicant?.education || [],
-        userId: applicant.userId || "",
-      }
-    : null;
-
-  const userWithJobApplications = applicant
-    ? {
-        ...applicant,
-        jobApplications: applicant?.JobApplications || [],
-        userId: applicant.userId || "",
-      }
-    : null;
-
   return (
-    <div className='w-full'>
+    <div className='space-y-8'>
       <div className='flex items-center justify-between w-full'>
         <CustomBreadCrumb
-          breadCrumbPage={applicant?.fullName || ""}
+          breadCrumbPage={employee?.fullName || ""}
           breadCrumbItem={[
             { link: "/manager/team-members", label: "Team Members" },
           ]}
         />
       </div>
-      <div className='grid md:grid-cols-3 grid-cols-1 md:gap-5 gap-0'>
-        <div className='md:col-span-1'>
-          <UserAboutSection
-            applicant={applicant}
-            user={user}
-            userJobApplications={userWithJobApplications}
-          />
+
+      <Tabs defaultValue='profile' className='w-full'>
+        <TabsList className='bg-transparent gap-10'>
+          {employeesTabs.map((tab) => (
+            <TabsTrigger
+              key={tab.value}
+              value={tab.value}
+              className='px-8 py-3 text-base data-[state=active]:bg-[#295B81] data-[state=active]:dark:bg-[#1034ff] rounded-md dark:shadow-white dark:text-[#fff] data-[state=active]:text-[#fff] text-neutral-800 font-medium'
+            >
+              <div className='flex gap-2 items-center justify-center w-full'>
+                <tab.icon className='w-5 h-5' />
+                {tab.label}
+              </div>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <div className=''>
+          <TabsContent value='profile'>
+            <EmployeeProfilePage employeeId={params.teammemberId} />
+          </TabsContent>
+          <TabsContent value='report'>
+            <EmployeeReportPage employeeId={params.teammemberId} />
+          </TabsContent>
+          <TabsContent value='appraisal'>
+            <AppraisalPage employeeId={params.teammemberId} />
+          </TabsContent>
         </div>
-        <div className='md:col-span-2'>
-          <UserExperienceEducationSection
-            userExperiences={userWithJobExperiences}
-            userEducations={userWithEducations}
-          />
-          <UserSkillsSection user={applicant} />
-          <UserCoverLetterSection
-            userJobApplications={userWithJobApplications}
-          />
-          <UserResumeSection user={applicant} />
-        </div>
-      </div>
+      </Tabs>
     </div>
   );
 };

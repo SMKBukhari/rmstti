@@ -67,7 +67,7 @@ const EmployeeProfilePage = async ({
       <div className='grid md:grid-cols-3 grid-cols-1 md:gap-5 gap-0'>
         <div className='md:col-span-1'>
           <UserAboutSection
-            emplolyee={employee}
+            employee={employee}
             user={user}
             userJobApplications={userWithJobApplications}
           />

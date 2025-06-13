@@ -62,6 +62,7 @@ interface Field<T extends FieldValues> {
     | "time"
     | "file";
   comboboxOptions?: { label: string; value: string }[];
+  maxLength?: number; // For textarea
   heading?: string;
   disabled?: boolean;
   accept?: string;
@@ -268,6 +269,7 @@ const DialogForm = <T extends FieldValues>({
                               placeholder={field.placeholder}
                               className='min-h-[200px]'
                               disabled={field.disabled || isSubmitting}
+                              maxLength={field.maxLength}
                             />
                           </FormControl>
                         )}

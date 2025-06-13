@@ -705,6 +705,10 @@ model Appraisal {
   outputRelativeToGoalsQuantity          String?
   outputRelativeToGoalsQuality           String?
   analyticalAbility                      String?
+  // Remarks and Overall Evaluation
+  commentsOnJobDescription               String? @db.LongText
+  commentsOnOverallPerformance           String? @db.LongText
+  specificAdviceToTheEmployee            String? @db.LongText
 
   // =============================================
   // =============================================

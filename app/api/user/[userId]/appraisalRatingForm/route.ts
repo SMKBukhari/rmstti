@@ -34,6 +34,9 @@ export const POST = async (
       outputRelativeToGoalsQuantity,
       outputRelativeToGoalsQuality,
       analyticalAbility,
+      commentsOnJobDescription,
+      commentsOnOverallPerformance,
+      specificAdviceToTheEmployee,
       appraisaledBy,
       appraisaledByDesignation,
     } = await req.json();
@@ -91,6 +94,9 @@ export const POST = async (
         outputRelativeToGoalsQuantity: outputRelativeToGoalsQuantity,
         outputRelativeToGoalsQuality: outputRelativeToGoalsQuality,
         analyticalAbility: analyticalAbility,
+        commentsOnJobDescription: commentsOnJobDescription,
+        commentsOnOverallPerformance: commentsOnOverallPerformance,
+        specificAdviceToTheEmployee: specificAdviceToTheEmployee,
       },
     });
 

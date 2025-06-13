@@ -343,6 +343,11 @@ export const adminRoutes = [
     href: "/admin/complaints",
   },
   {
+    icon: NotebookPen,
+    label: "Appraisals",
+    href: "/admin/appraisals",
+  },
+  {
     icon: User,
     label: "Profile",
     href: "/profile",
@@ -400,6 +405,11 @@ export const employeeRoutes = [
     icon: Mailbox,
     label: "Complaints",
     href: "/employee/complaints",
+  },
+  {
+    icon: NotebookPen,
+    label: "Appraisals",
+    href: "/employee/appraisals",
   },
   {
     icon: User,
@@ -469,6 +479,11 @@ export const managerRoutes = [
     icon: Mailbox,
     label: "Complaints",
     href: "/manager/complaints",
+  },
+  {
+    icon: NotebookPen,
+    label: "Appraisals",
+    href: "/manager/appraisals",
   },
   {
     icon: User,

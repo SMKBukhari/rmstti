@@ -28,39 +28,50 @@ const SettingsPage = async () => {
   });
 
   const publicHolidays = await db.publicHoliday.findMany({
-      include: {
-        employees: true,
-      },
-    });
+    include: {
+      employees: true,
+    },
+  });
 
   const applicationStatus = await db.applicationStatus.findFirst({
-      where: { name: "Hired" },
-    });
+    where: { name: "Hired" },
+  });
 
   const employees = await db.userProfile.findMany({
-      where: {
-        applicationStatusId: applicationStatus?.id,
-        role: {
-          name: {
-            notIn: ["User", "Applicant", "Interviewee", "CEO"],
-          },
-        },
-        status: {
-          name: "Active",
+    where: {
+      applicationStatusId: applicationStatus?.id,
+      role: {
+        name: {
+          notIn: ["User", "Applicant", "Interviewee", "CEO"],
         },
       },
-      include: {
-        role: true,
-        workstatus: true,
-        status: true,
-        department: true,
-        company: true,
+      status: {
+        name: "Active",
       },
-    });
+    },
+    include: {
+      role: true,
+      workstatus: true,
+      status: true,
+      department: true,
+      company: true,
+    },
+  });
 
   const departments = await db.department.findMany({
     include: {
-      users: true,
+      users: {
+        where: {
+          role: {
+            name: {
+              notIn: ["User", "Applicant", "Interviewee", "CEO"],
+            },
+          },
+          status: {
+            name: "Active",
+          },
+        },
+      },
     },
   });
 
