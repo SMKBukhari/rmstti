@@ -10,6 +10,15 @@ export const AppraisalMarkingOptions = [
   { label: "Excellent (5)", value: "5" },
 ];
 
+export const AppraisalMarkingOptions2 = [
+  { label: "N/A", value: "N/A" },
+  { label: "Poor (2)", value: "2" },
+  { label: "Average (4)", value: "4" },
+  { label: "Good (6)", value: "6" },
+  { label: "V. Good (8)", value: "8" },
+  { label: "Excellent (10)", value: "10" },
+];
+
 export const WarningLetterOptions = [
   { label: "N/A", value: "N/A" },
   { label: "One (-1)", value: "-10" },
