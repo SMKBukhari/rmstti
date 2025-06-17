@@ -21,9 +21,9 @@ export const AppraisalMarkingOptions2 = [
 
 export const WarningLetterOptions = [
   { label: "N/A", value: "N/A" },
-  { label: "One (-1)", value: "-10" },
-  { label: "Two (-2)", value: "-20" },
-  { label: "Three (-3)", value: "-30" },
+  { label: "One (-10)", value: "-10" },
+  { label: "Two (-20)", value: "-20" },
+  { label: "Three (-30)", value: "-30" },
 ];
 
 export type AppraisalField = {
@@ -80,7 +80,7 @@ export const addAppraisalFormFields: AppraisalField[] = [
     name: "intelligence",
     label: "Intelligence",
     type: "select",
-    comboboxOptions: AppraisalMarkingOptions ? AppraisalMarkingOptions : [],
+    comboboxOptions: AppraisalMarkingOptions2 ? AppraisalMarkingOptions2 : [],
   },
   {
     name: "relWithSupervisor",
@@ -98,7 +98,7 @@ export const addAppraisalFormFields: AppraisalField[] = [
     name: "teamWork",
     label: "Team Work",
     type: "select",
-    comboboxOptions: AppraisalMarkingOptions ? AppraisalMarkingOptions : [],
+    comboboxOptions: AppraisalMarkingOptions2 ? AppraisalMarkingOptions2 : [],
   },
   {
     name: "abilityToCommunicateWrittenly",
@@ -164,7 +164,7 @@ export const addAppraisalFormFields: AppraisalField[] = [
     name: "professionalKnowledge",
     label: "Professional Knowledge",
     type: "select",
-    comboboxOptions: AppraisalMarkingOptions ? AppraisalMarkingOptions : [],
+    comboboxOptions: AppraisalMarkingOptions2 ? AppraisalMarkingOptions2 : [],
   },
   {
     name: "creativeness",
@@ -188,7 +188,7 @@ export const addAppraisalFormFields: AppraisalField[] = [
     name: "abilityToPlanAndOrganizeWork",
     label: "Ability to Plan and Organize Work",
     type: "select",
-    comboboxOptions: AppraisalMarkingOptions ? AppraisalMarkingOptions : [],
+    comboboxOptions: AppraisalMarkingOptions2 ? AppraisalMarkingOptions2 : [],
   },
   {
     name: "optimalUseOfResources",
@@ -200,13 +200,13 @@ export const addAppraisalFormFields: AppraisalField[] = [
     name: "outputRelativeToGoalsQuantity",
     label: "Output Relative to Goals (Quantity)",
     type: "select",
-    comboboxOptions: AppraisalMarkingOptions ? AppraisalMarkingOptions : [],
+    comboboxOptions: AppraisalMarkingOptions2 ? AppraisalMarkingOptions2 : [],
   },
   {
     name: "outputRelativeToGoalsQuality",
     label: "Output Relative to Goals (Quality)",
     type: "select",
-    comboboxOptions: AppraisalMarkingOptions ? AppraisalMarkingOptions : [],
+    comboboxOptions: AppraisalMarkingOptions2 ? AppraisalMarkingOptions2 : [],
   },
   {
     name: "analyticalAbility",
