@@ -192,7 +192,7 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
         //   0
         // );
 
-        const { obtainedPoints, totalPoints } = validCriteria.reduce(
+        let { obtainedPoints, totalPoints } = validCriteria.reduce(
           (acc, [key, value]) => {
             const weight =
               criteriaWeightage[key as keyof typeof criteriaWeightage] || 5;
@@ -204,6 +204,9 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
           { obtainedPoints: 0, totalPoints: 0 }
         );
         // const totalPoints = validCriteria.length * 5; // Assuming each criterion is out of 5 points
+        if (numberOfWarningLettersInThisContract !== "N/A") {
+          totalPoints = totalPoints - 5;
+        }
         const percentage = (obtainedPoints / totalPoints) * 100;
 
         return (

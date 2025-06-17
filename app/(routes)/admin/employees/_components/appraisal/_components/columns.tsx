@@ -151,15 +151,62 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
           numberOfWarningLettersInThisContract,
         };
 
-        const validCriteria = Object.values(criteria).filter(
-          (value) => value !== "N/A"
+        const criteriaWeightage = {
+          appearance: 5,
+          intelligence: 10,
+          relWithSupervisor: 5,
+          relWithColleagues: 5,
+          teamWork: 10,
+          abilityToCommunicateWrittenly: 5,
+          abilityToCommunicateSpokenly: 5,
+          integrityGeneral: 5,
+          integrityIntellectual: 5,
+          dedicationToWork: 5,
+          reliability: 5,
+          responseUnderStressMentalPhysical: 5,
+          willingnessToAcceptAddedResponsibility: 5,
+          initiative: 5,
+          financialAbility: 5,
+          professionalKnowledge: 10,
+          creativeness: 5,
+          abilityToTakeDecisions: 5,
+          tendencyToLearn: 5,
+          abilityToPlanAndOrganizeWork: 10,
+          optimalUseOfResources: 5,
+          outputRelativeToGoalsQuantity: 10,
+          outputRelativeToGoalsQuality: 10,
+          analyticalAbility: 5,
+          // numberOfWarningLettersInThisContract: 30,
+        };
+
+        // const validCriteria = Object.values(criteria).filter(
+        //   (value) => value !== "N/A"
+        // );
+
+        const validCriteria = Object.entries(criteria).filter(
+          ([_, value]) => value !== "N/A"
         );
 
-        const obtainedPoints = validCriteria.reduce(
-          (total, value) => total + parseInt(value || "0"),
-          0
+        // const obtainedPoints = validCriteria.reduce(
+        //   (total, value) => total + parseInt(value || "0"),
+        //   0
+        // );
+
+        let { obtainedPoints, totalPoints } = validCriteria.reduce(
+          (acc, [key, value]) => {
+            const weight =
+              criteriaWeightage[key as keyof typeof criteriaWeightage] || 5;
+            return {
+              obtainedPoints: acc.obtainedPoints + parseInt(value || "0"),
+              totalPoints: acc.totalPoints + weight,
+            };
+          },
+          { obtainedPoints: 0, totalPoints: 0 }
         );
-        const totalPoints = validCriteria.length * 5; // Assuming each criterion is out of 5 points
+        // const totalPoints = validCriteria.length * 5; // Assuming each criterion is out of 5 points
+        if (numberOfWarningLettersInThisContract !== "N/A") {
+          totalPoints = totalPoints - 5;
+        }
         const percentage = (obtainedPoints / totalPoints) * 100;
 
         return (

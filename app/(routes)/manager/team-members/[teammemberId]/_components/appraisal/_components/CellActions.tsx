@@ -90,6 +90,12 @@ const CellActions = ({
       analyticalAbility: currentAppraisal?.analyticalAbility || "N/A",
       numberOfWarningLettersInThisContract:
         currentAppraisal?.numberOfWarningLettersInThisContract || "N/A",
+      commentsOnJobDescription:
+        currentAppraisal?.commentsOnJobDescription || "N/A",
+      commentsOnOverallPerformance:
+        currentAppraisal?.commentsOnOverallPerformance || "N/A",
+      specificAdviceToTheEmployee:
+        currentAppraisal?.specificAdviceToTheEmployee || "N/A",
       appraisaledBy: user?.fullName || "N/A",
       appraisaledByDesignation: user?.designation || "N/A",
     },
@@ -138,6 +144,12 @@ const CellActions = ({
         analyticalAbility: currentAppraisal?.analyticalAbility || "N/A",
         numberOfWarningLettersInThisContract:
           currentAppraisal?.numberOfWarningLettersInThisContract || "N/A",
+        commentsOnJobDescription:
+          currentAppraisal.commentsOnJobDescription || "N/A",
+        commentsOnOverallPerformance:
+          currentAppraisal.commentsOnOverallPerformance || "N/A",
+        specificAdviceToTheEmployee:
+          currentAppraisal.specificAdviceToTheEmployee || "N/A",
         appraisaledBy: user?.fullName || "N/A",
         appraisaledByDesignation: user?.designation || "N/A",
       });
