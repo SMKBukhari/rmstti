@@ -12,6 +12,10 @@ export const POST = async (
     const { userId } = params;
     const { interviewDateTime, applicantId, timezoneOffset } = await req.json();
 
+    if (!interviewDateTime || isNaN(new Date(interviewDateTime).getTime())) {
+      return new NextResponse("Invalid date format", { status: 400 });
+    }
+
     // Get the user profile
     const user = await db.userProfile.findFirst({
       where: { userId: userId },
@@ -21,9 +25,18 @@ export const POST = async (
       return new NextResponse("User not found", { status: 404 });
     }
 
-    const utcDate = new Date(interviewDateTime);
-    const localDate = addMinutes(utcDate, -timezoneOffset);
+    // const utcDate = new Date(interviewDateTime);
+    // const localDate = addMinutes(utcDate, -timezoneOffset);
 
+    const utcDate = new Date(interviewDateTime);
+    // Validate the date is in the future
+    if (utcDate < new Date()) {
+      return new NextResponse("Interview date cannot be in the past", {
+        status: 400,
+      });
+    }
+
+    const localDate = addMinutes(utcDate, -timezoneOffset);
     const applicant = await db.userProfile.findFirst({
       where: {
         userId: applicantId,
@@ -175,7 +188,7 @@ export const POST = async (
       response,
     });
   } catch (error) {
-    console.error(`SUBMIT_RESUME_POST: ${error}`);
+    console.error(`SCHEDULE_INTERVIEW_POST: ${error}`);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 };

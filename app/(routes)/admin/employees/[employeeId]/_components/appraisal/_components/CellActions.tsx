@@ -11,7 +11,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AppraisalRatingFormSchema } from "@/schemas";
 import { Appraisal, Role, UserProfile } from "@prisma/client";
-import { InterviewMarkingOptions } from "@/lib/data";
+import { addAppraisalFormFields, AppraisalField } from "@/lib/dialogFields";
 
 interface CellActionsProps {
   user: (UserProfile & { role: Role | null }) | null;
@@ -88,6 +88,8 @@ const CellActions = ({
       outputRelativeToGoalsQuality:
         currentAppraisal?.outputRelativeToGoalsQuality || "N/A",
       analyticalAbility: currentAppraisal?.analyticalAbility || "N/A",
+      numberOfWarningLettersInThisContract:
+        currentAppraisal?.numberOfWarningLettersInThisContract || "N/A",
       appraisaledBy: user?.fullName || "N/A",
       appraisaledByDesignation: user?.designation || "N/A",
     },
@@ -134,6 +136,8 @@ const CellActions = ({
         outputRelativeToGoalsQuality:
           currentAppraisal?.outputRelativeToGoalsQuality || "N/A",
         analyticalAbility: currentAppraisal?.analyticalAbility || "N/A",
+        numberOfWarningLettersInThisContract:
+          currentAppraisal?.numberOfWarningLettersInThisContract || "N/A",
         appraisaledBy: user?.fullName || "N/A",
         appraisaledByDesignation: user?.designation || "N/A",
       });
@@ -192,233 +196,12 @@ const CellActions = ({
         onOpenChange={setDialogOpen}
         title='Appraisal Rating Form'
         description='Please fill out the appraisal rating form for the employee.'
-        fields={[
-          {
-            name: "employeeName",
-            label: "Employee Name",
-            type: "input",
-            disabled: true,
-          },
-          {
-            name: "appraisalDate",
-            label: "Appraisal Date",
-            type: "date",
-          },
-          {
-            name: "department",
-            label: "Department",
-            type: "input",
-            disabled: true,
-          },
-          {
-            name: "designation",
-            label: "Designation",
-            type: "input",
-            disabled: true,
-          },
-          {
-            name: "appearance",
-            label: "Appearance",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "intelligence",
-            label: "Intelligence",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "relWithSupervisor",
-            label: "Relationship with Supervisor",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "relWithColleagues",
-            label: "Relationship with Colleagues",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "teamWork",
-            label: "Team Work",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "abilityToCommunicateWrittenly",
-            label: "Ability to Communicate Writtenly",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "abilityToCommunicateSpokenly",
-            label: "Ability to Communicate Spokenly",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "integrityGeneral",
-            label: "Integrity (General)",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "integrityIntellectual",
-            label: "Integrity (Intellectual)",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "dedicationToWork",
-            label: "Dedication to Work",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "reliability",
-            label: "Reliability",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "responseUnderStressMentalPhysical",
-            label: "Response Under Stress (Mental and Physical)",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "willingnessToAcceptAddedResponsibility",
-            label: "Willingness to Accept Added Responsibility",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "initiative",
-            label: "Initiative",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "financialAbility",
-            label: "Financial Ability",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "professionalKnowledge",
-            label: "Professional Knowledge",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "creativeness",
-            label: "Creativeness",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "abilityToTakeDecisions",
-            label: "Ability to Take Decisions",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "tendencyToLearn",
-            label: "Tendency to Learn",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "abilityToPlanAndOrganizeWork",
-            label: "Ability to Plan and Organize Work",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "optimalUseOfResources",
-            label: "Optimal Use of Resources",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "outputRelativeToGoalsQuantity",
-            label: "Output Relative to Goals (Quantity)",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "outputRelativeToGoalsQuality",
-            label: "Output Relative to Goals (Quality)",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "analyticalAbility",
-            label: "Analytical Ability",
-            type: "select",
-            comboboxOptions: InterviewMarkingOptions
-              ? InterviewMarkingOptions
-              : [],
-          },
-          {
-            name: "appraisaledBy",
-            label: "Appraised By (Your Name)",
-            type: "input",
-          },
-          {
-            name: "appraisaledByDesignation",
-            label: "Appraised By Designation",
-            type: "input",
-          },
-        ]}
+        fields={addAppraisalFormFields.map((field: AppraisalField) => ({
+          name: field.name,
+          label: field.label,
+          type: field.type,
+          comboboxOptions: field.comboboxOptions,
+        }))}
         buttons={[
           {
             label: "Update",

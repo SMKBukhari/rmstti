@@ -60,7 +60,9 @@ const page = async () => {
   const employees = users.filter(
     (user) => user.isHired === true && user.status?.name === "Active"
   );
-  const applicants = users.filter((user) => user.role?.name === "Applicant");
+  const applicants = users.filter(
+    (user) => user.role?.name === "Applicant" && user.isHired === false
+  );
 
   const leaveRequests = await db.leaveRequest.findMany({
     where: {
@@ -113,10 +115,10 @@ const page = async () => {
   });
 
   const warnings = await db.warnings.findMany({
-      include: {
-        user: true,
-      },
-    });
+    include: {
+      user: true,
+    },
+  });
 
   // Get the applicants from the previous month
   const previousMonthApplicants = await db.userProfile.findMany({

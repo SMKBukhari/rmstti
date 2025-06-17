@@ -379,6 +379,9 @@ export const AppraisalRatingFormSchema = z.object({
     .string()
     .min(1, "Analytical Ability rating is required"),
   analyticalAbility: z.string().min(1, "Analytical Ability rating is required"),
+  numberOfWarningLettersInThisContract: z
+    .string()
+    .min(1, "Number of Warning Letters is required"),
   commentsOnJobDescription: z.string().optional(),
   commentsOnOverallPerformance: z.string().optional(),
   specificAdviceToTheEmployee: z.string().optional(),

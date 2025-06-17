@@ -10,6 +10,13 @@ export const AppraisalMarkingOptions = [
   { label: "Excellent (5)", value: "5" },
 ];
 
+export const WarningLetterOptions = [
+  { label: "N/A", value: "N/A" },
+  { label: "One (-1)", value: "-10" },
+  { label: "Two (-2)", value: "-20" },
+  { label: "Three (-3)", value: "-30" },
+];
+
 export type AppraisalField = {
   name: keyof z.infer<typeof AppraisalRatingFormSchema>;
   label: string;
@@ -197,6 +204,12 @@ export const addAppraisalFormFields: AppraisalField[] = [
     label: "Analytical Ability",
     type: "select",
     comboboxOptions: AppraisalMarkingOptions ? AppraisalMarkingOptions : [],
+  },
+  {
+    name: "numberOfWarningLettersInThisContract",
+    label: "Number of Warning Letters (in this Contract)",
+    type: "select",
+    comboboxOptions: WarningLetterOptions ? WarningLetterOptions : [],
   },
   {
     name: "commentsOnJobDescription",

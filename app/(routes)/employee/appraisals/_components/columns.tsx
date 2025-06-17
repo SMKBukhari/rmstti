@@ -74,6 +74,7 @@ export type ApplicantsColumns = {
   analyticalAbilityRemarks?: string;
   commentsOnOverallPerformance: string;
   specificAdviceToTheEmployee: string;
+  numberOfWarningLettersInThisContract: string;
   appraisaledBy: string;
   appraisaledByDesignation: string;
 };
@@ -155,6 +156,7 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
         outputRelativeToGoalsQuantity,
         outputRelativeToGoalsQuality,
         analyticalAbility,
+        numberOfWarningLettersInThisContract,
       } = row.original;
       if (isAppraised) {
         const criteria = {
@@ -182,6 +184,7 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
           outputRelativeToGoalsQuantity,
           outputRelativeToGoalsQuality,
           analyticalAbility,
+          numberOfWarningLettersInThisContract,
         };
 
         const validCriteria = Object.values(criteria).filter(

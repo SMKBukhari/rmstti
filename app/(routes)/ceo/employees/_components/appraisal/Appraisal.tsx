@@ -80,6 +80,8 @@ const AppraisalPage = async () => {
       outputRelativeToGoalsQuality:
         appraisal.outputRelativeToGoalsQuality || "N/A",
       analyticalAbility: appraisal.analyticalAbility || "N/A",
+      numberOfWarningLettersInThisContract:
+        appraisal.numberOfWarningLettersInThisContract || "N/A",
       appraisaledBy: appraisal.appraisaledBy || "N/A",
       appraisaledByDesignation: appraisal.appraisaledByDesignation || "N/A",
     })

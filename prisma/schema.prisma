@@ -709,6 +709,8 @@ model Appraisal {
   commentsOnJobDescription               String? @db.LongText
   commentsOnOverallPerformance           String? @db.LongText
   specificAdviceToTheEmployee            String? @db.LongText
+  // Number of Warning Letters
+  numberOfWarningLettersInThisContract   String?
 
   // =============================================
   // =============================================

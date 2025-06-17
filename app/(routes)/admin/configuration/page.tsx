@@ -29,7 +29,18 @@ const SettingsPage = async () => {
 
   const departments = await db.department.findMany({
     include: {
-      users: true,
+      users: {
+        where: {
+          role: {
+            name: {
+              notIn: ["User", "Applicant", "Interviewee", "CEO"],
+            },
+          },
+          status: {
+            name: "Active",
+          },
+        },
+      },
     },
   });
 

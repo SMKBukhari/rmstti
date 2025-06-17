@@ -34,6 +34,10 @@ export const PATCH = async (
       outputRelativeToGoalsQuantity,
       outputRelativeToGoalsQuality,
       analyticalAbility,
+      numberOfWarningLettersInThisContract,
+      commentsOnJobDescription,
+      commentsOnOverallPerformance,
+      specificAdviceToTheEmployee,
       appraisaledBy,
       appraisaledByDesignation,
     } = await req.json();
@@ -92,6 +96,11 @@ export const PATCH = async (
         outputRelativeToGoalsQuantity: outputRelativeToGoalsQuantity,
         outputRelativeToGoalsQuality: outputRelativeToGoalsQuality,
         analyticalAbility: analyticalAbility,
+        numberOfWarningLettersInThisContract:
+          numberOfWarningLettersInThisContract,
+        commentsOnJobDescription: commentsOnJobDescription,
+        commentsOnOverallPerformance: commentsOnOverallPerformance,
+        specificAdviceToTheEmployee: specificAdviceToTheEmployee,
       },
     });
 

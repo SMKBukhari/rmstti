@@ -88,6 +88,8 @@ const CellActions = ({
       outputRelativeToGoalsQuality:
         currentAppraisal?.outputRelativeToGoalsQuality || "N/A",
       analyticalAbility: currentAppraisal?.analyticalAbility || "N/A",
+      numberOfWarningLettersInThisContract:
+        currentAppraisal?.numberOfWarningLettersInThisContract || "N/A",
       appraisaledBy: user?.fullName || "N/A",
       appraisaledByDesignation: user?.designation || "N/A",
     },
@@ -134,6 +136,8 @@ const CellActions = ({
         outputRelativeToGoalsQuality:
           currentAppraisal?.outputRelativeToGoalsQuality || "N/A",
         analyticalAbility: currentAppraisal?.analyticalAbility || "N/A",
+        numberOfWarningLettersInThisContract:
+          currentAppraisal.numberOfWarningLettersInThisContract || "N/A",
         appraisaledBy: user?.fullName || "N/A",
         appraisaledByDesignation: user?.designation || "N/A",
       });
