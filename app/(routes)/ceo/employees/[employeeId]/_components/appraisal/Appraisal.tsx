@@ -101,6 +101,7 @@ const AppraisalPage = async ({ employeeId }: AppraisalPageProps) => {
         appraisal.numberOfWarningLettersInThisContract || "N/A",
       appraisaledBy: appraisal.appraisaledBy || "N/A",
       appraisaledByDesignation: appraisal.appraisaledByDesignation || "N/A",
+      isApproved: appraisal.approved || false,
     })
   );
 

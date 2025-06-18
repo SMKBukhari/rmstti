@@ -84,6 +84,7 @@ const AppraisalPage = async () => {
         appraisal.numberOfWarningLettersInThisContract || "N/A",
       appraisaledBy: appraisal.appraisaledBy || "N/A",
       appraisaledByDesignation: appraisal.appraisaledByDesignation || "N/A",
+      isApproved: appraisal.approved || false,
     })
   );
 

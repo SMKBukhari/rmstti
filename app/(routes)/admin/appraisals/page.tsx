@@ -21,6 +21,7 @@ const AppraisalPage = async () => {
   const appraisals = await db.appraisal.findMany({
     where: {
       userId: user?.userId,
+      approved: true,
     },
     include: {
       user: {

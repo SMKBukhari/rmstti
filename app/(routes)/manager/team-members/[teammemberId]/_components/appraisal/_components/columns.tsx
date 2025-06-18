@@ -50,6 +50,7 @@ export type ApplicantsColumns = {
   numberOfWarningLettersInThisContract: string;
   appraisaledBy: string;
   appraisaledByDesignation: string;
+  isApproved: boolean;
 };
 
 export const columns: ColumnDef<ApplicantsColumns>[] = [
@@ -117,6 +118,7 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
         outputRelativeToGoalsQuality,
         analyticalAbility,
         numberOfWarningLettersInThisContract,
+        isApproved,
       } = row.original;
       if (isAppraised) {
         const criteria = {
@@ -242,6 +244,7 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
               dob={dob}
               doj={doj}
               userAppraisals={userAppraisals}
+              isApproved={isApproved}
             />
           </div>
         );

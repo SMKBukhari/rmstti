@@ -11,7 +11,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AppraisalRatingFormSchema } from "@/schemas";
 import { Appraisal, Role, UserProfile } from "@prisma/client";
-import { addAppraisalFormFields, AppraisalField } from "@/lib/dialogFields";
+import {
+  addAppraisalFormFields,
+  addAppraisalFormFieldsApproved,
+  AppraisalField,
+} from "@/lib/dialogFields";
 
 interface CellActionsProps {
   user: (UserProfile & { role: Role | null }) | null;
@@ -22,6 +26,7 @@ interface CellActionsProps {
   dob?: string;
   doj?: string;
   department: string;
+  isApproved: boolean;
 }
 
 const CellActions = ({
@@ -31,8 +36,10 @@ const CellActions = ({
   department,
   designation,
   userAppraisals,
+  isApproved,
 }: CellActionsProps) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
+  const [isSecondDialogOpen, setSecondDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentAppraisal, setCurrentAppraisal] = useState<Appraisal | null>(
     null
@@ -96,6 +103,8 @@ const CellActions = ({
         currentAppraisal?.commentsOnOverallPerformance || "N/A",
       specificAdviceToTheEmployee:
         currentAppraisal?.specificAdviceToTheEmployee || "N/A",
+      remarksByHR: currentAppraisal?.remarksByHR || "N/A",
+      remarksByCEO: currentAppraisal?.remarksByCEO || "N/A",
       appraisaledBy: user?.fullName || "N/A",
       appraisaledByDesignation: user?.designation || "N/A",
     },
@@ -150,6 +159,8 @@ const CellActions = ({
           currentAppraisal?.commentsOnOverallPerformance || "N/A",
         specificAdviceToTheEmployee:
           currentAppraisal?.specificAdviceToTheEmployee || "N/A",
+        remarksByHR: currentAppraisal.remarksByHR || "N/A",
+        remarksByCEO: currentAppraisal.remarksByCEO || "N/A",
         appraisaledBy: user?.fullName || "N/A",
         appraisaledByDesignation: user?.designation || "N/A",
       });
@@ -185,23 +196,78 @@ const CellActions = ({
     }
   };
 
+  const onApprove = async () => {
+    try {
+      setIsLoading(true);
+      await axios.patch(
+        `/api/user/${user?.userId}/appraisalRatingForm/approve`,
+        { id }
+      );
+      toast.success(`Appraisal Approved successfully for ${fullName}.`);
+      setDialogOpen(false);
+      setIsLoading(false);
+      router.refresh();
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        if (error.response && error.response.data) {
+          toast.error(error.response.data);
+        } else {
+          toast.error("An unexpected error occurred. Please try again.");
+        }
+      }
+    } finally {
+      setDialogOpen(false);
+      setIsLoading(false);
+    }
+  };
+
   const handleButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent the click from bubbling up to the row
   };
 
   return (
     <div className='flex gap-3' onClick={handleButtonClick}>
-      <Button
-        variant={"outline"}
-        className='bg-transparent dark:border-white border-black'
-        onClick={() => setDialogOpen(true)}
-      >
-        {isLoading ? (
-          <Loader2 className='w-4 h-4 animate-spin dark:text-[#1034ff] text-[#295B81]' />
-        ) : (
-          <span>Update</span>
-        )}
-      </Button>
+      {!isApproved && (
+        <Button
+          variant={"outline"}
+          className='bg-transparent dark:border-white border-black'
+          onClick={() => setDialogOpen(true)}
+        >
+          {isLoading ? (
+            <Loader2 className='w-4 h-4 animate-spin dark:text-[#1034ff] text-[#295B81]' />
+          ) : (
+            <span>Update</span>
+          )}
+        </Button>
+      )}
+
+      {isApproved && (
+        <Button
+          variant={"outline"}
+          className='bg-transparent dark:border-white border-black'
+          onClick={() => setSecondDialogOpen(true)}
+        >
+          {isLoading ? (
+            <Loader2 className='w-4 h-4 animate-spin dark:text-[#1034ff] text-[#295B81]' />
+          ) : (
+            <span>View</span>
+          )}
+        </Button>
+      )}
+
+      {!isApproved && (
+        <Button
+          variant={"primary"}
+          className='bg-transparent dark:border-white border-black'
+          onClick={() => onApprove()}
+        >
+          {isLoading ? (
+            <Loader2 className='w-4 h-4 animate-spin dark:text-[#1034ff] text-[#295B81]' />
+          ) : (
+            <span>Approve</span>
+          )}
+        </Button>
+      )}
 
       <DialogForm
         isOpen={isDialogOpen}
@@ -221,6 +287,32 @@ const CellActions = ({
             variant: "primary",
             isLoading: isLoading,
           },
+          {
+            label: "Cancel",
+            type: "button",
+            onClick: () => setDialogOpen(false),
+          },
+        ]}
+        onSubmit={(data) => {
+          onSubmit(data);
+          setDialogOpen(false);
+        }}
+        form={form}
+      />
+
+      <DialogForm
+        isOpen={isSecondDialogOpen}
+        onOpenChange={setSecondDialogOpen}
+        title='Appraisal Rating Form'
+        description='You can see the appraisal rating form for the employee.'
+        fields={addAppraisalFormFieldsApproved.map((field: AppraisalField) => ({
+          name: field.name,
+          label: field.label,
+          type: field.type,
+          comboboxOptions: field.comboboxOptions,
+          disabled: true,
+        }))}
+        buttons={[
           {
             label: "Cancel",
             type: "button",

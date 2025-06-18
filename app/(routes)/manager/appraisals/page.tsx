@@ -21,6 +21,7 @@ const AppraisalPage = async () => {
   const appraisals = await db.appraisal.findMany({
     where: {
       userId: user?.userId,
+      approved: true,
     },
     include: {
       user: {
@@ -88,6 +89,8 @@ const AppraisalPage = async () => {
         appraisal.commentsOnOverallPerformance || "No remarks provided.",
       specificAdviceToTheEmployee:
         appraisal.specificAdviceToTheEmployee || "No advice provided.",
+      numberOfWarningLettersInThisContract:
+        appraisal.numberOfWarningLettersInThisContract || "N/A",
     })
   );
 

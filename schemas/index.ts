@@ -385,6 +385,8 @@ export const AppraisalRatingFormSchema = z.object({
   commentsOnJobDescription: z.string().optional(),
   commentsOnOverallPerformance: z.string().optional(),
   specificAdviceToTheEmployee: z.string().optional(),
+  remarksByHR: z.string().optional(),
+  remarksByCEO: z.string().optional(),
   appraisaledBy: z.string().min(1, "Appraised by is required"),
   appraisaledByDesignation: z
     .string()
