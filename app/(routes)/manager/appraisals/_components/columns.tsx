@@ -9,9 +9,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ScoreGauge } from "./ScoreGauge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import RemarksAction from "./RemarksAction";
+import { ScoreGauge } from "@/components/global/ScoreGauge";
 
 export type ApplicantsColumns = {
   user: (UserProfile & { role: Role | null }) | null;
@@ -25,55 +25,32 @@ export type ApplicantsColumns = {
   dob: string;
   doj: string;
   appearance: string;
-  appearanceRemarks?: string;
   intelligence: string;
-  intelligenceRemarks?: string;
   relWithSupervisor: string;
-  relWithSupervisorRemarks?: string;
   relWithColleagues: string;
-  relWithColleaguesRemarks?: string;
   teamWork: string;
-  teamWorkRemarks?: string;
   abilityToCommunicateWrittenly: string;
-  abilityToCommunicateWrittenlyRemarks?: string;
   abilityToCommunicateSpokenly: string;
-  abilityToCommunicateSpokenlyRemarks?: string;
   integrityGeneral: string;
-  integrityGeneralRemarks?: string;
   integrityIntellectual: string;
-  integrityIntellectualRemarks?: string;
   dedicationToWork: string;
-  dedicationToWorkRemarks?: string;
   reliability: string;
-  reliabilityRemarks?: string;
   responseUnderStressMentalPhysical: string;
-  responseUnderStressMentalPhysicalRemarks?: string;
   willingnessToAcceptAddedResponsibility: string;
-  willingnessToAcceptAddedResponsibilityRemarks?: string;
   initiative: string;
-  initiativeRemarks?: string;
   financialAbility: string;
-  financialAbilityRemarks?: string;
   professionalKnowledge: string;
-  professionalKnowledgeRemarks?: string;
   creativeness: string;
-  creativenessRemarks?: string;
   abilityToTakeDecisions: string;
-  abilityToTakeDecisionsRemarks?: string;
   tendencyToLearn: string;
-  tendencyToLearnRemarks?: string;
   abilityToPlanAndOrganizeWork: string;
-  abilityToPlanAndOrganizeWorkRemarks?: string;
   optimalUseOfResources: string;
-  optimalUseOfResourcesRemarks?: string;
   outputRelativeToGoalsQuantity: string;
-  outputRelativeToGoalsQuantityRemarks?: string;
   outputRelativeToGoalsQuality: string;
-  outputRelativeToGoalsQualityRemarks?: string;
   analyticalAbility: string;
-  analyticalAbilityRemarks?: string;
   commentsOnOverallPerformance: string;
   specificAdviceToTheEmployee: string;
+  numberOfWarningLettersInThisContract: string;
   appraisaledBy: string;
   appraisaledByDesignation: string;
 };
@@ -155,6 +132,7 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
         outputRelativeToGoalsQuantity,
         outputRelativeToGoalsQuality,
         analyticalAbility,
+        numberOfWarningLettersInThisContract,
       } = row.original;
       if (isAppraised) {
         const criteria = {
@@ -182,17 +160,65 @@ export const columns: ColumnDef<ApplicantsColumns>[] = [
           outputRelativeToGoalsQuantity,
           outputRelativeToGoalsQuality,
           analyticalAbility,
+          numberOfWarningLettersInThisContract,
         };
 
-        const validCriteria = Object.values(criteria).filter(
-          (value) => value !== "N/A"
+        const criteriaWeightage = {
+          appearance: 5,
+          intelligence: 10,
+          relWithSupervisor: 5,
+          relWithColleagues: 5,
+          teamWork: 10,
+          abilityToCommunicateWrittenly: 5,
+          abilityToCommunicateSpokenly: 5,
+          integrityGeneral: 5,
+          integrityIntellectual: 5,
+          dedicationToWork: 5,
+          reliability: 5,
+          responseUnderStressMentalPhysical: 5,
+          willingnessToAcceptAddedResponsibility: 5,
+          initiative: 5,
+          financialAbility: 5,
+          professionalKnowledge: 10,
+          creativeness: 5,
+          abilityToTakeDecisions: 5,
+          tendencyToLearn: 5,
+          abilityToPlanAndOrganizeWork: 10,
+          optimalUseOfResources: 5,
+          outputRelativeToGoalsQuantity: 10,
+          outputRelativeToGoalsQuality: 10,
+          analyticalAbility: 5,
+          // numberOfWarningLettersInThisContract: 30,
+        };
+
+        // const validCriteria = Object.values(criteria).filter(
+        //   (value) => value !== "N/A"
+        // );
+
+        const validCriteria = Object.entries(criteria).filter(
+          ([_, value]) => value !== "N/A"
         );
 
-        const obtainedPoints = validCriteria.reduce(
-          (total, value) => total + parseInt(value || "0"),
-          0
+        // const obtainedPoints = validCriteria.reduce(
+        //   (total, value) => total + parseInt(value || "0"),
+        //   0
+        // );
+
+        let { obtainedPoints, totalPoints } = validCriteria.reduce(
+          (acc, [key, value]) => {
+            const weight =
+              criteriaWeightage[key as keyof typeof criteriaWeightage] || 5;
+            return {
+              obtainedPoints: acc.obtainedPoints + parseInt(value || "0"),
+              totalPoints: acc.totalPoints + weight,
+            };
+          },
+          { obtainedPoints: 0, totalPoints: 0 }
         );
-        const totalPoints = validCriteria.length * 5; // Assuming each criterion is out of 5 points
+        // const totalPoints = validCriteria.length * 5; // Assuming each criterion is out of 5 points
+        if (numberOfWarningLettersInThisContract !== "N/A") {
+          totalPoints = totalPoints - 5;
+        }
         const percentage = (obtainedPoints / totalPoints) * 100;
 
         return (

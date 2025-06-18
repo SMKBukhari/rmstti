@@ -10,7 +10,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ScoreGauge } from "./ScoreGauge";
+import { ScoreGauge } from "@/components/global/ScoreGauge";
 
 export type ApplicantsColumns = {
   user: (UserProfile & { role: Role | null }) | null;
