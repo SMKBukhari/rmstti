@@ -24,10 +24,10 @@ export const ScoreGauge = ({
   }, []);
 
   const getScoreLabel = (percentage: number) => {
-    if (percentage > 90) return "Excellent";
-    if (percentage > 75.33) return "Very Good";
-    if (percentage > 59.33) return "Good";
-    if (percentage > 30) return "Fair";
+    if (percentage > 90.01) return "Excellent";
+    if (percentage > 75.34) return "Very Good";
+    if (percentage > 59.34) return "Good";
+    if (percentage > 30.01) return "Fair";
     return "Poor (Needs Improvement)";
   };
 
