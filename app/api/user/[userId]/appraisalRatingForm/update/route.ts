@@ -38,6 +38,8 @@ export const PATCH = async (
       commentsOnJobDescription,
       commentsOnOverallPerformance,
       specificAdviceToTheEmployee,
+      remarksByHR,
+      remarksByCEO,
       appraisaledBy,
       appraisaledByDesignation,
     } = await req.json();
@@ -101,6 +103,8 @@ export const PATCH = async (
         commentsOnJobDescription: commentsOnJobDescription,
         commentsOnOverallPerformance: commentsOnOverallPerformance,
         specificAdviceToTheEmployee: specificAdviceToTheEmployee,
+        remarksByHR: remarksByHR,
+        remarksByCEO: remarksByCEO,
       },
     });
 

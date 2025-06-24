@@ -37,6 +37,9 @@ export const POST = async (
       commentsOnJobDescription,
       commentsOnOverallPerformance,
       specificAdviceToTheEmployee,
+      numberOfWarningLettersInThisContract,
+      remarksByHR,
+      remarksByCEO,
       appraisaledBy,
       appraisaledByDesignation,
     } = await req.json();
@@ -97,6 +100,10 @@ export const POST = async (
         commentsOnJobDescription: commentsOnJobDescription,
         commentsOnOverallPerformance: commentsOnOverallPerformance,
         specificAdviceToTheEmployee: specificAdviceToTheEmployee,
+        numberOfWarningLettersInThisContract:
+          numberOfWarningLettersInThisContract,
+        remarksByHR: remarksByHR,
+        remarksByCEO: remarksByCEO,
       },
     });
 

@@ -11,7 +11,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AppraisalRatingFormSchema } from "@/schemas";
 import { Appraisal, Role, UserProfile } from "@prisma/client";
-import { addAppraisalFormFields, AppraisalField } from "@/lib/dialogFields";
+import {
+  addAppraisalFormFieldsApproved,
+  AppraisalField,
+} from "@/lib/dialogFields";
 
 interface CellActionsProps {
   user: (UserProfile & { role: Role | null }) | null;
@@ -88,6 +91,14 @@ const CellActions = ({
       outputRelativeToGoalsQuality:
         currentAppraisal?.outputRelativeToGoalsQuality || "N/A",
       analyticalAbility: currentAppraisal?.analyticalAbility || "N/A",
+      commentsOnJobDescription:
+        currentAppraisal?.commentsOnJobDescription || "N/A",
+      commentsOnOverallPerformance:
+        currentAppraisal?.commentsOnOverallPerformance || "N/A",
+      specificAdviceToTheEmployee:
+        currentAppraisal?.specificAdviceToTheEmployee || "N/A",
+      remarksByHR: currentAppraisal?.remarksByHR || "N/A",
+      remarksByCEO: currentAppraisal?.remarksByCEO || "N/A",
       appraisaledBy: user?.fullName || "N/A",
       appraisaledByDesignation: user?.designation || "N/A",
     },
@@ -134,6 +145,14 @@ const CellActions = ({
         outputRelativeToGoalsQuality:
           currentAppraisal?.outputRelativeToGoalsQuality || "N/A",
         analyticalAbility: currentAppraisal?.analyticalAbility || "N/A",
+        commentsOnJobDescription:
+          currentAppraisal?.commentsOnJobDescription || "N/A",
+        commentsOnOverallPerformance:
+          currentAppraisal?.commentsOnOverallPerformance || "N/A",
+        specificAdviceToTheEmployee:
+          currentAppraisal?.specificAdviceToTheEmployee || "N/A",
+        remarksByHR: currentAppraisal?.remarksByHR || "N/A",
+        remarksByCEO: currentAppraisal?.remarksByCEO || "N/A",
         appraisaledBy: user?.fullName || "N/A",
         appraisaledByDesignation: user?.designation || "N/A",
       });
@@ -192,7 +211,7 @@ const CellActions = ({
         onOpenChange={setDialogOpen}
         title='Appraisal Rating Form'
         description='Please fill out the appraisal rating form for the employee.'
-        fields={addAppraisalFormFields.map((field: AppraisalField) => ({
+        fields={addAppraisalFormFieldsApproved.map((field: AppraisalField) => ({
           name: field.name,
           label: field.label,
           type: field.type,
