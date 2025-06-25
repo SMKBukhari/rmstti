@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 import type { UserProfile } from "@prisma/client";
-import { Calculator, Loader2 } from "lucide-react";
+import { Calculator, Loader2, Search } from "lucide-react";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { CalculateAttendanceSchema } from "@/schemas";
@@ -23,6 +23,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 
 interface CalculateAttendancePageProps {
   user: UserProfile | null;
@@ -65,6 +66,7 @@ export default function CalculateAttendancePage({
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const [isLoadingEmployees, setIsLoadingEmployees] = useState(false);
   const [calculationResults, setCalculationResults] = useState<{
@@ -103,6 +105,34 @@ export default function CalculateAttendancePage({
 
     fetchEmployees();
   }, [user]);
+
+  // Filter employees based on search term
+  const filteredEmployees = employees.filter(
+    (employee) =>
+      employee.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.department?.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      employee.designation?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Update toggleAll to work with filtered employees
+  const toggleAllFilteredEmployees = () => {
+    const filteredEmployeeIds = filteredEmployees.map((emp) => emp.userId);
+
+    if (filteredEmployeeIds.every((id) => selectedEmployees.includes(id))) {
+      // Deselect all filtered
+      setSelectedEmployees((prev) =>
+        prev.filter((id) => !filteredEmployeeIds.includes(id))
+      );
+    } else {
+      // Select all filtered
+      setSelectedEmployees((prev) => [
+        ...new Set([...prev, ...filteredEmployeeIds]),
+      ]);
+    }
+  };
 
   const handleSubmit = async (
     data: z.infer<typeof CalculateAttendanceSchema>
@@ -202,7 +232,7 @@ export default function CalculateAttendancePage({
           <div className='mb-6'>
             <div className='flex items-center justify-between mb-2'>
               <h3 className='text-sm font-medium'>Select Employees</h3>
-              <Button
+              {/* <Button
                 variant='outline'
                 size='sm'
                 onClick={toggleAllEmployees}
@@ -212,7 +242,31 @@ export default function CalculateAttendancePage({
                 {selectedEmployees.length === employees.length
                   ? "Deselect All"
                   : "Select All"}
+              </Button> */}
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={toggleAllFilteredEmployees}
+                className='h-8'
+                type='button'
+              >
+                {filteredEmployees.length > 0 &&
+                filteredEmployees.every((emp) =>
+                  selectedEmployees.includes(emp.userId)
+                )
+                  ? "Deselect All"
+                  : "Select All"}
               </Button>
+            </div>
+
+            <div className='relative mb-3'>
+              <Search className='absolute left-3 top-3 h-4 w-4 text-muted-foreground' />
+              <Input
+                placeholder='Search employees...'
+                className='pl-9'
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
 
             {isLoadingEmployees ? (
@@ -222,7 +276,7 @@ export default function CalculateAttendancePage({
             ) : (
               <ScrollArea className='h-[200px] rounded-md border p-2'>
                 <div className='space-y-2'>
-                  {employees.map((employee) => (
+                  {/* {employees.map((employee) => (
                     <div
                       key={employee.userId}
                       className='flex items-center space-x-2'
@@ -248,14 +302,51 @@ export default function CalculateAttendancePage({
                     <p className='text-center text-sm text-muted-foreground py-4'>
                       No active employees found
                     </p>
+                  )} */}
+
+                  {filteredEmployees.map((employee) => (
+                    <div
+                      key={employee.userId}
+                      className='flex items-center space-x-2'
+                    >
+                      <Checkbox
+                        id={employee.userId}
+                        checked={selectedEmployees.includes(employee.userId)}
+                        onCheckedChange={() => toggleEmployee(employee.userId)}
+                      />
+                      <label
+                        htmlFor={employee.userId}
+                        className='flex-1 text-sm cursor-pointer flex justify-between'
+                      >
+                        <span>{employee.fullName}</span>
+                        <span className='text-muted-foreground text-xs'>
+                          {employee.department?.name || "No Department"}
+                        </span>
+                      </label>
+                    </div>
+                  ))}
+
+                  {filteredEmployees.length === 0 && (
+                    <p className='text-center text-sm text-muted-foreground py-4'>
+                      {employees.length === 0
+                        ? "No active employees found"
+                        : "No employees match your search"}
+                    </p>
                   )}
                 </div>
               </ScrollArea>
             )}
 
+            {/* <div className='mt-2 text-xs text-muted-foreground'>
+              {selectedEmployees.length} of {employees.length} employees
+              selected
+            </div> */}
             <div className='mt-2 text-xs text-muted-foreground'>
               {selectedEmployees.length} of {employees.length} employees
               selected
+              {searchTerm && (
+                <span> (showing {filteredEmployees.length} matches)</span>
+              )}
             </div>
           </div>
         }

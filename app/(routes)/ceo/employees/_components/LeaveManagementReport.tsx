@@ -23,6 +23,15 @@ const LeaveManagementReport = ({ employees }: LeaveManagementReportProps) => {
     return <div>No employee data available</div>;
   }
 
+  // Function to calculate the number of days between two dates
+  const calculateLeaveDays = (startDate: Date, endDate: Date): number => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const timeDiff = end.getTime() - start.getTime();
+    const dayDiff = timeDiff / (1000 * 3600 * 24);
+    return Math.floor(dayDiff) + 1; // +1 to include both start and end dates
+  };
+
   // Process all employees' data
   const allRecords = employees.flatMap((employee) => {
     // Format data from leave balance adjustments
@@ -41,32 +50,44 @@ const LeaveManagementReport = ({ employees }: LeaveManagementReportProps) => {
     // Format data from leave requests (approved leaves)
     const leaveRequestData = employee.leaveRequests
       .filter((req) => req.status === "Approved")
-      .map((req) => ({
-        id: req.id,
-        employeeId: employee.userId,
-        employeeName: employee.fullName,
-        date: req.createdAt,
-        startDate: req.startDate,
-        endDate: req.endDate,
-        reason: req.reason,
-        entitledLeaves: "-1", // Deduct 1 day per leave request
-        type: "Leave" as const,
-      }));
+      .map((req) => {
+        const leaveDays = calculateLeaveDays(
+          new Date(req.startDate),
+          new Date(req.endDate)
+        );
+        return {
+          id: req.id,
+          employeeId: employee.userId,
+          employeeName: employee.fullName,
+          date: req.createdAt,
+          startDate: req.startDate,
+          endDate: req.endDate,
+          reason: req.reason,
+          entitledLeaves: `-${leaveDays}`, // Deduct the actual number of leave days
+          type: "Leave" as const,
+        };
+      });
 
     // Format data from attendance records (absences)
     const absenceData = employee.Attendence.filter(
       (att) => att.workStatus?.name === "Absent"
-    ).map((att) => ({
-      id: att.id,
-      employeeId: employee.userId,
-      employeeName: employee.fullName,
-      date: att.date,
-      startDate: att.date, // Same as date for single-day absence
-      endDate: att.date, // Same as date for single-day absence
-      reason: "Deducted for absence",
-      entitledLeaves: "-1", // Deduct 1 day per absence
-      type: "Absence" as const,
-    }));
+    ).map((att) => {
+      const absenceDate = calculateLeaveDays(
+        new Date(att.date),
+        new Date(att.date)
+      )
+      return {
+        id: att.id,
+        employeeId: employee.userId,
+        employeeName: employee.fullName,
+        date: att.date,
+        startDate: att.date, // Same as date for single-day absence
+        endDate: att.date, // Same as date for single-day absence
+        reason: "Deducted for absence",
+        entitledLeaves: `-${absenceDate}`, // Deduct one day for absence
+        type: "Absence" as const,
+      };
+    });
 
     return [...adjustmentData, ...leaveRequestData, ...absenceData];
   });
