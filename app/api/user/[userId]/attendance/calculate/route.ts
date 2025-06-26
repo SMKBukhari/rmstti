@@ -2571,9 +2571,11 @@ export async function POST(
 
       // Calculate leave deductions based on late arrivals
       const previousLateCount = previousLateCountsMap.get(employee.userId) || 0;
-      const newLateCount = previousLateCount + lateArrivals.length;
+      const combinedLateEarlyCount =
+        previousLateCount + lateArrivals.length + earlyExits.length;
       const leavesToDeduct =
-        Math.floor(newLateCount / 3) - Math.floor(previousLateCount / 3);
+        Math.floor(combinedLateEarlyCount / 3) -
+        Math.floor(previousLateCount / 3);
 
       // Commented out database updates for late count and leave balance
       /*
@@ -2643,7 +2645,7 @@ export async function POST(
         earlyExits,
         leavesDeducted: leavesToDeduct,
         previousLateCount,
-        newLateCount,
+        newLateCount:combinedLateEarlyCount,
       });
     }
 
