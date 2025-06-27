@@ -118,7 +118,7 @@ export async function POST(
         link: "/dashboard",
       },
     });
-    
+
     try {
       const emailBody = await compileContractRenewalMail(
         employee.fullName,
@@ -127,7 +127,7 @@ export async function POST(
         renewalData.proposedSalary,
         renewalData.proposedDuration,
         renewalData.proposedStartDate,
-        renewalData.proposedEndDate,
+        renewalData.proposedEndDate
       );
 
       await sendMail({
