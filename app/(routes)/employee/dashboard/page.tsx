@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import EmployeeBannerWarning from "./_components/userBannerWarning";
 import BalanceLeaves from "./_components/Cards/BalanceLeaves";
 import WarningEmployee from "./_components/Cards/WarningsEmployees";
+import ContractRenewalBanner from "./_components/contractRenewalBanner";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -27,6 +28,7 @@ const page = async () => {
       jobExperience: true,
       leaveRequests: true,
       education: true,
+      ContractRenewals: true,
       Warnings: {
         include: {
           user: true,
@@ -76,15 +78,43 @@ const page = async () => {
     },
   });
 
+  // Check for active contract renewal
+  const activeContractRenewal = user?.ContractRenewals?.[0];
+  const hasActiveContractRenewal =
+    activeContractRenewal && activeContractRenewal.status === "Pending";
+
+  // Check if contract renewal has expired
+  if (
+    activeContractRenewal?.expiryDate &&
+    new Date() > activeContractRenewal.expiryDate
+  ) {
+    await db.contractRenewal.update({
+      where: { id: activeContractRenewal.id },
+      data: { status: "Expired", isPortalBlocked: false },
+    });
+    await db.userProfile.update({
+      where: { userId },
+      data: { hasActiveRenewal: false },
+    });
+  }
+
   return (
     <>
-      {warning && (
-        <EmployeeBannerWarning
-          warningTitle={warning.title}
-          warningMessage={warning.message}
-          senderDesignation={warning.senderDesignation}
-        />
-      )}
+      <div className={`${hasActiveContractRenewal ? "mb-5" : ""}`}>
+        {hasActiveContractRenewal && (
+          <ContractRenewalBanner
+            user={user}
+            contractRenewal={activeContractRenewal}
+          />
+        )}
+        {warning && (
+          <EmployeeBannerWarning
+            warningTitle={warning.title}
+            warningMessage={warning.message}
+            senderDesignation={warning.senderDesignation}
+          />
+        )}
+      </div>
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
         <LeaveRequests
           totalRequests={leaveRequests.length}

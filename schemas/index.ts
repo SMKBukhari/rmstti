@@ -406,3 +406,22 @@ export const LeaveBalanceManagementSchema = z.object({
   }, "Must be a valid number"),
   reason: z.string().min(1, "Reason is required"),
 });
+
+// Contract Management Schemas
+export const ContractRenewalSchema = z.object({
+  proposedDesignation: z.string().min(1, "Designation is required"),
+  proposedDepartment: z.string().min(1, "Department is required"),
+  proposedRole: z.string().min(1, "Role is required"),
+  proposedSalary: z.string().min(1, "Salary is required"),
+  proposedStartDate: z.date(),
+  proposedEndDate: z.date(),
+  proposedDuration: z.string().min(1, "Contract duration is required"),
+  proposedLeaves: z.string().min(1, "Leave entitlement is required"),
+  notes: z.string().optional(),
+  expiryDate: z.date().optional(),
+});
+
+export const ContractResponseSchema = z.object({
+  response: z.enum(["accept", "reject"]),
+  rejectionReason: z.string().optional(),
+});

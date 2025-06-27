@@ -37,6 +37,7 @@ enum NotificationType {
   Reminder
   Reward
   Security
+  Contract
 }
 
 enum NotificationCreator {
@@ -67,6 +68,14 @@ enum ShiftType {
   Morning
   Evening
   Off
+}
+
+enum ContractRenewalStatus {
+  Pending
+  Accepted
+  Rejected
+  Expired
+  Withdrawn
 }
 
 // =============================================
@@ -110,6 +119,13 @@ model UserProfile {
   salary             String?
   salaryOffered      String?
   DOJ                DateTime?
+
+  // Contract information
+  contractStartDate    DateTime?
+  contractEndDate      DateTime?
+  contractDuration     String? // e.g., "1 year", "6 months"
+  contractRenewalCount Int?      @default(0)
+  hasActiveRenewal     Boolean?  @default(false)
 
   // Documents and attachments
   resumeUrl           String?
@@ -178,6 +194,7 @@ model UserProfile {
   LateCount              LateCount[]
   leaveBalanceAdjustment LeaveBalanceAdjustment[]
   Appraisal              Appraisal[]
+  ContractRenewals       ContractRenewal[]
 
   // Timestamps
   createdAt DateTime @default(now())
@@ -722,4 +739,56 @@ model Appraisal {
   appraisaledByDesignation String?
   createdAt                DateTime @default(now())
   updatedAt                DateTime @default(now())
+}
+
+// =============================================
+// CONTRACT MANAGEMENT MODELS
+// =============================================
+
+model ContractRenewal {
+  id     String                @id @unique @default(cuid())
+  userId String
+  user   UserProfile           @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  status ContractRenewalStatus @default(Pending)
+
+  // Current contract details
+  currentDesignation String?
+  currentDepartment  String?
+  currentRole        String?
+  currentSalary      String?
+  currentStartDate   DateTime?
+  currentEndDate     DateTime?
+  currentLeaves      String?
+
+  // Proposed contract details
+  proposedDesignation String?
+  proposedDepartment  String?
+  proposedRole        String?
+  proposedSalary      String?
+  proposedStartDate   DateTime?
+  proposedEndDate     DateTime?
+  proposedDuration    String?
+  proposedLeaves      String?
+
+  // Contract documents
+  contractOfferUrl      String?
+  contractOfferName     String?
+  contractOfferPublicId String?
+
+  // Workflow tracking
+  initiatedBy     String? // Admin/CEO who initiated
+  initiatedByName String?
+  responseDate    DateTime?
+  rejectionReason String?   @db.LongText
+  expiryDate      DateTime? // When the renewal offer expires
+  remindersSent   Int?      @default(0)
+  isPortalBlocked Boolean?  @default(true) // Block employee portal actions
+
+  // History and notes
+  renewalNumber Int? // 1st renewal, 2nd renewal, etc.
+  notes         String? @db.LongText
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }

@@ -7,6 +7,7 @@ import { ApplicationReceivedMail } from "./designs/applicationReceivedMail";
 import { InterviewScheduledMail } from "./designs/interviewScheduleMail";
 import { ApplicationRejectedMail } from "./designs/rejectJobApplicationMail ";
 import { JobOfferMail } from "./designs/jobOfferMail";
+import { ContractRenewalMail } from "./designs/contractRenewalMail";
 
 // const { SMTP_PASSWORD, SMTP_EMAIL } = process.env;
 // export const sendMail = async ({
@@ -92,7 +93,6 @@ export const sendMail = async ({
     return;
   }
 };
-
 
 export const compileOTPMail = async (fullName: string, otp: string) => {
   const template = handlebars.compile(OTPMail);
@@ -210,6 +210,31 @@ export const compileNewEmployeeInfoMail = async (
     designation: designation,
     department: department,
     salary: salary,
+  });
+
+  return htmlBody;
+};
+
+export const compileContractRenewalMail = async (
+  fullName: string,
+  designation: string,
+  department: string,
+  salary: string,
+  contractDuration: string,
+  startDate: string,
+  endDate: string
+) => {
+  const template = handlebars.compile(ContractRenewalMail);
+
+  const htmlBody = template({
+    fullName: fullName,
+    designation: designation,
+    department: department,
+    salary: salary,
+    contractDuration: contractDuration,
+    startDate: startDate,
+    endDate: endDate,
+    portalLink: `${process.env.NEXT_PUBLIC_PORTAL_URL}`,
   });
 
   return htmlBody;

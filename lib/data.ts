@@ -30,6 +30,7 @@ import {
   UserRoundX,
   Users,
 } from "lucide-react";
+import { FaFileContract } from "react-icons/fa";
 
 export const GenderOptions = [
   { label: "Male", value: "Male" },
@@ -346,6 +347,11 @@ export const adminRoutes = [
     icon: NotebookPen,
     label: "Appraisals",
     href: "/admin/appraisals",
+  },
+  {
+    icon: FaFileContract,
+    label: "Contract Management",
+    href: "/admin/contract-management",
   },
   {
     icon: User,
