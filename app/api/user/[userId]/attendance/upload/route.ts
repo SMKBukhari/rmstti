@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { parse } from "csv-parse/sync";
 import { parse as parseDate, format } from "date-fns";
 import { db } from "@/lib/db";
-import redis from "@/lib/redis";
+// import redis from "@/lib/redis";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,21 +13,21 @@ export async function POST(req: NextRequest) {
     }
 
     const csvContent = await file.text();
-    const cacheKey = `attendance:${csvContent}`;
+    // const cacheKey = `attendance:${csvContent}`;
 
-    // Check Redis cache first with proper type handling
-    const cachedResponse = await redis.get<string>(cacheKey);
+    // // Check Redis cache first with proper type handling
+    // const cachedResponse = await redis.get<string>(cacheKey);
 
-    if (cachedResponse) {
-      console.log("Serving from cache");
-      try {
-        const parsedData = JSON.parse(cachedResponse);
-        return NextResponse.json(parsedData);
-      } catch (e) {
-        console.error("Error parsing cached response", e);
-        // Continue with processing if cache is corrupted
-      }
-    }
+    // if (cachedResponse) {
+    //   console.log("Serving from cache");
+    //   try {
+    //     const parsedData = JSON.parse(cachedResponse);
+    //     return NextResponse.json(parsedData);
+    //   } catch (e) {
+    //     console.error("Error parsing cached response", e);
+    //     // Continue with processing if cache is corrupted
+    //   }
+    // }
 
     const records = parse(csvContent, {
       columns: true,
@@ -84,21 +84,21 @@ export async function POST(req: NextRequest) {
 
     for (const record of records) {
       // Note: Using lowercase column names to match CSV
-      const { cnic, date, time, checks } = record;
+      const { Cnic, Date, Time, Checks } = record;
 
       const employee = await db.userProfile.findFirst({
         where: {
-          cnic,
+          cnic: Cnic,
         },
       });
 
       if (!employee) {
-        console.error(`⚠️ Skipping CNIC ${cnic} - Employee not found`);
+        console.error(`⚠️ Skipping CNIC ${Cnic} - Employee not found`);
         continue;
       }
 
-      const parsedDate = parseDateString(date);
-      const parsedCheckTime = parseDateString(date, time);
+      const parsedDate = parseDateString(Date);
+      const parsedCheckTime = parseDateString(Date, Time);
 
       if (!parsedDate || !parsedCheckTime) {
         console.error(
@@ -113,44 +113,44 @@ export async function POST(req: NextRequest) {
 
       // Get the last entry of the same CNIC
       const lastEntryIndex = attendanceRecords.findLastIndex(
-        (entry) => entry.cnic === cnic
+        (entry) => entry.cnic === Cnic
       );
       const lastEntry =
         lastEntryIndex !== -1 ? attendanceRecords[lastEntryIndex] : null;
 
       console.log(
-        `Processing CNIC: ${cnic}, Date: ${formattedDate}, Time: ${formattedTime}, Check: ${checks}`
+        `Processing CNIC: ${Cnic}, Date: ${formattedDate}, Time: ${formattedTime}, Check: ${Checks}`
       );
 
-      if (checks === "IN") {
+      if (Checks === "IN") {
         if (lastEntry && lastEntry.timeIn) {
           console.log(
-            `⏳ Duplicate IN found for CNIC: ${cnic} at ${lastEntry.timeIn}. Removing previous entry and adding new IN at ${formattedTime}`
+            `⏳ Duplicate IN found for CNIC: ${Cnic} at ${lastEntry.timeIn}. Removing previous entry and adding new IN at ${formattedTime}`
           );
           attendanceRecords.splice(lastEntryIndex, 1); // Remove previous IN
         }
-        console.log(`✅ Adding IN entry for CNIC: ${cnic} at ${formattedTime}`);
+        console.log(`✅ Adding IN entry for CNIC: ${Cnic} at ${formattedTime}`);
         attendanceRecords.push({
-          cnic,
+          cnic: Cnic,
           date: formattedDate,
           timeIn: formattedTime,
-          checkType: checks,
+          checkType: Checks,
         });
-      } else if (checks === "OUT") {
+      } else if (Checks === "OUT") {
         if (lastEntry && lastEntry.timeOut) {
           console.log(
-            `🚫 Skipping duplicate OUT for CNIC: ${cnic} at ${formattedTime}, as last entry was also OUT at ${lastEntry.timeOut}`
+            `🚫 Skipping duplicate OUT for CNIC: ${Cnic} at ${formattedTime}, as last entry was also OUT at ${lastEntry.timeOut}`
           );
           continue; // Skip the second OUT
         }
         console.log(
-          `✅ Adding OUT entry for CNIC: ${cnic} at ${formattedTime}`
+          `✅ Adding OUT entry for CNIC: ${Cnic} at ${formattedTime}`
         );
         attendanceRecords.push({
-          cnic,
+          cnic: Cnic,
           date: formattedDate,
           timeOut: formattedTime,
-          checkType: checks,
+          checkType: Checks,
         });
       }
     }
@@ -160,7 +160,7 @@ export async function POST(req: NextRequest) {
 
     // Process and save attendance records
     for (const record of attendanceRecords) {
-      const { cnic, date, timeIn, timeOut } = record;   
+      const { cnic, date, timeIn, timeOut } = record;
 
       // Find the user by CNIC
       const user = await db.userProfile.findFirst({
@@ -279,13 +279,13 @@ export async function POST(req: NextRequest) {
       data: attendanceRecords,
     };
 
-    // Cache for 1 hour (3600 seconds) with error handling
-    try {
-      await redis.setex(cacheKey, 3600, JSON.stringify(responseData));
-    } catch (e) {
-      console.error("Failed to cache response", e);
-      // Don't fail the request if caching fails
-    }
+    // // Cache for 1 hour (3600 seconds) with error handling
+    // try {
+    //   await redis.setex(cacheKey, 3600, JSON.stringify(responseData));
+    // } catch (e) {
+    //   console.error("Failed to cache response", e);
+    //   // Don't fail the request if caching fails
+    // }
 
     return NextResponse.json(responseData);
   } catch (error) {

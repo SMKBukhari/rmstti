@@ -585,7 +585,7 @@
 //               },
 //             })
 //           );
-          
+
 //           dbUpdates.push(
 //             db.leaveRequest.create({
 //               data: {
@@ -649,12 +649,12 @@
 //     dbUpdates.push(
 //       db.userProfile.update({
 //         where: { userId: employee.userId },
-//         data: { 
-//           totalLeavesBalance: (parseFloat(employee.totalLeavesBalance || "0") - 0.5).toString() 
+//         data: {
+//           totalLeavesBalance: (parseFloat(employee.totalLeavesBalance || "0") - 0.5).toString()
 //         }
 //       })
 //     );
-    
+
 //     dbUpdates.push(
 //       db.leaveRequest.create({
 //         data: {
@@ -716,12 +716,12 @@
 //       dbUpdates.push(
 //         db.userProfile.update({
 //           where: { userId: employee.userId },
-//           data: { 
-//             totalLeavesBalance: (parseFloat(employee.totalLeavesBalance || "0") - 0.5).toString() 
+//           data: {
+//             totalLeavesBalance: (parseFloat(employee.totalLeavesBalance || "0") - 0.5).toString()
 //           }
 //         })
 //       );
-      
+
 //       dbUpdates.push(
 //         db.leaveRequest.create({
 //           data: {
@@ -904,8 +904,6 @@ type Employee = {
   totalLeavesBalance: string | null;
   leaveRequests: LeaveRequest[];
   DOJ: Date | string | null;
-  officeTimingIn: string | null;
-  OfficeTimingOut: string | null;
 };
 
 type AttendanceRecord = {
@@ -927,6 +925,15 @@ type AttendanceRecord = {
     createdAt: Date;
     updatedAt: Date;
   } | null;
+};
+
+type TimetableEntry = {
+  id: string;
+  userId: string;
+  date: Date;
+  shiftStart: Date | null;
+  shiftEnd: Date | null;
+  shiftType: ShiftType;
 };
 
 type AttendanceCalculationResult = {
@@ -963,38 +970,69 @@ function isDateInRange(date: Date, startDate: Date, endDate: Date): boolean {
 }
 
 // Improved time parsing function that handles both "9:00" and "9:00 AM" formats
-function parseTimeToMinutes(timeString: string | null): number {
-  if (!timeString) return 9 * 60; // 9:00 AM UTC
-  const [timePart] = timeString.split(" "); // Ignore AM/PM if present
-  const [hoursStr, minutesStr] = timePart.split(":");
-  return parseInt(hoursStr) * 60 + parseInt(minutesStr || "0");
-}
+// function parseTimeToMinutes(timeString: string | null): number {
+//   if (!timeString) return 9 * 60; // 9:00 AM UTC
+//   const [timePart] = timeString.split(" "); // Ignore AM/PM if present
+//   const [hoursStr, minutesStr] = timePart.split(":");
+//   return parseInt(hoursStr) * 60 + parseInt(minutesStr || "0");
+// }
 
 // Improved function to extract time from datetime and convert to minutes
 function extractTimeFromDateTime(dateTime: Date): number {
-  return dateTime.getUTCHours() * 60 + dateTime.getUTCMinutes();
+  // Use the raw hours and minutes from the database without timezone conversion
+  const timeString = dateTime.toISOString();
+  const timePart = timeString.split("T")[1];
+  const [hours, minutes] = timePart.split(":").map(Number);
+
+  console.log(
+    `    Raw DateTime: ${dateTime.toISOString()}, Extracted Hours: ${hours}, Minutes: ${minutes}`
+  );
+
+  return hours * 60 + minutes;
 }
 
 // Improved function to check if employee is late with grace period
 function isLate(
   checkInTime: Date | null,
-  expectedTime: string | null
+  expectedShiftStart: Date | null
 ): boolean {
-  if (!checkInTime) return false;
-  const expectedMinutes = parseTimeToMinutes(expectedTime);
+  if (!checkInTime || !expectedShiftStart) return false;
+
+  const expectedMinutes = extractTimeFromDateTime(expectedShiftStart);
   const actualMinutes = extractTimeFromDateTime(checkInTime);
-  return actualMinutes > expectedMinutes + 15; // 15-min grace
+
+  // Allow 15 minutes grace period
+  const graceMinutes = 0;
+  const isLateResult = actualMinutes > expectedMinutes + graceMinutes;
+
+  console.log(
+    `    Time check: Expected ${expectedShiftStart.toISOString()} (${expectedMinutes}min), ` +
+      `Actual ${checkInTime.toISOString()} (${actualMinutes}min), Grace: ${graceMinutes}min, Late: ${isLateResult}`
+  );
+
+  return isLateResult;
 }
 
 // Improved function to check if employee left early with grace period
 function isEarlyExit(
   checkOutTime: Date | null,
-  expectedTime: string | null
+  expectedShiftEnd: Date | null
 ): boolean {
-  if (!checkOutTime) return false;
-  const expectedMinutes = parseTimeToMinutes(expectedTime);
+  if (!checkOutTime || !expectedShiftEnd) return false;
+
+  const expectedMinutes = extractTimeFromDateTime(expectedShiftEnd);
   const actualMinutes = extractTimeFromDateTime(checkOutTime);
-  return actualMinutes < expectedMinutes - 10; // 10-min grace
+
+  // Allow 10 minutes grace period for early exit
+  const graceMinutes = 0;
+  const isEarly = actualMinutes < expectedMinutes - graceMinutes;
+
+  console.log(
+    `    Time check: Expected ${expectedShiftEnd.toISOString()} (${expectedMinutes}min), ` +
+      `Actual ${checkOutTime.toISOString()} (${actualMinutes}min), Grace: ${graceMinutes}min, Early: ${isEarly}`
+  );
+
+  return isEarly;
 }
 
 function hasApprovedHalfLeaveOnDate(
@@ -1038,9 +1076,7 @@ function getDayAttendanceSummary(records: AttendanceRecord[]) {
 
     if (record.checkLog?.checkInTime) {
       const checkInTime = new Date(record.checkLog.checkInTime);
-      console.log(
-        `        Check-in: ${checkInTime.toISOString()} -> ${checkInTime.toLocaleTimeString()}`
-      );
+      console.log(`        Check-in: ${checkInTime.toISOString()}`);
 
       if (!earliestCheckIn || checkInTime < earliestCheckIn) {
         earliestCheckIn = checkInTime;
@@ -1049,9 +1085,7 @@ function getDayAttendanceSummary(records: AttendanceRecord[]) {
 
     if (record.checkLog?.checkOutTime) {
       const checkOutTime = new Date(record.checkLog.checkOutTime);
-      console.log(
-        `        Check-out: ${checkOutTime.toISOString()} -> ${checkOutTime.toLocaleTimeString()}`
-      );
+      console.log(`        Check-out: ${checkOutTime.toISOString()}`);
 
       if (!latestCheckOut || checkOutTime > latestCheckOut) {
         latestCheckOut = checkOutTime;
@@ -1061,8 +1095,8 @@ function getDayAttendanceSummary(records: AttendanceRecord[]) {
 
   console.log(
     `    Final times - Check-in: ${
-      earliestCheckIn?.toLocaleTimeString() || "none"
-    }, Check-out: ${latestCheckOut?.toLocaleTimeString() || "none"}`
+      earliestCheckIn?.toISOString() || "none"
+    }, Check-out: ${latestCheckOut?.toISOString() || "none"}`
   );
 
   return {
@@ -1131,8 +1165,6 @@ export async function POST(
         fullName: true,
         totalLeavesBalance: true,
         DOJ: true,
-        officeTimingIn: true,
-        OfficeTimingOut: true,
         leaveRequests: {
           select: {
             id: true,
@@ -1250,15 +1282,15 @@ export async function POST(
         .push(record as AttendanceRecord);
     });
 
-    const timetableMap = new Map<string, Map<string, ShiftType>>();
+    const timetableMap = new Map<string, Map<string, TimetableEntry>>();
     timetables.forEach((entry) => {
       const userId = entry.userId;
       const dateKey = formatDate(entry.date);
 
       if (!timetableMap.has(userId)) {
-        timetableMap.set(userId, new Map<string, ShiftType>());
+        timetableMap.set(userId, new Map<string, TimetableEntry>());
       }
-      timetableMap.get(userId)!.set(dateKey, entry.shiftType);
+      timetableMap.get(userId)!.set(dateKey, entry as TimetableEntry);
     });
 
     const holidayMap = new Map<string, Set<string>>();
@@ -1352,11 +1384,11 @@ export async function POST(
         const currentDate = new Date(dateStr);
         const dayOfWeek = currentDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
 
+        // Get timetable entry for this date
+        const timetableEntry = employeeTimetableMap.get(dateStr);
+
         // Skip weekends (Saturday and Sunday) unless specifically scheduled
-        if (
-          (dayOfWeek === 0 || dayOfWeek === 6) &&
-          !employeeTimetableMap.has(dateStr)
-        ) {
+        if ((dayOfWeek === 0 || dayOfWeek === 6) && !timetableEntry) {
           continue;
         }
 
@@ -1381,11 +1413,20 @@ export async function POST(
         }
 
         // Check timetable to see if employee is scheduled to work
-        const shiftType = employeeTimetableMap.get(dateStr);
+        if (!timetableEntry) {
+          console.log(
+            `Employee ${employee.fullName} has no timetable entry for ${dateStr}, skipping attendance check.`
+          );
+          continue;
+        }
+
+        // Check timetable to see if employee is scheduled to work
+        // const shiftType = employeeTimetableMap.get(dateStr);
         console.log(
-          `Employee ${employee.fullName} is scheduled for ${shiftType} on ${dateStr}`
+          `Employee ${employee.fullName} is scheduled for ${timetableEntry.shiftType} on ${dateStr}`
         );
-        if (shiftType === ShiftType.Off) {
+
+        if (timetableEntry.shiftType === ShiftType.Off) {
           console.log(
             `Employee ${employee.fullName} is off on ${dateStr}, skipping attendance check.`
           );
@@ -1411,7 +1452,7 @@ export async function POST(
               },
             })
           );
-          
+
           dbUpdates.push(
             db.leaveRequest.create({
               data: {
@@ -1444,60 +1485,63 @@ export async function POST(
         // Check for late arrival using the earliest check-in
         const isLateArrival = isLate(
           daySummary.checkInTime,
-          employee.officeTimingIn
+          timetableEntry.shiftStart
         );
 
         if (isLateArrival) {
           lateArrivals.push(dateStr);
 
-          // Calculate how late the employee was in hours
-          const expectedMinutes = parseTimeToMinutes(
-            employee.officeTimingIn || "9:00"
-          );
-          const actualMinutes = extractTimeFromDateTime(
-            daySummary.checkInTime!
-          );
-          const lateMinutes = actualMinutes - expectedMinutes;
-          const lateHours = lateMinutes / 60;
+          if (timetableEntry.shiftStart) {
+            const expectedMinutes = extractTimeFromDateTime(
+              timetableEntry.shiftStart
+            );
+            const actualMinutes = extractTimeFromDateTime(
+              daySummary.checkInTime!
+            );
+            const lateMinutes = actualMinutes - expectedMinutes;
+            const lateHours = lateMinutes / 60;
 
-          console.log(
-            `    Employee was ${lateHours.toFixed(2)} hours late on ${dateStr}`
-          );
+            console.log(
+              `    Employee was ${lateHours.toFixed(
+                2
+              )} hours late on ${dateStr}`
+            );
 
-          // Check if employee was 1 hour or more late and doesn't have approved half leave
-          if (
-            lateHours >= 1 &&
-            !hasApprovedHalfLeaveOnDate(employee, dateStr)
-          ) {
-            // Deduct 0.5 leaves as unauthorized half leave
-            // Commented out database updates as requested
-            /*
-    dbUpdates.push(
-      db.userProfile.update({
-        where: { userId: employee.userId },
-        data: { 
-          totalLeavesBalance: (parseFloat(employee.totalLeavesBalance || "0") - 0.5).toString() 
-        }
-      })
-    );
-    
-    dbUpdates.push(
-      db.leaveRequest.create({
-        data: {
-          userId: employee.userId,
-          leaveTypeId: unauthorizedAbsentLeaveType.id,
-          startDate: currentDate,
-          endDate: currentDate,
-          reason: `Automatically deducted 0.5 leave for being ${lateHours.toFixed(2)} hours late on ${dateStr}`,
-          status: "Approved",
-          managerApproval: true,
-          adminApproval: true,
-          ceoApproval: true,
-          approvedBy: "System",
-        },
-      })
-    );
-    */
+            // Check if employee was 1 hour or more late and doesn't have approved half leave
+            if (
+              lateHours >= 1 &&
+              !hasApprovedHalfLeaveOnDate(employee, dateStr)
+            ) {
+              // Deduct 0.5 leaves as unauthorized half leave
+              // Commented out database updates as requested
+              /*
+      dbUpdates.push(
+        db.userProfile.update({
+          where: { userId: employee.userId },
+          data: {
+            totalLeavesBalance: (parseFloat(employee.totalLeavesBalance || "0") - 0.5).toString()
+          }
+        })
+      );
+  
+      dbUpdates.push(
+        db.leaveRequest.create({
+          data: {
+            userId: employee.userId,
+            leaveTypeId: unauthorizedAbsentLeaveType.id,
+            startDate: currentDate,
+            endDate: currentDate,
+            reason: `Automatically deducted 0.5 leave for being ${lateHours.toFixed(2)} hours late on ${dateStr}`,
+            status: "Approved",
+            managerApproval: true,
+            adminApproval: true,
+            ceoApproval: true,
+            approvedBy: "System",
+          },
+        })
+      );
+      */
+            }
 
             console.log(
               `    Deducted 0.5 leaves for unauthorized late arrival on ${dateStr}`
@@ -1506,18 +1550,18 @@ export async function POST(
         }
 
         // Check for early exit using the latest check-out
-        if (daySummary.checkOutTime) {
+        if (daySummary.checkOutTime && timetableEntry.shiftEnd) {
           const isEarlyExitVal = isEarlyExit(
             daySummary.checkOutTime,
-            employee.OfficeTimingOut
+            timetableEntry.shiftEnd
           );
 
           if (isEarlyExitVal) {
             earlyExits.push(dateStr);
 
             // Calculate how early the employee left in hours
-            const expectedMinutes = parseTimeToMinutes(
-              employee.OfficeTimingOut || "17:00"
+            const expectedMinutes = extractTimeFromDateTime(
+              timetableEntry.shiftEnd
             );
             const actualMinutes = extractTimeFromDateTime(
               daySummary.checkOutTime
@@ -1542,12 +1586,12 @@ export async function POST(
       dbUpdates.push(
         db.userProfile.update({
           where: { userId: employee.userId },
-          data: { 
-            totalLeavesBalance: (parseFloat(employee.totalLeavesBalance || "0") - 0.5).toString() 
+          data: {
+            totalLeavesBalance: (parseFloat(employee.totalLeavesBalance || "0") - 0.5).toString()
           }
         })
       );
-      
+
       dbUpdates.push(
         db.leaveRequest.create({
           data: {
@@ -1707,4 +1751,3 @@ export async function POST(
     );
   }
 }
-
