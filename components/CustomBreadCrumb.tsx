@@ -24,30 +24,80 @@ const CustomBreadCrumb = ({
 
   const isEmployeePage =
     pathName?.startsWith("/employee/dashboard") ||
+    pathName?.startsWith("/employee/team-members") ||
+    pathName?.startsWith("/employee/attendance-management") ||
+    pathName?.startsWith("/employee/leave-management") ||
+    pathName?.startsWith("/employee/workFromHome") ||
+    pathName?.startsWith("/employee/resign") ||
+    pathName?.startsWith("/employee/requests") ||
+    pathName?.startsWith("/employee/complaints") ||
+    pathName?.startsWith("/employee/appraisals") ||
     pathName?.startsWith("/employee/profile") ||
-    pathName?.startsWith("/employee/settings");
+    pathName?.startsWith("/employee/settings") ||
+    pathName?.startsWith("/employee/notifications");
 
   const isAdminPage =
     pathName?.startsWith("/admin/dashboard") ||
+    pathName?.startsWith("/admin/team-members") ||
+    pathName?.startsWith("/admin/attendance-management") ||
+    pathName?.startsWith("/admin/leave-management") ||
+    pathName?.startsWith("/admin/workFromHome") ||
+    pathName?.startsWith("/admin/timetable") ||
+    pathName?.startsWith("/admin/jobs") ||
     pathName?.startsWith("/admin/employees") ||
     pathName?.startsWith("/admin/applicants") ||
+    pathName?.startsWith("/admin/rejected") ||
     pathName?.startsWith("/admin/interviewees") ||
+    pathName?.startsWith("/admin/resignationManagement") ||
+    pathName?.startsWith("/admin/requests") ||
+    pathName?.startsWith("/admin/complaints") ||
+    pathName?.startsWith("/admin/appraisals") ||
+    pathName?.startsWith("/admin/contract-management") ||
     pathName?.startsWith("/admin/profile") ||
-    pathName?.startsWith("/admin/settings");
+    pathName?.startsWith("/admin/settings") ||
+    pathName?.startsWith("/admin/configuration") ||
+    pathName?.startsWith("/admin/notifications");
 
   const isManagerPage =
     pathName?.startsWith("/manager/dashboard") ||
+    pathName?.startsWith("/manager/team-members") ||
+    pathName?.startsWith("/manager/attendance-management") ||
+    pathName?.startsWith("/manager/leave-management") ||
+    pathName?.startsWith("/manager/workFromHome") ||
+    pathName?.startsWith("/manager/applicants") ||
+    pathName?.startsWith("/manager/rejected") ||
+    pathName?.startsWith("/manager/interviewees") ||
+    pathName?.startsWith("/manager/resign") ||
+    pathName?.startsWith("/manager/requests") ||
+    pathName?.startsWith("/manager/complaints") ||
+    pathName?.startsWith("/manager/appraisals") ||
     pathName?.startsWith("/manager/profile") ||
-    pathName?.startsWith("/manager/settings");
+    pathName?.startsWith("/manager/settings") ||
+    pathName?.startsWith("/manager/notifications");
 
   const isCEOPage =
     pathName?.startsWith("/ceo/dashboard") ||
-    pathName?.startsWith("/ceo/dashboard/employees") ||
-    pathName?.startsWith("/ceo/dashboard/applicants") ||
-    pathName?.startsWith("/ceo/dashboard/interviewees") ||
-    pathName?.startsWith("/ceo/dashboard/overview") ||
+    pathName?.startsWith("/ceo/employees") ||
+    pathName?.startsWith("/ceo/leave-management") ||
+    pathName?.startsWith("/ceo/workFromHome") ||
+    pathName?.startsWith("/ceo/attendance-management") ||
+    pathName?.startsWith("/ceo/timetable") ||
+    pathName?.startsWith("/ceo/jobs") ||
+    pathName?.startsWith("/ceo/applicants") ||
+    pathName?.startsWith("/ceo/rejected") ||
+    pathName?.startsWith("/ceo/interviewees") ||
+    pathName?.startsWith("/ceo/resign/manage-resignations") ||
+    pathName?.startsWith("/ceo/requests") ||
+    pathName?.startsWith("/ceo/complaints") ||
+    pathName?.startsWith("/ceo/overview") ||
     pathName?.startsWith("/ceo/profile") ||
-    pathName?.startsWith("/ceo/settings");
+    pathName?.startsWith("/ceo/settings") ||
+    pathName?.startsWith("/ceo/configuration") ||
+    pathName?.startsWith("/ceo/notifications") ||
+    console.log("isEmployeePage", isEmployeePage);
+  console.log("isAdminPage", isAdminPage);
+  console.log("isManagerPage", isManagerPage);
+  console.log("isCEOPage", isCEOPage);
 
   let dashboardLink = "/dashboard";
   if (isAdminPage) {
