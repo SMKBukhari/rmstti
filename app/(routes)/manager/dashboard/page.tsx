@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import EmployeeBannerWarning from "./_components/userBannerWarning";
 import LeaveRequests from "./_components/Cards/LeaveRequests";
 import BalanceLeaves from "./_components/Cards/BalanceLeaves";
+import ContractRenewalBanner from "./_components/contractRenewalBanner";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -27,6 +28,7 @@ const page = async () => {
       jobExperience: true,
       leaveRequests: true,
       education: true,
+      ContractRenewals: true,
       department: {
         include: {
           users: {
@@ -41,6 +43,26 @@ const page = async () => {
 
   if (!user) {
     redirect("/signIn");
+  }
+
+  // Check for active contract renewal
+  const activeContractRenewal = user?.ContractRenewals?.[0];
+  const hasActiveContractRenewal =
+    activeContractRenewal && activeContractRenewal.status === "Pending";
+
+  // Check if contract renewal has expired
+  if (
+    activeContractRenewal?.expiryDate &&
+    new Date() > activeContractRenewal.expiryDate
+  ) {
+    await db.contractRenewal.update({
+      where: { id: activeContractRenewal.id },
+      data: { status: "Expired", isPortalBlocked: false },
+    });
+    await db.userProfile.update({
+      where: { userId },
+      data: { hasActiveRenewal: false },
+    });
   }
 
   const previousMonthStart = new Date();
@@ -62,7 +84,9 @@ const page = async () => {
   // Filter the users to get the employees and applicants
   const employees = users.filter(
     (emp) =>
-      user.isHired === true && emp.status?.name === "Active" && emp.department?.name === user.department?.name
+      user.isHired === true &&
+      emp.status?.name === "Active" &&
+      emp.department?.name === user.department?.name
   );
   const applicants = users.filter(
     (user) =>
@@ -102,8 +126,8 @@ const page = async () => {
       user: {
         department: {
           name: user.department?.name,
-        }
-      }
+        },
+      },
     },
   });
 
@@ -165,13 +189,21 @@ const page = async () => {
   });
   return (
     <>
-      {warning && (
-        <EmployeeBannerWarning
-          warningTitle={warning.title}
-          warningMessage={warning.message}
-          senderDesignation={warning.senderDesignation}
-        />
-      )}
+      <div className={`${hasActiveContractRenewal ? "mb-5" : ""}`}>
+        {hasActiveContractRenewal && (
+          <ContractRenewalBanner
+            user={user}
+            contractRenewal={activeContractRenewal}
+          />
+        )}
+        {warning && (
+          <EmployeeBannerWarning
+            warningTitle={warning.title}
+            warningMessage={warning.message}
+            senderDesignation={warning.senderDesignation}
+          />
+        )}
+      </div>
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
         <TotalEmployee
           totalEmployees={currentCountEmployees}

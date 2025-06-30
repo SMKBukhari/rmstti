@@ -10,6 +10,7 @@ import LeaveRequests from "./_components/Cards/LeaveRequests";
 import { AttendanceChart } from "./_components/AttendanceChart";
 import BalanceLeaves from "./_components/Cards/BalanceLeaves";
 import WarningEmployees from "./_components/Cards/WarningsEmployees";
+import ContractRenewalBanner from "./_components/contractRenewalBanner";
 
 const page = async () => {
   const cookieStore = cookies();
@@ -29,6 +30,7 @@ const page = async () => {
       jobExperience: true,
       leaveRequests: true,
       education: true,
+      ContractRenewals: true,
       department: {
         include: {
           users: {
@@ -47,6 +49,26 @@ const page = async () => {
 
   if (user.role?.name !== "Admin") {
     redirect("/signIn");
+  }
+
+  // Check for active contract renewal
+  const activeContractRenewal = user?.ContractRenewals?.[0];
+  const hasActiveContractRenewal =
+    activeContractRenewal && activeContractRenewal.status === "Pending";
+
+  // Check if contract renewal has expired
+  if (
+    activeContractRenewal?.expiryDate &&
+    new Date() > activeContractRenewal.expiryDate
+  ) {
+    await db.contractRenewal.update({
+      where: { id: activeContractRenewal.id },
+      data: { status: "Expired", isPortalBlocked: false },
+    });
+    await db.userProfile.update({
+      where: { userId },
+      data: { hasActiveRenewal: false },
+    });
   }
 
   const previousMonthStart = new Date();
@@ -170,13 +192,21 @@ const page = async () => {
   });
   return (
     <>
-      {warning && (
-        <EmployeeBannerWarning
-          warningTitle={warning.title}
-          warningMessage={warning.message}
-          senderDesignation={warning.senderDesignation}
-        />
-      )}
+      <div className={`${hasActiveContractRenewal ? "mb-5" : ""}`}>
+        {hasActiveContractRenewal && (
+          <ContractRenewalBanner
+            user={user}
+            contractRenewal={activeContractRenewal}
+          />
+        )}
+        {warning && (
+          <EmployeeBannerWarning
+            warningTitle={warning.title}
+            warningMessage={warning.message}
+            senderDesignation={warning.senderDesignation}
+          />
+        )}
+      </div>
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
         <TotalEmployee
           totalEmployees={currentCountEmployees}
