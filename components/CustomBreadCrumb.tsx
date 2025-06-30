@@ -34,7 +34,7 @@ const CustomBreadCrumb = ({
     pathName?.startsWith("/employee/appraisals") ||
     pathName?.startsWith("/employee/profile") ||
     pathName?.startsWith("/employee/settings") ||
-    pathName?.startsWith("/employee/notifications");
+    pathName?.startsWith("/notifications");
 
   const isAdminPage =
     pathName?.startsWith("/admin/dashboard") ||
@@ -56,7 +56,7 @@ const CustomBreadCrumb = ({
     pathName?.startsWith("/admin/profile") ||
     pathName?.startsWith("/admin/settings") ||
     pathName?.startsWith("/admin/configuration") ||
-    pathName?.startsWith("/admin/notifications");
+    pathName?.startsWith("/notifications");
 
   const isManagerPage =
     pathName?.startsWith("/manager/dashboard") ||
@@ -73,7 +73,7 @@ const CustomBreadCrumb = ({
     pathName?.startsWith("/manager/appraisals") ||
     pathName?.startsWith("/manager/profile") ||
     pathName?.startsWith("/manager/settings") ||
-    pathName?.startsWith("/manager/notifications");
+    pathName?.startsWith("/notifications");
 
   const isCEOPage =
     pathName?.startsWith("/ceo/dashboard") ||
@@ -93,11 +93,7 @@ const CustomBreadCrumb = ({
     pathName?.startsWith("/ceo/profile") ||
     pathName?.startsWith("/ceo/settings") ||
     pathName?.startsWith("/ceo/configuration") ||
-    pathName?.startsWith("/ceo/notifications") ||
-    console.log("isEmployeePage", isEmployeePage);
-  console.log("isAdminPage", isAdminPage);
-  console.log("isManagerPage", isManagerPage);
-  console.log("isCEOPage", isCEOPage);
+    pathName?.startsWith("/notifications");
 
   let dashboardLink = "/dashboard";
   if (isAdminPage) {
