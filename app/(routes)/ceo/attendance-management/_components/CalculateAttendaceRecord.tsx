@@ -49,6 +49,8 @@ interface CalculationResult {
   leavesDeducted: number;
   previousLateCount: number;
   newLateCount: number;
+  sandwichDays: string[]; // NEW
+  sandwichDeductions: number; // NEW
 }
 
 interface CalculationSummary {
@@ -58,6 +60,8 @@ interface CalculationSummary {
   totalLateArrivals: number;
   totalEarlyExits: number;
   totalLeavesDeducted: number;
+  totalSandwichDays: number; // NEW
+  totalSandwichDeductions: number; // NEW
 }
 
 export default function CalculateAttendancePage({
@@ -377,6 +381,25 @@ export default function CalculateAttendancePage({
                     </span>
                     <span className='text-2xl font-bold text-red-500'>
                       {calculationResults.summary.totalUnauthorizedAbsences}
+                    </span>
+                  </div>
+                  {/* NEW: Sandwich Days Card */}
+                  <div className='flex flex-col gap-1 rounded-lg border p-3'>
+                    <span className='text-sm text-muted-foreground'>
+                      Sandwich Days
+                    </span>
+                    <span className='text-2xl font-bold text-purple-500'>
+                      {calculationResults.summary.totalSandwichDays}
+                    </span>
+                  </div>
+
+                  {/* NEW: Sandwich Deductions Card */}
+                  <div className='flex flex-col gap-1 rounded-lg border p-3'>
+                    <span className='text-sm text-muted-foreground'>
+                      Sandwich Deductions
+                    </span>
+                    <span className='text-2xl font-bold text-purple-500'>
+                      {calculationResults.summary.totalSandwichDeductions}
                     </span>
                   </div>
                   <div className='flex flex-col gap-1 rounded-lg border p-3'>

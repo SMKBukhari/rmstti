@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 import type { UserProfile } from "@prisma/client";
-import { Calculator, Loader2 } from "lucide-react";
+import { Calculator, Loader2, Search } from "lucide-react";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { CalculateAttendanceSchema } from "@/schemas";
@@ -23,6 +23,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 
 interface CalculateAttendancePageProps {
   user: UserProfile | null;
@@ -48,6 +49,13 @@ interface CalculationResult {
   leavesDeducted: number;
   previousLateCount: number;
   newLateCount: number;
+  sandwichDays: string[]; // NEW
+  sandwichDeductions: number; // NEW
+  halfLeaveDeductionsLate: number;
+  halfLeaveDeductionsEarly: number;
+  totalHalfLeaveDeductions: number;
+  unauthorizedHalfLeaveDatesLate: string[]; // NEW
+  unauthorizedHalfLeaveDatesEarly: string[]; // NEW
 }
 
 interface CalculationSummary {
@@ -57,6 +65,11 @@ interface CalculationSummary {
   totalLateArrivals: number;
   totalEarlyExits: number;
   totalLeavesDeducted: number;
+  totalSandwichDays: number; // NEW
+  totalSandwichDeductions: number; // NEW
+  totalHalfLeaveDeductionsLate: number;
+  totalHalfLeaveDeductionsEarly: number;
+  totalHalfLeaveDeductions: number;
 }
 
 export default function CalculateAttendancePage({
@@ -65,6 +78,7 @@ export default function CalculateAttendancePage({
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const [isLoadingEmployees, setIsLoadingEmployees] = useState(false);
   const [calculationResults, setCalculationResults] = useState<{
@@ -103,6 +117,34 @@ export default function CalculateAttendancePage({
 
     fetchEmployees();
   }, [user]);
+
+  // Filter employees based on search term
+  const filteredEmployees = employees.filter(
+    (employee) =>
+      employee.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.department?.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      employee.designation?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Update toggleAll to work with filtered employees
+  const toggleAllFilteredEmployees = () => {
+    const filteredEmployeeIds = filteredEmployees.map((emp) => emp.userId);
+
+    if (filteredEmployeeIds.every((id) => selectedEmployees.includes(id))) {
+      // Deselect all filtered
+      setSelectedEmployees((prev) =>
+        prev.filter((id) => !filteredEmployeeIds.includes(id))
+      );
+    } else {
+      // Select all filtered
+      setSelectedEmployees((prev) => [
+        ...new Set([...prev, ...filteredEmployeeIds]),
+      ]);
+    }
+  };
 
   const handleSubmit = async (
     data: z.infer<typeof CalculateAttendanceSchema>
@@ -202,7 +244,7 @@ export default function CalculateAttendancePage({
           <div className='mb-6'>
             <div className='flex items-center justify-between mb-2'>
               <h3 className='text-sm font-medium'>Select Employees</h3>
-              <Button
+              {/* <Button
                 variant='outline'
                 size='sm'
                 onClick={toggleAllEmployees}
@@ -212,7 +254,31 @@ export default function CalculateAttendancePage({
                 {selectedEmployees.length === employees.length
                   ? "Deselect All"
                   : "Select All"}
+              </Button> */}
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={toggleAllFilteredEmployees}
+                className='h-8'
+                type='button'
+              >
+                {filteredEmployees.length > 0 &&
+                filteredEmployees.every((emp) =>
+                  selectedEmployees.includes(emp.userId)
+                )
+                  ? "Deselect All"
+                  : "Select All"}
               </Button>
+            </div>
+
+            <div className='relative mb-3'>
+              <Search className='absolute left-3 top-3 h-4 w-4 text-muted-foreground' />
+              <Input
+                placeholder='Search employees...'
+                className='pl-9'
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
 
             {isLoadingEmployees ? (
@@ -222,7 +288,7 @@ export default function CalculateAttendancePage({
             ) : (
               <ScrollArea className='h-[200px] rounded-md border p-2'>
                 <div className='space-y-2'>
-                  {employees.map((employee) => (
+                  {/* {employees.map((employee) => (
                     <div
                       key={employee.userId}
                       className='flex items-center space-x-2'
@@ -248,14 +314,51 @@ export default function CalculateAttendancePage({
                     <p className='text-center text-sm text-muted-foreground py-4'>
                       No active employees found
                     </p>
+                  )} */}
+
+                  {filteredEmployees.map((employee) => (
+                    <div
+                      key={employee.userId}
+                      className='flex items-center space-x-2'
+                    >
+                      <Checkbox
+                        id={employee.userId}
+                        checked={selectedEmployees.includes(employee.userId)}
+                        onCheckedChange={() => toggleEmployee(employee.userId)}
+                      />
+                      <label
+                        htmlFor={employee.userId}
+                        className='flex-1 text-sm cursor-pointer flex justify-between'
+                      >
+                        <span>{employee.fullName}</span>
+                        <span className='text-muted-foreground text-xs'>
+                          {employee.department?.name || "No Department"}
+                        </span>
+                      </label>
+                    </div>
+                  ))}
+
+                  {filteredEmployees.length === 0 && (
+                    <p className='text-center text-sm text-muted-foreground py-4'>
+                      {employees.length === 0
+                        ? "No active employees found"
+                        : "No employees match your search"}
+                    </p>
                   )}
                 </div>
               </ScrollArea>
             )}
 
+            {/* <div className='mt-2 text-xs text-muted-foreground'>
+              {selectedEmployees.length} of {employees.length} employees
+              selected
+            </div> */}
             <div className='mt-2 text-xs text-muted-foreground'>
               {selectedEmployees.length} of {employees.length} employees
               selected
+              {searchTerm && (
+                <span> (showing {filteredEmployees.length} matches)</span>
+              )}
             </div>
           </div>
         }
@@ -288,6 +391,25 @@ export default function CalculateAttendancePage({
                       {calculationResults.summary.totalUnauthorizedAbsences}
                     </span>
                   </div>
+                  {/* NEW: Sandwich Days Card */}
+                  <div className='flex flex-col gap-1 rounded-lg border p-3'>
+                    <span className='text-sm text-muted-foreground'>
+                      Sandwich Days
+                    </span>
+                    <span className='text-2xl font-bold text-purple-500'>
+                      {calculationResults.summary.totalSandwichDays}
+                    </span>
+                  </div>
+
+                  {/* NEW: Sandwich Deductions Card */}
+                  <div className='flex flex-col gap-1 rounded-lg border p-3'>
+                    <span className='text-sm text-muted-foreground'>
+                      Sandwich Deductions
+                    </span>
+                    <span className='text-2xl font-bold text-purple-500'>
+                      {calculationResults.summary.totalSandwichDeductions}
+                    </span>
+                  </div>
                   <div className='flex flex-col gap-1 rounded-lg border p-3'>
                     <span className='text-sm text-muted-foreground'>
                       Late Arrivals
@@ -310,6 +432,33 @@ export default function CalculateAttendancePage({
                     </span>
                     <span className='text-2xl font-bold text-red-500'>
                       {calculationResults.summary.totalLeavesDeducted}
+                    </span>
+                  </div>
+                  {/* Add these new cards for half leave deductions */}
+                  <div className='flex flex-col gap-1 rounded-lg border p-3'>
+                    <span className='text-sm text-muted-foreground'>
+                      Half Leaves (Late)
+                    </span>
+                    <span className='text-2xl font-bold text-amber-500'>
+                      {calculationResults.summary.totalHalfLeaveDeductionsLate}
+                    </span>
+                  </div>
+
+                  <div className='flex flex-col gap-1 rounded-lg border p-3'>
+                    <span className='text-sm text-muted-foreground'>
+                      Half Leaves (Early)
+                    </span>
+                    <span className='text-2xl font-bold text-amber-500'>
+                      {calculationResults.summary.totalHalfLeaveDeductionsEarly}
+                    </span>
+                  </div>
+
+                  <div className='flex flex-col gap-1 rounded-lg border p-3'>
+                    <span className='text-sm text-muted-foreground'>
+                      Total Half Leaves
+                    </span>
+                    <span className='text-2xl font-bold text-red-500'>
+                      {calculationResults.summary.totalHalfLeaveDeductions}
                     </span>
                   </div>
                 </div>
@@ -341,6 +490,60 @@ export default function CalculateAttendancePage({
                               </Badge>
                             ))}
                           </div>
+                        </div>
+                      )}
+
+                      {/* In the employee details section */}
+                      {(result.unauthorizedHalfLeaveDatesLate.length > 0 ||
+                        result.unauthorizedHalfLeaveDatesEarly.length > 0) && (
+                        <div className='mt-4'>
+                          <h4 className='font-medium mb-2'>
+                            Unauthorized Half Leaves Deducted
+                          </h4>
+
+                          {result.unauthorizedHalfLeaveDatesLate.length > 0 && (
+                            <div className='mb-3'>
+                              <p className='text-sm text-muted-foreground mb-1'>
+                                For Late Arrivals (
+                                {result.unauthorizedHalfLeaveDatesLate.length}):
+                              </p>
+                              <div className='flex flex-wrap gap-2'>
+                                {result.unauthorizedHalfLeaveDatesLate.map(
+                                  (date) => (
+                                    <Badge
+                                      key={`late-${date}`}
+                                      variant='destructive'
+                                    >
+                                      {date}
+                                    </Badge>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {result.unauthorizedHalfLeaveDatesEarly.length >
+                            0 && (
+                            <div>
+                              <p className='text-sm text-muted-foreground mb-1'>
+                                For Early Exits (
+                                {result.unauthorizedHalfLeaveDatesEarly.length}
+                                ):
+                              </p>
+                              <div className='flex flex-wrap gap-2'>
+                                {result.unauthorizedHalfLeaveDatesEarly.map(
+                                  (date) => (
+                                    <Badge
+                                      key={`early-${date}`}
+                                      variant='destructive'
+                                    >
+                                      {date}
+                                    </Badge>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
 
