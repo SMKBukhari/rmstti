@@ -935,6 +935,8 @@ type AttendanceCalculationResult = {
   totalHalfLeaveDeductions: number; // Total half leaves deducted
   unauthorizedHalfLeaveDatesLate: string[]; // Dates with unauthorized half leaves for late arrivals
   unauthorizedHalfLeaveDatesEarly: string[]; // Dates with unauthorized half leaves for early exits
+  creditedLeaves: string[]; // NEW: Dates where leaves were credited back
+  creditedLeaveCount: number; // NEW: Total leaves credited back
 };
 
 function parseDate(date: Date | string | null): Date | null {
@@ -1138,7 +1140,7 @@ function detectSandwichDays(
     if (dayDiff <= 1 || dayDiff > 3) continue;
 
     // Check each day between the two leaves
-    let checkDate = new Date(currentLeave);
+    const checkDate = new Date(currentLeave);
     checkDate.setDate(checkDate.getDate() + 1);
 
     while (checkDate < nextLeave) {
@@ -1443,6 +1445,9 @@ export async function POST(
       const lateArrivals: string[] = [];
       const earlyExits: string[] = [];
 
+      const creditedLeaves: string[] = [];
+      let creditedLeaveCount = 0;
+
       // // NEW: Sandwich leave detection
       // const sandwichDays: string[] = [];
       // let consecutiveLeaves: string[] = [];
@@ -1477,8 +1482,23 @@ export async function POST(
           continue;
         }
 
+        // // Check if it's an approved leave
+        // const isApprovedLeave = employee.leaveRequests.some(
+        //   (leave) =>
+        //     leave.status === "Approved" &&
+        //     isDateInRange(
+        //       currentDate,
+        //       new Date(leave.startDate),
+        //       new Date(leave.endDate)
+        //     )
+        // );
+
+        // if (isApprovedLeave) {
+        //   continue;
+        // }
+
         // Check if it's an approved leave
-        const isApprovedLeave = employee.leaveRequests.some(
+        const approvedLeaves = employee.leaveRequests.filter(
           (leave) =>
             leave.status === "Approved" &&
             isDateInRange(
@@ -1488,7 +1508,41 @@ export async function POST(
             )
         );
 
-        if (isApprovedLeave) {
+        // Check attendance records for this date
+        const dayAttendanceRecords = employeeAttendanceMap.get(dateStr) || [];
+
+        if (approvedLeaves.length > 0 && dayAttendanceRecords.length > 0) {
+          // Credit back leave
+          creditedLeaves.push(dateStr);
+          creditedLeaveCount += approvedLeaves.length;
+          console.log(
+            `Leave credited back for ${employee.fullName} on ${dateStr} because attendance was found. Total leaves credited back: ${creditedLeaveCount} (${approvedLeaves.length} leaves)`
+          );
+          // Commented out database update for leave credit
+          /*
+          // For each approved leave that covers this date
+          for (const leave of approvedLeaves) {
+          // Credit back the leave
+          dbUpdates.push(
+             db.userProfile.update({
+              where: { userId: employee.userId },
+              data: {
+                totalLeavesBalance: (parseFloat(employee.totalLeavesBalance || "0") + approvedLeaves.length).toString()
+              }
+             })
+          )
+             // Add leave balance adjustment record
+             dbUpdates.push(
+              db.leaveBalanceAdjustment.create({
+                data: {
+                  userId: employee.userId,
+                   entitledLeaves: "1",
+                  reason: `Leave credited back for ${dateStr} as employee attended work`,
+                  date: new Date(),
+                }
+              })
+          }
+          */
           continue;
         }
 
@@ -1512,9 +1566,6 @@ export async function POST(
           );
           continue;
         }
-
-        // Check attendance records for this date
-        const dayAttendanceRecords = employeeAttendanceMap.get(dateStr) || [];
 
         if (dayAttendanceRecords.length === 0) {
           // No attendance record found - unauthorized absence
@@ -1817,6 +1868,8 @@ export async function POST(
           halfLeaveDeductionsLate + halfLeaveDeductionsEarly,
         unauthorizedHalfLeaveDatesLate,
         unauthorizedHalfLeaveDatesEarly,
+        creditedLeaves,
+        creditedLeaveCount,
       });
 
       // NEW: Log the total deductions for this employee
@@ -1875,6 +1928,14 @@ export async function POST(
       ),
       totalHalfLeaveDeductions: calculationResults.reduce(
         (sum, result) => sum + result.totalHalfLeaveDeductions,
+        0
+      ),
+      totalCreditedLeaves: calculationResults.reduce(
+        (sum, result) => sum + result.creditedLeaves.length,
+        0
+      ),
+      totalCreditedLeaveCount: calculationResults.reduce(
+        (sum, result) => sum + result.creditedLeaveCount,
         0
       ),
     };

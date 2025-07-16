@@ -56,8 +56,7 @@ interface CalculationResult {
   totalHalfLeaveDeductions: number;
   unauthorizedHalfLeaveDatesLate: string[]; // NEW
   unauthorizedHalfLeaveDatesEarly: string[]; // NEW
-  creditedLeaves: number;
-  creditedLeaveDates: string[];
+  creditedLeaves: string[];
 }
 
 interface CalculationSummary {
@@ -389,6 +388,15 @@ export default function CalculateAttendancePage({
 
                   <div className='flex flex-col gap-1 rounded-lg border p-3'>
                     <span className='text-sm text-muted-foreground'>
+                      Total Credited Leaves
+                    </span>
+                    <span className='text-2xl font-bold text-green-500'>
+                      {calculationResults.summary.totalCreditedLeaves}
+                    </span>
+                  </div>
+
+                  <div className='flex flex-col gap-1 rounded-lg border p-3'>
+                    <span className='text-sm text-muted-foreground'>
                       Unauthorized Absences
                     </span>
                     <span className='text-2xl font-bold text-red-500'>
@@ -486,6 +494,20 @@ export default function CalculateAttendancePage({
                   </CardHeader>
                   <CardContent>
                     <div className='space-y-4'>
+                      {result.creditedLeaves.length > 0 && (
+                        <div>
+                          <h4 className='font-medium mb-2'>
+                            Credited Leaves ({result.creditedLeaves.length})
+                          </h4>
+                          <div className='flex flex-wrap gap-2'>
+                            {result.creditedLeaves.map((date) => (
+                              <Badge key={date} variant='outline'>
+                                {date}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       {result.unauthorizedAbsences.length > 0 && (
                         <div>
                           <h4 className='font-medium mb-2'>
