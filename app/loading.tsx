@@ -1,11 +1,14 @@
-import { Loader2 } from "lucide-react";
+import Loading from "@/components/global/Loading";
 
-function Loading() {
+function LoadingMain() {
   return (
-    <div className='flex justify-center items-center w-full h-[100vh]' suppressHydrationWarning>
-      <Loader2 size={64} className="animate-spin" />
+    <div
+      className='flex justify-center items-center w-full h-[100vh]'
+      suppressHydrationWarning
+    >
+      <Loading />
     </div>
   );
 }
 
-export default Loading;
+export default LoadingMain;
