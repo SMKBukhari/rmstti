@@ -37,7 +37,10 @@ const SidebarRouteItem = ({
     >
       <div className='flex items-center gap-x-2 py-4'>
         <Icon
-          className={cn("dark:text-neutral-400 text-neutral-500", isActive && "text-[#ffff] dark:text-[#ffff]")}
+          className={cn(
+            "dark:text-neutral-400 text-neutral-500",
+            isActive && "text-[#ffff] dark:text-[#ffff]"
+          )}
           size={22}
         />
         {label}

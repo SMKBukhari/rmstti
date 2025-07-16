@@ -28,7 +28,7 @@ const Sidebar = async () => {
         <SidebarRoutes user={user} />
       </div>
 
-      <div className="absolute bottom-5 left-5">
+      <div className='absolute bottom-5 left-5'>
         <ThemeToggle />
       </div>
     </div>

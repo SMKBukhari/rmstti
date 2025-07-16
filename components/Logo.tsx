@@ -25,7 +25,7 @@ const Logo = () => {
 
     // Add event listener for window resize
     window.addEventListener("resize", handleResize);
-    
+
     // Cleanup event listener on component unmount
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -40,9 +40,19 @@ const Logo = () => {
   return (
     <div>
       {resolvedTheme === "dark" ? (
-        <Image src={"/img/logo_dark.png"} alt="The Truth International Logo Dark" width={logoSize.width} height={logoSize.height} />
+        <Image
+          src={"/img/logo_dark.png"}
+          alt='The Truth International Logo Dark'
+          width={logoSize.width}
+          height={logoSize.height}
+        />
       ) : (
-        <Image src={"/img/logo_light.png"} alt="The Truth International Logo Light" width={logoSize.width} height={logoSize.height} />
+        <Image
+          src={"/img/logo_light.png"}
+          alt='The Truth International Logo Light'
+          width={logoSize.width}
+          height={logoSize.height}
+        />
       )}
     </div>
   );

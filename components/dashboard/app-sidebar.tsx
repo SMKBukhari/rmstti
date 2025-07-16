@@ -104,8 +104,8 @@ export default function AppSidebar({ user }: AppSidebarProps) {
   return (
     <Sidebar collapsible='icon'>
       <SidebarHeader>
-        <div className='flex gap-2 py-2 text-sidebar-accent-foreground'>
-          <div className='flex aspect-square size-8 items-center relative justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground'>
+        <div className='flex gap-2 py-2'>
+          <div className='flex aspect-square size-8 items-center relative justify-center rounded-lg bg-sidebar-primary text-foreground'>
             <Image
               src={company.logo}
               alt={company.name}
@@ -113,8 +113,10 @@ export default function AppSidebar({ user }: AppSidebarProps) {
               height={10}
             />
           </div>
-          <div className='grid flex-1 text-left text-sm leading-tight'>
-            <span className='truncate font-semibold'>{company.name}</span>
+          <div className='grid flex-1 text-left text-sm leading-tight text-foreground'>
+            <span className='truncate font-semibold text-foreground'>
+              {company.name}
+            </span>
             <span className='truncate text-xs'>{company.designation}</span>
           </div>
         </div>

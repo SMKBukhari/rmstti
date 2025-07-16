@@ -55,7 +55,7 @@ const ComboBox = ({ options, value, onChange, heading }: ComboBoxProps) => {
       </PopoverTrigger>
       <PopoverContent className='w-full p-0 md:min-w-96'>
         <Command>
-          <div className='w-full px-2 py-2 flex items-center border rounded-md'>
+          <div className='w-full px-2 py-2 flex items-center border border-border rounded-md'>
             <Search className='mr-2 h-4 w-4 min-w-4' />
             <input
               type='text'
