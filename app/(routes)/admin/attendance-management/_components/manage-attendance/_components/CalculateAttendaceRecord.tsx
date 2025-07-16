@@ -56,6 +56,8 @@ interface CalculationResult {
   totalHalfLeaveDeductions: number;
   unauthorizedHalfLeaveDatesLate: string[]; // NEW
   unauthorizedHalfLeaveDatesEarly: string[]; // NEW
+  creditedLeaves: number;
+  creditedLeaveDates: string[];
 }
 
 interface CalculationSummary {
@@ -70,6 +72,7 @@ interface CalculationSummary {
   totalHalfLeaveDeductionsLate: number;
   totalHalfLeaveDeductionsEarly: number;
   totalHalfLeaveDeductions: number;
+  totalCreditedLeaves: number;
 }
 
 export default function CalculateAttendancePage({
@@ -191,13 +194,13 @@ export default function CalculateAttendancePage({
     );
   };
 
-  const toggleAllEmployees = () => {
-    if (selectedEmployees.length === employees.length) {
-      setSelectedEmployees([]);
-    } else {
-      setSelectedEmployees(employees.map((emp) => emp.userId));
-    }
-  };
+  // const toggleAllEmployees = () => {
+  //   if (selectedEmployees.length === employees.length) {
+  //     setSelectedEmployees([]);
+  //   } else {
+  //     setSelectedEmployees(employees.map((emp) => emp.userId));
+  //   }
+  // };
 
   return (
     <>
@@ -383,6 +386,7 @@ export default function CalculateAttendancePage({
                       {calculationResults.summary.totalDaysChecked}
                     </span>
                   </div>
+
                   <div className='flex flex-col gap-1 rounded-lg border p-3'>
                     <span className='text-sm text-muted-foreground'>
                       Unauthorized Absences
@@ -391,6 +395,7 @@ export default function CalculateAttendancePage({
                       {calculationResults.summary.totalUnauthorizedAbsences}
                     </span>
                   </div>
+                  
                   {/* NEW: Sandwich Days Card */}
                   <div className='flex flex-col gap-1 rounded-lg border p-3'>
                     <span className='text-sm text-muted-foreground'>
@@ -410,6 +415,7 @@ export default function CalculateAttendancePage({
                       {calculationResults.summary.totalSandwichDeductions}
                     </span>
                   </div>
+
                   <div className='flex flex-col gap-1 rounded-lg border p-3'>
                     <span className='text-sm text-muted-foreground'>
                       Late Arrivals
@@ -418,6 +424,7 @@ export default function CalculateAttendancePage({
                       {calculationResults.summary.totalLateArrivals}
                     </span>
                   </div>
+
                   <div className='flex flex-col gap-1 rounded-lg border p-3'>
                     <span className='text-sm text-muted-foreground'>
                       Early Exits
@@ -426,6 +433,7 @@ export default function CalculateAttendancePage({
                       {calculationResults.summary.totalEarlyExits}
                     </span>
                   </div>
+
                   <div className='flex flex-col gap-1 rounded-lg border p-3'>
                     <span className='text-sm text-muted-foreground'>
                       Leaves Deducted
@@ -434,6 +442,7 @@ export default function CalculateAttendancePage({
                       {calculationResults.summary.totalLeavesDeducted}
                     </span>
                   </div>
+
                   {/* Add these new cards for half leave deductions */}
                   <div className='flex flex-col gap-1 rounded-lg border p-3'>
                     <span className='text-sm text-muted-foreground'>
@@ -543,6 +552,32 @@ export default function CalculateAttendancePage({
                                 )}
                               </div>
                             </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* In the employee details section */}
+                      {result.sandwichDays.length > 0 && (
+                        <div className='mt-4'>
+                          <h4 className='font-medium mb-2'>
+                            Sandwich Days ({result.sandwichDays.length})
+                          </h4>
+                          <div className='flex flex-wrap gap-2'>
+                            {result.sandwichDays.map((date) => (
+                              <Badge
+                                key={`sandwich-${date}`}
+                                variant='outline'
+                                className='bg-purple-100 text-purple-800 hover:bg-purple-200'
+                              >
+                                {date}
+                              </Badge>
+                            ))}
+                          </div>
+                          {result.sandwichDeductions > 0 && (
+                            <p className='text-sm text-muted-foreground mt-2'>
+                              {result.sandwichDeductions} additional leave(s)
+                              deducted for sandwich pattern
+                            </p>
                           )}
                         </div>
                       )}

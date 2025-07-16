@@ -1095,6 +1095,83 @@ function getDayAttendanceSummary(records: AttendanceRecord[]) {
   };
 }
 
+function detectSandwichDays(
+  employee: Employee,
+  dateRange: string[],
+  timetableMap: Map<string, Map<string, TimetableEntry>>,
+  holidayMap: Map<string, Set<string>>,
+  unauthorizedAbsences: string[],
+  unauthorizedHalfLeaves: string[]
+): string[] {
+  const sandwichDays: string[] = [];
+
+  // 1. Combine ALL leave dates (approved + unauthorized)
+  const allLeaveDates = new Set<string>([
+    ...unauthorizedAbsences,
+    ...unauthorizedHalfLeaves,
+    ...employee.leaveRequests
+      .filter((leave) => leave.status === "Approved")
+      .flatMap((leave) => {
+        const dates = [];
+        const start = new Date(leave.startDate);
+        const end = new Date(leave.endDate);
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          dates.push(formatDate(d));
+        }
+        return dates;
+      }),
+  ]);
+
+  // 2. Sort dates chronologically
+  const sortedLeaveDates = Array.from(allLeaveDates).sort(
+    (a, b) => new Date(a).getTime() - new Date(b).getTime()
+  );
+
+  // 3. Find sandwich patterns between consecutive leave dates
+  for (let i = 0; i < sortedLeaveDates.length - 1; i++) {
+    const currentLeave = new Date(sortedLeaveDates[i]);
+    const nextLeave = new Date(sortedLeaveDates[i + 1]);
+
+    // Only check sequences where leaves are separated by 1-3 days
+    const dayDiff =
+      (nextLeave.getTime() - currentLeave.getTime()) / (1000 * 60 * 60 * 24);
+    if (dayDiff <= 1 || dayDiff > 3) continue;
+
+    // Check each day between the two leaves
+    let checkDate = new Date(currentLeave);
+    checkDate.setDate(checkDate.getDate() + 1);
+
+    while (checkDate < nextLeave) {
+      const checkDateStr = formatDate(checkDate);
+
+      // Verify it's truly an off day
+      const isHoliday = holidayMap.get(employee.userId)?.has(checkDateStr);
+      const timetableEntry = timetableMap
+        .get(employee.userId)
+        ?.get(checkDateStr);
+      const isScheduledOff = timetableEntry?.shiftType === ShiftType.Off;
+      const isWeekend = !timetableEntry && [0, 6].includes(checkDate.getDay());
+
+      if (
+        (isHoliday || isScheduledOff || isWeekend) &&
+        !allLeaveDates.has(checkDateStr) &&
+        !sandwichDays.includes(checkDateStr)
+      ) {
+        sandwichDays.push(checkDateStr);
+        console.log(
+          `✅ Sandwich day detected: ${checkDateStr} between ${
+            sortedLeaveDates[i]
+          } and ${sortedLeaveDates[i + 1]}`
+        );
+      }
+
+      checkDate.setDate(checkDate.getDate() + 1);
+    }
+  }
+
+  return sandwichDays;
+}
+
 export async function POST(
   req: NextRequest,
   { params }: { params: { userId: string } }
@@ -1366,9 +1443,9 @@ export async function POST(
       const lateArrivals: string[] = [];
       const earlyExits: string[] = [];
 
-      // NEW: Sandwich leave detection
-      const sandwichDays: string[] = [];
-      let consecutiveLeaves: string[] = [];
+      // // NEW: Sandwich leave detection
+      // const sandwichDays: string[] = [];
+      // let consecutiveLeaves: string[] = [];
 
       let halfLeaveDeductionsLate = 0;
       let halfLeaveDeductionsEarly = 0;
@@ -1476,91 +1553,15 @@ export async function POST(
           continue;
         }
 
-        const isLeaveDay = employee.leaveRequests.some(
-          (leave) =>
-            leave.status === "Approved" &&
-            isDateInRange(
-              new Date(dateStr),
-              new Date(leave.startDate),
-              new Date(leave.endDate)
-            )
-        );
-
-        const isOffDay =
-          employeeHolidaySet.has(dateStr) ||
-          employeeTimetableMap.get(dateStr)?.shiftType === ShiftType.Off ||
-          (!employeeTimetableMap.get(dateStr) &&
-            [0, 6].includes(new Date(dateStr).getDay()));
-
-        if (isLeaveDay) {
-          consecutiveLeaves.push(dateStr);
-        } else if (consecutiveLeaves.length > 0) {
-          // End of leave sequence, check for sandwich pattern
-          if (consecutiveLeaves.length >= 2) {
-            const firstLeave = new Date(consecutiveLeaves[0]);
-            const lastLeave = new Date(
-              consecutiveLeaves[consecutiveLeaves.length - 1]
-            );
-
-            console.log(
-              `    Processing sandwich days for employee ${
-                employee.fullName
-              } from ${formatDate(firstLeave)} to ${formatDate(lastLeave)}`
-            );
-
-            // Find off days between first and last leave
-            const currentDate = new Date(firstLeave);
-            currentDate.setDate(currentDate.getDate() + 1);
-
-            while (currentDate < lastLeave) {
-              const currentDateStr = formatDate(currentDate);
-
-              if (
-                isOffDay &&
-                !sandwichDays.includes(currentDateStr) &&
-                !consecutiveLeaves.includes(currentDateStr)
-              ) {
-                sandwichDays.push(currentDateStr);
-              }
-
-              currentDate.setDate(currentDate.getDate() + 1);
-
-              console.log(
-                `    Found sandwich day: ${currentDateStr} for employee ${employee.fullName}`
-              );
-            }
-          }
-          consecutiveLeaves = []; // Reset after processing
-        }
-
-        // Reset if we end with leaves
-        if (consecutiveLeaves.length >= 2) {
-          const firstLeave = new Date(consecutiveLeaves[0]);
-          const lastLeave = new Date(
-            consecutiveLeaves[consecutiveLeaves.length - 1]
-          );
-
-          const currentDate = new Date(firstLeave);
-          currentDate.setDate(currentDate.getDate() + 1);
-
-          while (currentDate < lastLeave) {
-            const currentDateStr = formatDate(currentDate);
-
-            if (
-              employeeHolidaySet.has(currentDateStr) ||
-              employeeTimetableMap.get(currentDateStr)?.shiftType ===
-                ShiftType.Off ||
-              (!employeeTimetableMap.get(currentDateStr) &&
-                [0, 6].includes(currentDate.getDay()))
-            ) {
-              if (!sandwichDays.includes(currentDateStr)) {
-                sandwichDays.push(currentDateStr);
-              }
-            }
-
-            currentDate.setDate(currentDate.getDate() + 1);
-          }
-        }
+        // const isLeaveDay = employee.leaveRequests.some(
+        //   (leave) =>
+        //     leave.status === "Approved" &&
+        //     isDateInRange(
+        //       new Date(dateStr),
+        //       new Date(leave.startDate),
+        //       new Date(leave.endDate)
+        //     )
+        // );
 
         // Get the summary of the day (earliest check-in, latest check-out)
         const daySummary = getDayAttendanceSummary(dayAttendanceRecords);
@@ -1786,6 +1787,15 @@ export async function POST(
         }
       }
       */
+
+      const sandwichDays = detectSandwichDays(
+        employee,
+        dateRange,
+        timetableMap,
+        holidayMap,
+        unauthorizedAbsences,
+        [...unauthorizedHalfLeaveDatesLate, ...unauthorizedHalfLeaveDatesEarly] // Combine half-leaves
+      );
 
       // Add to calculation results
       calculationResults.push({
