@@ -224,8 +224,8 @@ const MeetingList: React.FC<MeetingListProps> = ({
                         </div>
                         <div className='flex items-center gap-2'>
                           <Clock className='w-4 h-4' />
-                          {format(meeting.startDateTime, "HH:mm")} -{" "}
-                          {format(meeting.endDateTime, "HH:mm")}
+                          {format(meeting.startDateTime, "HH:mm a")} -{" "}
+                          {format(meeting.endDateTime, "HH:mm a")}
                         </div>
                         <div className='flex items-center gap-2'>
                           <Users className='w-4 h-4' />

@@ -753,8 +753,8 @@ const MeetingDetailDialog: React.FC<MeetingDetailDialogProps> = ({
                     <Clock className='w-4 h-4 text-gray-500' />
                     <span className='font-medium'>Time:</span>
                     <span>
-                      {format(new Date(meeting.startDateTime), "HH:mm")} -{" "}
-                      {format(new Date(meeting.endDateTime), "HH:mm")}
+                      {format(new Date(meeting.startDateTime), "HH:mm a")} -{" "}
+                      {format(new Date(meeting.endDateTime), "HH:mm a")}
                     </span>
                   </div>
                   <div className='flex items-center gap-2'>
