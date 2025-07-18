@@ -31,6 +31,7 @@ import {
   Users,
 } from "lucide-react";
 import { FaFileContract } from "react-icons/fa";
+import { FaPeopleLine } from "react-icons/fa6";
 
 export const GenderOptions = [
   { label: "Male", value: "Male" },
@@ -354,6 +355,11 @@ export const adminRoutes = [
     href: "/admin/contract-management",
   },
   {
+    icon: FaPeopleLine,
+    label: "Meetings",
+    href: "/admin/meetings",
+  },
+  {
     icon: User,
     label: "Profile",
     href: "/profile",
@@ -416,6 +422,11 @@ export const employeeRoutes = [
     icon: NotebookPen,
     label: "Appraisals",
     href: "/employee/appraisals",
+  },
+  {
+    icon: FaPeopleLine,
+    label: "Meetings",
+    href: "/employee/meetings",
   },
   {
     icon: User,
@@ -490,6 +501,11 @@ export const managerRoutes = [
     icon: NotebookPen,
     label: "Appraisals",
     href: "/manager/appraisals",
+  },
+  {
+    icon: FaPeopleLine,
+    label: "Meetings",
+    href: "/manager/meetings",
   },
   {
     icon: User,
@@ -574,6 +590,16 @@ export const ceoRoutes = [
     icon: Mailbox,
     label: "Complaints",
     href: "/ceo/complaints",
+  },
+  {
+    icon: FaFileContract,
+    label: "Contract Management",
+    href: "/ceo/contract-management",
+  },
+  {
+    icon: FaPeopleLine,
+    label: "Meetings",
+    href: "/ceo/meetings",
   },
   {
     icon: User,

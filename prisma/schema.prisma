@@ -79,6 +79,62 @@ enum ContractRenewalStatus {
 }
 
 // =============================================
+// MEETING ENUMS
+// =============================================
+
+enum MeetingType {
+  Virtual
+  Physical
+}
+
+enum MeetingStatus {
+  Scheduled
+  InProgress
+  Completed
+  Cancelled
+}
+
+enum MeetingPriority {
+  Low
+  Medium
+  High
+  Urgent
+}
+
+enum RecurringType {
+  Daily
+  Weekly
+  Monthly
+  Yearly
+}
+
+enum VisibilityType {
+  CC // Participants can see each other
+  BCC // Participants cannot see each other
+}
+
+enum ParticipantRole {
+  Organizer
+  CoOrganizer
+  Attendee
+  Optional
+}
+
+enum ResponseStatus {
+  Pending
+  Accepted
+  Declined
+}
+
+enum NoteType {
+  General
+  ActionItem
+  Decision
+  KeyPoint
+  Question
+}
+
+// =============================================
 // USER MANAGEMENT MODELS
 // =============================================
 
@@ -195,6 +251,12 @@ model UserProfile {
   leaveBalanceAdjustment LeaveBalanceAdjustment[]
   Appraisal              Appraisal[]
   ContractRenewals       ContractRenewal[]
+
+  // Meeting relations
+  organizedMeetings   Meeting[]            @relation("MeetingOrganizer")
+  meetingParticipants MeetingParticipant[] @relation("MeetingParticipants")
+  meetingNotes        MeetingNote[]        @relation("MeetingNotes")
+  meetingApprovals    MeetingApproval[]    @relation("MeetingApprovals")
 
   // Timestamps
   createdAt DateTime @default(now())
@@ -791,4 +853,116 @@ model ContractRenewal {
   // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+}
+
+// =============================================
+// MEETING MANAGEMENT MODELS
+// =============================================
+
+model Meeting {
+  id          String  @id @unique @default(cuid())
+  title       String
+  description String? @db.LongText
+
+  // Meeting scheduling
+  startDateTime   DateTime
+  endDateTime     DateTime
+  timezone        String      @default("UTC")
+  venue           String? // Physical location or meeting link
+  meetingType     MeetingType @default(Physical)
+  actualStartTime DateTime?
+  actualEndTime   DateTime?
+
+  // Meeting status
+  status   MeetingStatus   @default(Scheduled)
+  priority MeetingPriority @default(Medium)
+
+  // Organizer information
+  organizerId String
+  organizer   UserProfile @relation("MeetingOrganizer", fields: [organizerId], references: [userId], onDelete: Cascade)
+
+  // Privacy settings
+  visibilityType VisibilityType @default(CC) // CC or BCC
+
+  // Meeting Minutes (MoM)
+  meetingMinutes          Boolean @default(false)
+  businessFromLastMeeting String? @db.LongText
+  openIssues              String? @db.LongText
+  newBusiness             String? @db.LongText
+  updatesAndAnnouncements String? @db.LongText
+  adjourment              String? @db.LongText
+
+  // Meeting completion
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+
+  // Relations
+  participants MeetingParticipant[]
+  notes        MeetingNote[]
+  approvals    MeetingApproval[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MeetingParticipant {
+  id        String      @id @unique @default(cuid())
+  meetingId String
+  meeting   Meeting     @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  userId    String
+  user      UserProfile @relation("MeetingParticipants", fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Participant role in meeting
+  role ParticipantRole @default(Attendee)
+
+  // Response status
+  responseStatus ResponseStatus @default(Pending)
+  responseAt     DateTime?
+
+  // Permissions
+  canEditNotes Boolean @default(false)
+  canSeeOthers Boolean @default(true) // For BCC functionality
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([meetingId, userId])
+}
+
+model MeetingNote {
+  id        String      @id @unique @default(cuid())
+  meetingId String
+  meeting   Meeting     @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    UserProfile @relation("MeetingNotes", fields: [authorId], references: [userId], onDelete: Cascade)
+
+  // Note content
+  title    String?
+  content  String   @db.LongText // Rich text content from TipTap
+  noteType NoteType @default(General)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MeetingApproval {
+  id        String      @id @unique @default(cuid())
+  meetingId String
+  meeting   Meeting     @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  userId    String
+  user      UserProfile @relation("MeetingApprovals", fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Approval status
+  isApproved Boolean   @default(false)
+  approvedAt DateTime?
+  comments   String?   @db.LongText
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([meetingId, userId])
 }

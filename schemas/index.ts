@@ -425,3 +425,81 @@ export const ContractResponseSchema = z.object({
   response: z.enum(["accept", "reject"]),
   rejectionReason: z.string().optional(),
 });
+
+// Meeting Schemas
+export const meetingFormSchema = z
+  .object({
+    title: z.string().min(1, "Meeting title is required"),
+    description: z.string().optional(),
+    agenda: z.string().optional(),
+    meetingType: z.string().default("General"),
+    venue: z.string().optional(),
+    virtualMeetingUrl: z.string().url().optional().or(z.literal("")),
+    startDateTime: z.date({
+      required_error: "Start date and time is required",
+    }),
+    endDateTime: z.date({
+      required_error: "End date and time is required",
+    }),
+    departmentId: z.string().optional(),
+    priority: z.enum(["Low", "Medium", "High", "Critical"]).default("Medium"),
+    isRecurring: z.boolean().default(false),
+    recurrencePattern: z.string().optional(),
+    recurrenceEnd: z.date().optional(),
+    requiresApproval: z.boolean().default(false),
+    participants: z
+      .array(z.string())
+      .min(1, "At least one participant is required"),
+    ccParticipants: z.array(z.string()).optional(),
+    bccParticipants: z.array(z.string()).optional(),
+  })
+  .refine(
+    (data) => {
+      return data.endDateTime > data.startDateTime;
+    },
+    {
+      message: "End time must be after start time",
+      path: ["endDateTime"],
+    }
+  );
+
+export const meetingResponseSchema = z.object({
+  response: z.enum(["Accepted", "Declined", "Tentative"]),
+  responseNote: z.string().optional(),
+});
+
+export const meetingNoteSchema = z.object({
+  content: z.string().min(1, "Note content is required"),
+  noteType: z
+    .enum(["General", "Action", "Decision", "Issue"])
+    .default("General"),
+  isPrivate: z.boolean().default(false),
+});
+
+export const meetingFileSchema = z.object({
+  fileName: z.string().min(1, "File name is required"),
+  fileUrl: z.string().url("Invalid file URL"),
+  fileType: z.string().min(1, "File type is required"),
+  fileSize: z.number().optional(),
+  description: z.string().optional(),
+});
+
+export const meetingUpdateSchema = z.object({
+  title: z.string().min(1, "Meeting title is required").optional(),
+  description: z.string().optional(),
+  agenda: z.string().optional(),
+  venue: z.string().optional(),
+  virtualMeetingUrl: z.string().url().optional().or(z.literal("")),
+  startDateTime: z.date().optional(),
+  endDateTime: z.date().optional(),
+  priority: z.enum(["Low", "Medium", "High", "Critical"]).optional(),
+  status: z
+    .enum(["Scheduled", "InProgress", "Completed", "Cancelled"])
+    .optional(),
+});
+
+export type MeetingFormData = z.infer<typeof meetingFormSchema>;
+export type MeetingResponseData = z.infer<typeof meetingResponseSchema>;
+export type MeetingNoteData = z.infer<typeof meetingNoteSchema>;
+export type MeetingFileData = z.infer<typeof meetingFileSchema>;
+export type MeetingUpdateData = z.infer<typeof meetingUpdateSchema>;

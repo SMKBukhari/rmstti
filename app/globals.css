@@ -175,4 +175,49 @@ body {
       top: auto;
     }
   }
+
+  /* globals.css or a dedicated CSS file */
+  .meeting-content h1 {
+    @apply text-2xl font-bold mb-4;
+  }
+
+  .meeting-content h2 {
+    @apply text-xl font-bold mb-3;
+  }
+
+  .meeting-content h3 {
+    @apply text-lg font-bold mb-2;
+  }
+
+  .meeting-content p {
+    @apply mb-4 dark:text-gray-100 !important;
+  }
+
+  .meeting-content p span {
+    @apply mb-4 dark:text-gray-100;
+  }
+
+  .meeting-content ul {
+    @apply list-disc pl-5 mb-4;
+  }
+
+  .meeting-content ol {
+    @apply list-decimal pl-5 mb-4;
+  }
+
+  .meeting-content a {
+    @apply text-blue-600 dark:text-blue-400 underline;
+  }
+
+  .meeting-content blockquote {
+    @apply border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic mb-4;
+  }
+
+  .meeting-content pre {
+    @apply bg-gray-100 dark:bg-gray-800 p-4 rounded overflow-x-auto mb-4;
+  }
+
+  .meeting-content code {
+    @apply bg-gray-100 dark:bg-gray-800 px-1 rounded text-sm;
+  }
 }

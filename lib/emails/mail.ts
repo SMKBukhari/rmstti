@@ -8,6 +8,11 @@ import { InterviewScheduledMail } from "./designs/interviewScheduleMail";
 import { ApplicationRejectedMail } from "./designs/rejectJobApplicationMail ";
 import { JobOfferMail } from "./designs/jobOfferMail";
 import { ContractRenewalMail } from "./designs/contractRenewalMail";
+import {
+  MeetingCancelledMail,
+  MeetingInviteMail,
+  MeetingReminderMail,
+} from "./designs/meetingInviteMail";
 
 // const { SMTP_PASSWORD, SMTP_EMAIL } = process.env;
 // export const sendMail = async ({
@@ -236,6 +241,69 @@ export const compileContractRenewalMail = async (
     endDate: endDate,
     portalLink: `${process.env.NEXT_PUBLIC_PORTAL_URL}`,
   });
+
+  return htmlBody;
+};
+
+// Meeting Email Templates
+export const compileMeetingInviteMail = async (data: {
+  participantName: string;
+  meetingTitle: string;
+  organizerName: string;
+  meetingDate: string;
+  meetingTime: string;
+  duration: number;
+  location?: string;
+  meetingLink?: string;
+  meetingType: string;
+  priority: string;
+  description?: string;
+  agenda?: string;
+  acceptLink: string;
+  tentativeLink: string;
+  declineLink: string;
+  responseDeadline: string;
+}) => {
+  const template = handlebars.compile(MeetingInviteMail);
+
+  const priorityClass = data.priority.toLowerCase();
+
+  const htmlBody = template({
+    ...data,
+    priorityClass,
+  });
+
+  return htmlBody;
+};
+
+export const compileMeetingReminderMail = async (data: {
+  participantName: string;
+  meetingTitle: string;
+  organizerName: string;
+  meetingDate: string;
+  meetingTime: string;
+  location?: string;
+  meetingLink?: string;
+  timeUntilMeeting: string;
+}) => {
+  const template = handlebars.compile(MeetingReminderMail);
+
+  const htmlBody = template(data);
+
+  return htmlBody;
+};
+
+export const compileMeetingCancelledMail = async (data: {
+  participantName: string;
+  meetingTitle: string;
+  organizerName: string;
+  meetingDate: string;
+  meetingTime: string;
+  cancellationReason?: string;
+}) => {
+  const template = handlebars.compile(MeetingCancelledMail);
+
+  const htmlBody = template(data);
 
   return htmlBody;
 };
