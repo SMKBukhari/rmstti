@@ -41,7 +41,6 @@ interface Meeting {
   priority: "Low" | "Medium" | "High" | "Urgent";
   location?: string;
   notes: Array<{ id: string; content: string }>;
-  files: Array<{ id: string; fileName: string }>;
   approvals: Array<{ isApproved: boolean }>;
 }
 
@@ -63,6 +62,12 @@ interface Department {
   employeeCount: number;
 }
 
+interface PreviousMeeting {
+  id: string;
+  title: string;
+  startDateTime: string;
+}
+
 const AdminMeetingsPage = () => {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -77,6 +82,9 @@ const AdminMeetingsPage = () => {
   const [showMeetingDetail, setShowMeetingDetail] = useState(false);
   const [currentUserId, setCurrentUserId] = useState("");
   const [userRole, setUserRole] = useState("");
+  const [previousMeetings, setPreviousMeetings] = useState<PreviousMeeting[]>(
+    []
+  );
 
   const loadInitialData = useCallback(async () => {
     try {
@@ -118,6 +126,13 @@ const AdminMeetingsPage = () => {
       const response = await fetch("/api/meetings");
       if (response.ok) {
         const data = await response.json();
+        setPreviousMeetings(
+          data.meetings.map((meeting: Meeting) => ({
+            id: meeting.id,
+            title: meeting.title,
+            startDateTime: meeting.startDateTime,
+          }))
+        );
         const formattedMeetings = data.meetings.map((meeting: Meeting) => ({
           ...meeting,
           startDateTime: new Date(meeting.startDateTime),
@@ -261,6 +276,7 @@ const AdminMeetingsPage = () => {
           currentUserId={currentUserId}
           userRole={userRole}
           onMeetingCreated={handleMeetingCreated}
+          previousMeetings={previousMeetings}
         />
       </div>
 

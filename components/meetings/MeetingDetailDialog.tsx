@@ -676,21 +676,15 @@ const MeetingDetailDialog: React.FC<MeetingDetailDialogProps> = ({
               </CardHeader>
               <CardContent>
                 <div className='space-y-4'>
-                  {meeting.approvals.some(
-                    (approval) =>
-                      approval.user.userId === currentUserId &&
-                      !approval.isApproved
-                  ) && (
-                    <div className='flex items-center gap-2'>
-                      <Button
-                        onClick={() => handleApproveMeeting(true)}
-                        className='flex items-center gap-2'
-                      >
-                        <ThumbsUp className='w-4 h-4' />
-                        Approve
-                      </Button>
-                    </div>
-                  )}
+                  <div className='flex items-center gap-2'>
+                    <Button
+                      onClick={() => handleApproveMeeting(true)}
+                      className='flex items-center gap-2'
+                    >
+                      <ThumbsUp className='w-4 h-4' />
+                      Approve
+                    </Button>
+                  </div>
 
                   {meeting.approvals.length > 0 && (
                     <div className='space-y-2'>
@@ -753,8 +747,8 @@ const MeetingDetailDialog: React.FC<MeetingDetailDialogProps> = ({
                     <Clock className='w-4 h-4 text-gray-500' />
                     <span className='font-medium'>Time:</span>
                     <span>
-                      {format(new Date(meeting.startDateTime), "HH:mm a")} -{" "}
-                      {format(new Date(meeting.endDateTime), "HH:mm a")}
+                      {format(new Date(meeting.startDateTime), "hh:mm a")} -{" "}
+                      {format(new Date(meeting.endDateTime), "hh:mm a")}
                     </span>
                   </div>
                   <div className='flex items-center gap-2'>

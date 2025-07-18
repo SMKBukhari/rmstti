@@ -144,27 +144,17 @@ const CreateMeetingModal: React.FC<CreateMeetingModalProps> = ({
 
   // Filter employees based on user role
   const availableEmployees = employees.filter((emp) => {
-    if (userRole === "CEO" || userRole === "Admin") {
+    if (userRole === "CEO" || userRole === "Admin" || userRole === "Manager") {
       return emp.userId !== currentUserId;
-    } else if (userRole === "Manager") {
-      const currentUser = employees.find((e) => e.userId === currentUserId);
-      return (
-        emp.department?.id === currentUser?.department?.id &&
-        emp.userId !== currentUserId
-      );
     }
     return false;
   });
 
   // Filter departments based on user role
-  const availableDepartments = departments.filter((dept) => {
-    if (userRole === "CEO" || userRole === "Admin") {
+  const availableDepartments = departments.filter(() => {
+    if (userRole === "CEO" || userRole === "Admin" || userRole === "Manager") {
       return true;
-    } else if (userRole === "Manager") {
-      const currentUser = employees.find((e) => e.userId === currentUserId);
-      return dept.id === currentUser?.department?.id;
     }
-    return false;
   });
 
   // Filter employees based on search term
