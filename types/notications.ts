@@ -51,3 +51,10 @@ export interface NotificationCardProps {
   onMarkAsRead: (id: string) => void;
   isRead: boolean;
 }
+
+const notificationTypes: NotificationType[] = [
+  "General",
+  "Task",
+  "Event",
+  "Announcement",
+];
