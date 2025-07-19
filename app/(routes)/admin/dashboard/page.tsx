@@ -91,7 +91,20 @@ const page = async () => {
   const employees = users.filter(
     (user) => user.isHired === true && user.status?.name === "Active"
   );
-  const applicants = users.filter((user) => user.role?.name === "Applicant");
+  // const applicants = users.filter((user) => user.role?.name === "Applicant");
+
+  const applicationStatus = await db.applicationStatus.findFirst({
+    where: { name: "Applied" },
+  });
+  const applicants = await db.jobApplications.findMany({
+    where: {
+      applicationStatusId: applicationStatus?.id,
+    },
+    include: {
+      user: true,
+      job: true,
+    },
+  });
 
   const leaveRequests = await db.leaveRequest.findMany({
     where: {

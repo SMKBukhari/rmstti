@@ -88,11 +88,29 @@ const page = async () => {
       emp.status?.name === "Active" &&
       emp.department?.name === user.department?.name
   );
-  const applicants = users.filter(
-    (user) =>
-      user.role?.name === "Applicant" &&
-      user.department?.name === user.department?.name
-  );
+  // const applicants = users.filter(
+  //   (user) =>
+  //     user.role?.name === "Applicant" &&
+  //     user.department?.name === user.department?.name
+  // );
+
+  const applicationStatus = await db.applicationStatus.findFirst({
+    where: { name: "Applied" },
+  });
+  const applicants = await db.jobApplications.findMany({
+    where: {
+      applicationStatusId: applicationStatus?.id,
+      user: {
+        department: {
+          name: user.department?.name,
+        },
+      },
+    },
+    include: {
+      user: true,
+      job: true,
+    },
+  });
 
   // Get the employees and applicants from the previous month
   const previousMonthEmployees = await db.userProfile.findMany({

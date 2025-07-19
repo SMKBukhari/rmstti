@@ -60,9 +60,22 @@ const page = async () => {
   const employees = users.filter(
     (user) => user.isHired === true && user.status?.name === "Active"
   );
-  const applicants = users.filter(
-    (user) => user.role?.name === "Applicant" && user.isHired === false
-  );
+  // const applicants = users.filter(
+  //   (user) => user.role?.name === "Applicant" && user.isHired === false
+  // );
+
+  const applicationStatus = await db.applicationStatus.findFirst({
+    where: { name: "Applied" },
+  });
+  const applicants = await db.jobApplications.findMany({
+    where: {
+      applicationStatusId: applicationStatus?.id,
+    },
+    include: {
+      user: true,
+      job: true,
+    },
+  });
 
   const leaveRequests = await db.leaveRequest.findMany({
     where: {
@@ -121,35 +134,47 @@ const page = async () => {
   });
 
   // Get the applicants from the previous month
-  const previousMonthApplicants = await db.userProfile.findMany({
+  const previousMonthApplicants = await db.jobApplications.findMany({
     where: {
-      role: {
-        name: "Applicant",
-      },
+      applicationStatusId: applicationStatus?.id,
       createdAt: {
         gte: previousMonthStart,
         lte: previousMonthEnd,
       },
+    },
+    include: {
+      user: true,
+      job: true,
     },
   });
 
   // Calculate the percentage change in the number of employees
   const currentCountEmployees = employees.length;
   const previousCountEmployees = previousMonthEmployees.length;
-  const percentageChange = previousCountEmployees
-    ? ((currentCountEmployees - previousCountEmployees) /
+  // Improved percentage calculation
+  let percentageChange = 0;
+  if (previousCountEmployees > 0) {
+    percentageChange =
+      ((currentCountEmployees - previousCountEmployees) /
         previousCountEmployees) *
-      100
-    : 0;
+      100;
+  } else if (currentCountEmployees > 0) {
+    percentageChange = 100; // Infinite% increase from 0
+  }
 
   // Calculate the percentage change in the number of applicants
   const currentCountApplicants = applicants.length;
   const previousCountApplicants = previousMonthApplicants.length;
-  const percentageChangeApplicants = previousCountApplicants
-    ? ((currentCountApplicants - previousCountApplicants) /
+  // Improved percentage calculation
+  let percentageChangeApplicants = 0;
+  if (previousCountApplicants > 0) {
+    percentageChangeApplicants =
+      ((currentCountApplicants - previousCountApplicants) /
         previousCountApplicants) *
-      100
-    : 0;
+      100;
+  } else if (currentCountApplicants > 0) {
+    percentageChangeApplicants = 100; // Infinite% increase from 0
+  }
   return (
     <>
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
