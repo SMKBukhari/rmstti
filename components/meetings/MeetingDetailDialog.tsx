@@ -53,6 +53,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import axios from "axios";
+import { MeetingPDF } from "@/lib/pdf/MeetingPdf";
 
 interface MeetingDetailDialogProps {
   meetingId: string | null;
@@ -81,6 +82,7 @@ interface Meeting {
   participants: Array<{
     userId: string;
     responseStatus: "Pending" | "Accepted" | "Declined" | "Tentative";
+    role: "Organizer" | "CoOrganizer" | "Attendee" | "Optional";
     user: {
       userId: string;
       fullName: string;
@@ -376,31 +378,38 @@ const MeetingDetailDialog: React.FC<MeetingDetailDialogProps> = ({
     }
   };
 
-  const downloadMeetingPDF = async () => {
-    if (!meetingId) return;
+  const downloadMeetingPDF = async (meeting: Meeting | null) => {
+    if (!meetingId || !meeting) return;
 
     setIsDownloadingPDF(true);
     try {
-      const response = await fetch(`/api/meetings/${meetingId}/pdf`);
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `meeting-${meeting?.title}-${format(
-          new Date(),
-          "yyyy-MM-dd"
-        )}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
+      // Create a BlobProvider to generate the PDF
+      const { pdf } = await import("@react-pdf/renderer");
+      const blob = await pdf(
+        <MeetingPDF meeting={meeting} userRole={userRole} />
+      ).toBlob();
+
+      // Create download link
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `meeting-${meeting.title}-${format(
+        new Date(),
+        "yyyy-MM-dd"
+      )}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+
+      // Clean up
+      setTimeout(() => {
         document.body.removeChild(a);
-        toast.success("PDF downloaded successfully!");
-      } else {
-        toast.error("Failed to download PDF");
-      }
+        URL.revokeObjectURL(url);
+      }, 100);
+
+      toast.success("PDF downloaded successfully!");
     } catch (error) {
       toast.error("Error downloading PDF" + error);
+      console.error("PDF generation error:", error);
     } finally {
       setIsDownloadingPDF(false);
     }
@@ -468,19 +477,6 @@ const MeetingDetailDialog: React.FC<MeetingDetailDialogProps> = ({
       userRole === "CEO" ||
       userRole === "Admin");
 
-  const canSeeApprovalWorkflow =
-    meeting &&
-    (meeting.organizer.userId === currentUserId ||
-      userRole === "CEO" ||
-      userRole === "Admin" ||
-      meeting.approvals.some(
-        (approval) =>
-          approval.user.userId === currentUserId && approval.isApproved
-      ));
-
-  // const approvedCount =
-  //   meeting?.approvals.filter((a) => a.isApproved).length || 0;
-
   if (loading) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -547,7 +543,7 @@ const MeetingDetailDialog: React.FC<MeetingDetailDialogProps> = ({
               <Button
                 size='sm'
                 variant='outline'
-                onClick={downloadMeetingPDF}
+                onClick={() => downloadMeetingPDF(meeting)}
                 disabled={isDownloadingPDF}
                 className='flex items-center gap-2 bg-transparent'
               >

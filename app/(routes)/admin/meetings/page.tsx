@@ -19,6 +19,7 @@ import CreateMeetingModal from "@/components/meetings/CreateMeetingModal";
 import MeetingDetailDialog from "@/components/meetings/MeetingDetailDialog";
 import { toast } from "sonner";
 import Loading from "@/components/global/Loading";
+import { motion } from "framer-motion";
 
 interface Meeting {
   id: string;
@@ -257,7 +258,12 @@ const AdminMeetingsPage = () => {
   }
 
   return (
-    <div className='space-y-6'>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className='space-y-6'
+    >
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div>
@@ -382,7 +388,7 @@ const AdminMeetingsPage = () => {
         </CardContent>
       </Card>
 
-      {/* Meeting Detail Dialog */}
+      Meeting Detail Dialog
       <MeetingDetailDialog
         meetingId={selectedMeetingId}
         open={showMeetingDetail}
@@ -390,7 +396,7 @@ const AdminMeetingsPage = () => {
         currentUserId={currentUserId}
         userRole={userRole}
       />
-    </div>
+    </motion.div>
   );
 };
 

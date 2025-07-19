@@ -370,7 +370,7 @@ const MeetingList: React.FC<MeetingListProps> = ({
                                       (a) => a.isApproved
                                     ).length
                                   }
-                                  /{meeting.approvals.length}
+                                  /{meeting.participants.length}
                                 </span>
                               </div>
                               <span className='text-xs text-purple-600'>
