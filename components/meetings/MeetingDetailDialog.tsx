@@ -53,7 +53,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import axios from "axios";
-// import { MeetingPDF } from "@/lib/pdf/MeetingPdf";
+import { MeetingPDF } from "@/lib/pdf/MeetingPdf";
 
 interface MeetingDetailDialogProps {
   meetingId: string | null;
@@ -383,28 +383,28 @@ const MeetingDetailDialog: React.FC<MeetingDetailDialogProps> = ({
 
     setIsDownloadingPDF(true);
     try {
-      // // Create a BlobProvider to generate the PDF
-      // const { pdf } = await import("@react-pdf/renderer");
-      // const blob = await pdf(
-      //   <MeetingPDF meeting={meeting} userRole={userRole} />
-      // ).toBlob();
+      // Create a BlobProvider to generate the PDF
+      const { pdf } = await import("@react-pdf/renderer");
+      const blob = await pdf(
+        <MeetingPDF meeting={meeting} userRole={userRole} />
+      ).toBlob();
 
-      // // Create download link
-      // const url = URL.createObjectURL(blob);
-      // const a = document.createElement("a");
-      // a.href = url;
-      // a.download = `meeting-${meeting.title}-${format(
-      //   new Date(),
-      //   "yyyy-MM-dd"
-      // )}.pdf`;
-      // document.body.appendChild(a);
-      // a.click();
+      // Create download link
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `meeting-${meeting.title}-${format(
+        new Date(),
+        "yyyy-MM-dd"
+      )}.pdf`;
+      document.body.appendChild(a);
+      a.click();
 
-      // // Clean up
-      // setTimeout(() => {
-      //   document.body.removeChild(a);
-      //   URL.revokeObjectURL(url);
-      // }, 100);
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
 
       toast.success("PDF downloaded successfully!");
     } catch (error) {
